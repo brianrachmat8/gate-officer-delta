@@ -1,0 +1,308 @@
+/* ==========================================================================
+   Surat Keterangan Container Rusak (SKCR) & Surat Edaran Pelayaran
+   Dedicated Print Stylesheet - Strictly 1-Sheet A4 Guaranteed
+   ========================================================================== */
+
+@page {
+  size: A4 portrait;
+  margin: 5mm 8mm;
+}
+
+@media print {
+  html, body {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: hidden !important;
+  }
+
+  body > * {
+    display: none !important;
+  }
+
+  body > #skcrPrintModal,
+  body > #noticePrintModal {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: 275mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    overflow: hidden !important;
+  }
+
+  #skcrPrintModal *, #noticePrintModal * {
+    visibility: visible !important;
+  }
+
+  #skcrPrintModal .modal-container,
+  #noticePrintModal .modal-container {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    overflow: hidden !important;
+  }
+
+  .modal-header, .modal-footer, .no-print, .app-header, .app-nav, .app-footer {
+    display: none !important;
+  }
+
+  .modal-body {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    overflow: hidden !important;
+  }
+
+  .skcr-certificate-document, .notice-official-document {
+    width: 100% !important;
+    max-width: 190mm !important;
+    margin: 0 auto !important;
+    padding: 2mm 4mm !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: 'Times New Roman', Times, serif, Arial !important;
+    page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Screen Document Layout for Certificate & Notice Preview */
+.skcr-certificate-document, .notice-official-document {
+  background: #ffffff;
+  color: #111827;
+  padding: 1.5rem 1.75rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-main);
+  border: 1px solid var(--border-color);
+  font-family: 'Times New Roman', Times, serif, Arial, sans-serif;
+  line-height: 1.25;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Letterhead Layout */
+.skcr-header-letterhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px double #000;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.skcr-letterhead-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.skcr-company-logo {
+  max-height: 48px;
+  max-width: 85px;
+  object-fit: contain;
+}
+
+.skcr-company-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #000;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+}
+
+.skcr-company-sub {
+  font-size: 0.7rem;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  color: #1f2937;
+  margin-top: 1px;
+}
+
+.skcr-company-address, .skcr-company-contact {
+  font-size: 0.68rem;
+  font-family: Arial, sans-serif;
+  color: #374151;
+  line-height: 1.15;
+}
+
+.skcr-letterhead-right {
+  text-align: right;
+  font-size: 0.72rem;
+  font-family: Arial, sans-serif;
+  color: #374151;
+  line-height: 1.25;
+}
+
+.skcr-official-title {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.skcr-official-title h2 {
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-decoration: underline;
+  margin-bottom: 1px;
+}
+
+.skcr-official-title .doc-num {
+  font-size: 0.8rem;
+  font-family: Arial, sans-serif;
+  color: #374151;
+}
+
+.skcr-statement-text {
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  text-align: justify;
+}
+
+.skcr-field-table {
+  width: 100%;
+  margin-bottom: 6px;
+  font-size: 0.84rem;
+  border-collapse: collapse;
+}
+
+.skcr-field-table td {
+  padding: 1px 0;
+  vertical-align: top;
+}
+
+.skcr-field-label {
+  width: 105px;
+  font-weight: bold;
+}
+
+.skcr-field-colon {
+  width: 12px;
+  text-align: center;
+}
+
+/* Compact Multi-Column Container Grid Layout (Side-by-Side Tables) */
+.skcr-multi-col-wrapper {
+  display: flex;
+  gap: 6px;
+  margin: 6px 0;
+  width: 100%;
+}
+
+.skcr-compact-table-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.skcr-container-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+  font-size: 0.68rem;
+}
+
+.skcr-container-table th, .skcr-container-table td {
+  border: 1px solid #000;
+  padding: 2px 4px;
+  text-align: left;
+  line-height: 1.1;
+}
+
+.skcr-container-table th {
+  background: #e5e7eb;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  text-align: center;
+}
+
+.skcr-closing-statement {
+  font-size: 0.82rem;
+  margin-top: 6px;
+  margin-bottom: 8px;
+  text-align: justify;
+  line-height: 1.25;
+}
+
+/* Stamp & Signature Section */
+.skcr-signature-block {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+  position: relative;
+}
+
+.skcr-sig-right {
+  width: 250px;
+  text-align: center;
+  position: relative;
+}
+
+.skcr-sig-city-date {
+  font-size: 0.82rem;
+  margin-bottom: 1px;
+}
+
+.skcr-sig-company {
+  font-weight: bold;
+  font-size: 0.82rem;
+  margin-bottom: 1px;
+}
+
+.skcr-stamp-signature-wrapper {
+  position: relative;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skcr-signature-img {
+  max-height: 58px;
+  max-width: 130px;
+  z-index: 2;
+  object-fit: contain;
+}
+
+.skcr-stamp-img {
+  position: absolute;
+  max-height: 65px;
+  max-width: 100px;
+  opacity: 0.85;
+  z-index: 1;
+  transform: rotate(-6deg);
+  object-fit: contain;
+}
+
+.skcr-sig-person-name {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  margin-top: 1px;
+}
+
+.skcr-sig-person-title {
+  font-size: 0.75rem;
+  color: #374151;
+}

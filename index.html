@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GATE OFFICER - DELTA - Informasional Gate & Shipping Line</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- SheetJS for Excel Reading/Parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/print.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="#" class="brand-logo">
+        <div class="brand-icon">
+          <i class="fa-solid fa-boxes-packing"></i>
+        </div>
+        <div>
+          <div class="brand-title">GATE OFFICER - DELTA</div>
+          <div class="brand-subtitle">Terminal & Gate Information System</div>
+        </div>
+      </a>
+
+      <!-- Global Container Quick Search -->
+      <div class="global-search-container">
+        <i class="fa-solid fa-magnifying-glass global-search-icon"></i>
+        <input type="text" id="globalContainerSearch" class="global-search-input" placeholder="Cari No. Kontainer / SKCR / Tarif LOLO / Petugas...">
+      </div>
+
+      <!-- Actions Right -->
+      <div class="header-actions">
+        <div class="clock-badge">
+          <div class="pulse-indicator"></div>
+          <span id="liveClockDisplay">25 Jul 2026 | 12:00 WIB</span>
+        </div>
+
+        <button id="btnOpenSettings" class="btn btn-secondary btn-sm" style="border-radius: 20px;" title="Pengaturan Logo, Stempel & Running Text">
+          <i class="fa-solid fa-gear"></i> Setting Logo & Running Text
+        </button>
+
+        <button id="themeToggleBtn" class="theme-toggle-btn" title="Ganti Tema Gelap / Soft Cream">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Custom Running Text Marquee Bar -->
+  <div class="marquee-banner" id="marqueeBanner">
+    <div class="marquee-tag"><i class="fa-solid fa-bullhorn"></i> PENGINGAT GATE</div>
+    <div class="marquee-content">
+      <div class="marquee-text-scroll" id="marqueeTextDisplay">
+        ⚠️ PENGINGAT GATE: Pastikan Cek Seal HAPAG & Remake Foto Floor SINOKOR Tujuan Hochiminh! | Wajib Cek Exception List Pelayaran ONE untuk Early Pick-Up. | Seal RCL Free Apabila Ada Email Konfirmasi.
+      </div>
+    </div>
+    <button class="marquee-toggle-btn" id="btnToggleMarquee" title="Sembunyikan / Tampilkan Running Text">
+      <i class="fa-solid fa-eye-slash"></i>
+    </button>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <nav class="app-nav">
+    <div class="nav-container">
+      <button class="nav-tab active" data-tab="skcr">
+        <i class="fa-solid fa-file-contract"></i> Surat Container Rusak (SKCR)
+        <span class="tab-badge" id="skcrCountBadge">4</span>
+      </button>
+      <button class="nav-tab" data-tab="roster">
+        <i class="fa-solid fa-table-cells"></i> Jadwal Shift Gate (Matriks Excel)
+      </button>
+      <button class="nav-tab" data-tab="info">
+        <i class="fa-solid fa-calendar-days"></i> Info & Peraturan Pelayaran
+        <span class="tab-badge" id="infoCountBadge">8</span>
+      </button>
+      <button class="nav-tab" data-tab="lolo">
+        <i class="fa-solid fa-truck-ramp-box"></i> Tarif Lift On & Lift Off (Excel)
+      </button>
+      <button class="nav-tab" data-tab="handover">
+        <i class="fa-solid fa-clipboard-check"></i> Catatan Serah Terima Shift
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content Body -->
+  <main class="app-main">
+
+    <!-- KPI Summary Bar -->
+    <section class="grid-4" style="margin-bottom: 2rem;">
+      <div class="kpi-card">
+        <div class="kpi-icon blue"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiTotalSKCR">4</div>
+          <div class="kpi-label">Laporan SKCR Terbit</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon purple"><i class="fa-solid fa-user-gear"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiGateDuty">10</div>
+          <div class="kpi-label">Petugas Gate Terdaftar</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon warning"><i class="fa-solid fa-bullhorn"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiActiveNotices">8</div>
+          <div class="kpi-label">Edaran Operasional Active</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon danger"><i class="fa-solid fa-receipt"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiTotalLOLORates">18</div>
+          <div class="kpi-label">Daftar Tarif LOLO Aktif</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 1: SURAT KETERANGAN CONTAINER RUSAK (SKCR) -->
+    <section id="tab-skcr" class="tab-content active">
+      <div class="grid-skcr-layout">
+        
+        <!-- Left: Form Input SKCR Multi-Container -->
+        <div class="glass-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa-solid fa-pen-to-square"></i> Input Surat Keterangan Rusak</h3>
+            <span class="badge badge-info" id="containerCountBadge">0 / 100 Container</span>
+          </div>
+
+          <form id="formCreateSKCR">
+            <!-- Copy Paste Multi-Container Textarea -->
+            <div class="form-group">
+              <label class="form-label">Copy-Paste Nomor Kontainer (Hingga 100 Container) *</label>
+              <textarea class="form-control" id="skcrContainerRawText" rows="4" placeholder="Paste nomor kontainer di sini (dipisahkan baris baru / koma / spasi)&#10;Contoh:&#10;SNKO8923410&#10;ONEU4421098&#10;HLCU9812304" required></textarea>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem;">
+                <i class="fa-solid fa-circle-info"></i> Bisa copy-paste kolom nomor kontainer dari Excel langsung hingga 100 kontainer sekaligus.
+              </div>
+            </div>
+
+            <div class="grid-2" style="gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label">Shipping Line / Pelayaran *</label>
+                <select class="form-select" id="skcrShippingLine" required>
+                  <option value="">-- Pilih Shipping Line --</option>
+                  <option value="HYUNDAI">HYUNDAI</option>
+                  <option value="HAPAG">HAPAG</option>
+                  <option value="SINOKOR">SINOKOR</option>
+                  <option value="HEUNG-A">HEUNG-A</option>
+                  <option value="RCL">RCL</option>
+                  <option value="WAN-HAI">WAN-HAI</option>
+                  <option value="SITC">SITC</option>
+                  <option value="STAR SHIPPING">STAR SHIPPING</option>
+                  <option value="ONE">ONE</option>
+                  <option value="ZIMLINE">ZIMLINE</option>
+                  <option value="HMM">HMM</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Tipe & Ukuran *</label>
+                <select class="form-select" id="skcrSizeType" required>
+                  <option value="40ft High Cube (40HC)">40ft High Cube (40HC)</option>
+                  <option value="20ft General Purpose (20GP)">20ft General Purpose (20GP)</option>
+                  <option value="40ft Reefer Container (40RF)">40ft Reefer Container (40RF)</option>
+                  <option value="20ft Open Top (20OT)">20ft Open Top (20OT)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-2" style="gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label">Nama Kapal & Voyage *</label>
+                <input type="text" class="form-control" id="skcrVesselVoyage" placeholder="Contoh: INTERASIA ENGAGE V. N037" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Consignee / Pemilik *</label>
+                <input type="text" class="form-control" id="skcrConsignee" placeholder="Contoh: PT STAR SHIPPING INDONESIA" required>
+              </div>
+            </div>
+
+            <div class="grid-2" style="gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label">Nama User Gate *</label>
+                <input type="text" class="form-control" id="skcrUserNameGate" value="RIDWAN ALAMSYAH" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Perusahaan *</label>
+                <input type="text" class="form-control" id="skcrCompanyName" value="PT DELTA KONTAINER DEPOT" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Jabatan *</label>
+              <input type="text" class="form-control" id="skcrUserTitle" value="Gate Operasional" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+              <i class="fa-solid fa-file-circle-plus"></i> Terbitkan Surat Keterangan SKCR
+            </button>
+          </form>
+        </div>
+
+        <!-- Right: Log Table of Issued SKCR -->
+        <div class="glass-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa-solid fa-list-check"></i> Log Surat Keterangan Container Rusak</h3>
+            <div style="display: flex; gap: 0.5rem;">
+              <select class="form-select" id="filterSKCRLine" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                <option value="">Semua Shipping Line</option>
+                <option value="HYUNDAI">HYUNDAI</option>
+                <option value="HAPAG">HAPAG</option>
+                <option value="SINOKOR">SINOKOR</option>
+                <option value="HEUNG-A">HEUNG-A</option>
+                <option value="RCL">RCL</option>
+                <option value="WAN-HAI">WAN-HAI</option>
+                <option value="SITC">SITC</option>
+                <option value="STAR SHIPPING">STAR SHIPPING</option>
+                <option value="ONE">ONE</option>
+              </select>
+              <button class="btn btn-secondary btn-sm" id="btnExportSKCRExcel" title="Export Excel">
+                <i class="fa-solid fa-file-excel"></i> Export
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table" id="tableSKCR">
+              <thead>
+                <tr>
+                  <th>No. SKCR</th>
+                  <th>Tanggal</th>
+                  <th>Jumlah / Container Utama</th>
+                  <th>Nama Kapal</th>
+                  <th>Consignee</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tbodySKCR">
+                <!-- Dynamically Populated by app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: JADWAL ANGGOTA GATE & UPLOAD EXCEL (ALL 5 BLOCKS UP TO 26 JULY) -->
+    <section id="tab-roster" class="tab-content">
+      <div class="glass-card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa-solid fa-file-excel"></i> Upload File Excel Shift Matriks (.xlsx / .csv)</h3>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-success btn-sm" id="btnDownloadExcelTemplate">
+              <i class="fa-solid fa-download"></i> Download Template Excel Matriks
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btnResetSavedRoster" style="color: var(--status-danger);" title="Reset File Excel Upload Ke Default">
+              <i class="fa-solid fa-rotate-left"></i> Reset Ke Default
+            </button>
+          </div>
+        </div>
+
+        <!-- Excel Drag & Drop Upload Zone -->
+        <div class="excel-upload-zone" id="dropZoneExcel">
+          <input type="file" id="fileInputExcel" accept=".xlsx, .xls, .csv" style="display: none;">
+          <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+          <div class="upload-title">Tarik & Lepas File Excel Jadwal (Format Multi-Blok Vertikal) di sini</div>
+          <div class="upload-subtitle">💾 File Excel yang di-upload akan <strong>TERSISIP PERMANEN</strong> di memori browser dan tidak hilang saat di-refresh!</div>
+        </div>
+      </div>
+
+      <!-- Live Roster Excel Matrix Schedule Table View -->
+      <div class="glass-card">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa-solid fa-table-cells"></i> Matriks Shift Gate Utuh (09 Maret s/d 26 Juli 2026)</h3>
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <!-- Filter Blok Bulan -->
+            <select class="form-select" id="filterRosterMonth" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.8rem; font-weight: bold; color: var(--accent-blue);">
+              <option value="">🗓️ Semua Tanggal (Mar s/d 26 Jul)</option>
+              <option value="Mar">Maret 2026</option>
+              <option value="Apr">April 2026</option>
+              <option value="May">Mei 2026</option>
+              <option value="Jun">Juni 2026</option>
+              <option value="Jul">Juli 2026 (s/d 26 Jul)</option>
+            </select>
+
+            <!-- Filter per Anggota Gate -->
+            <select class="form-select" id="filterRosterStaff" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.8rem;">
+              <option value="">-- Semua Anggota Gate --</option>
+              <!-- Dynamically Populated -->
+            </select>
+
+            <!-- Filter Kode Shift -->
+            <select class="form-select" id="filterRosterShift" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.8rem;">
+              <option value="">Semua Shift</option>
+              <option value="P-">Pagi (P-IN / P-OUT / P-ACC DO)</option>
+              <option value="S-">Sore (S-IN / S-OUT / S-ACC DO)</option>
+              <option value="M-">Malam (M-IN / M-OUT)</option>
+              <option value="OT">Overtime (OT)</option>
+              <option value="OFF">OFF (Libur)</option>
+            </select>
+
+            <button class="btn btn-secondary btn-sm" id="btnResetRosterFilter">Reset Filter</button>
+          </div>
+        </div>
+
+        <!-- Modern Excel Matrix Grid Table Container -->
+        <div class="matrix-table-wrapper" id="rosterMatrixContainer">
+          <table class="matrix-schedule-table" id="tableMatrixSchedule">
+            <thead id="theadMatrixSchedule">
+              <!-- Dynamically Generated Date Columns -->
+            </thead>
+            <tbody id="tbodyMatrixSchedule">
+              <!-- Dynamically Generated Staff Rows & Shift Pills -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Official Keterangan Shift & Catatan Operasional DKD -->
+        <div class="roster-legend-box" style="margin-top: 1.5rem; background: var(--bg-input); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: 12px;">
+          <h4 style="font-size: 0.95rem; margin-bottom: 0.85rem; color: var(--text-main);"><i class="fa-solid fa-book-open" style="color: var(--accent-blue);"></i> Keterangan Kode Shift & Catatan Operasional Depot Management DKD</h4>
+          
+          <div class="grid-2" style="gap: 1.5rem;">
+            <div>
+              <h5 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">KODE SHIFT KERJA (EXCEL LEGEND):</h5>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.8rem; margin-bottom: 0.85rem;">
+                <span class="shift-pill shift-pill-yellow">P : SHIFT 1</span>
+                <span class="shift-pill shift-pill-blue">S : SHIFT 2</span>
+                <span class="shift-pill shift-pill-grey">M : SHIFT 3</span>
+                <span class="shift-pill shift-pill-red">OT : OVERTIME</span>
+              </div>
+
+              <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">
+                <strong>Deskripsi Kode Sub-Tugas:</strong><br>
+                • <code>P-IN</code> / <code>S-IN</code> / <code>M-IN</code> : Inbound Heavy Duty Gate<br>
+                • <code>P-OUT</code> / <code>S-OUT</code> / <code>M-OUT</code> : Outbound Empty Gate<br>
+                • <code>P-ACC DO</code> / <code>S-ACC DO</code> : Acceptance DO & Release Duty
+              </div>
+            </div>
+
+            <div>
+              <h5 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">CATATAN & ATURAN OPERASIONAL DEPOT:</h5>
+              <ol style="font-size: 0.8rem; line-height: 1.55; padding-left: 1.2rem; color: var(--text-muted);">
+                <li>Untuk kegiatan jam operasional depot ditentukan oleh Management DKD.</li>
+                <li>Jika kegiatan operasional padat dimohon setiap personil bersedia untuk lembur.</li>
+                <li>Segala kegiatan operasional mohon dijalankan dengan sebaik-baiknya, penuh tanggung jawab dan kerja sama TEAM.</li>
+                <li>Personil wajib menempati posisi sesuai dengan jadwal yang sudah ditentukan.</li>
+                <li>Personil yang telah ditentukan Over Time wajib hadir melaksanakan tugasnya.</li>
+                <li>Jika personil berhalangan hadir/absen mohon diinfokan segera sebelum kegiatan operasional berjalan.</li>
+              </ol>
+            </div>
+          </div>
+
+          <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-color); font-size: 0.78rem; color: var(--text-muted); display: flex; justify-content: space-between; flex-wrap: wrap;">
+            <div><strong>Mengetahui / Menyetujui:</strong> Dady (Kord. Gate) | Yulfikar (Manager OPS)</div>
+            <div><strong>Personil Team:</strong> Arip | Bayu | Brian | Agus | Irfan | Ridwan | Syahrul | Agum | Nurhikmah | Indra</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 3: INFORMASI & PERATURAN OPERASIONAL PER PELAYARAN -->
+    <section id="tab-info" class="tab-content">
+      <div class="grid-skcr-layout">
+        
+        <!-- Left: Filters & Form Add Rule -->
+        <div class="glass-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa-solid fa-filter"></i> Filter Informasi & Pelayaran</h3>
+          </div>
+
+          <!-- Tipe Layanan Sub-Tabs (Ekspor vs Impor) -->
+          <div class="form-group">
+            <label class="form-label">Tipe Layanan Operations *</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-primary btn-sm service-type-btn active" id="btnNoticeTypeEkspor" data-type="EKSPOR" style="flex: 1;">
+                <i class="fa-solid fa-plane-departure"></i> EKSPOR
+              </button>
+              <button class="btn btn-secondary btn-sm service-type-btn" id="btnNoticeTypeImpor" data-type="IMPOR" style="flex: 1;">
+                <i class="fa-solid fa-plane-arrival"></i> IMPOR
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Kategori / Shipping Line</label>
+            <select class="form-select" id="filterNoticeCategory">
+              <option value="">Semua Pelayaran & Kategori</option>
+              <option value="HYUNDAI">HYUNDAI</option>
+              <option value="HAPAG">HAPAG</option>
+              <option value="SINOKOR">SINOKOR</option>
+              <option value="HEUNG-A">HEUNG-A</option>
+              <option value="RCL">RCL</option>
+              <option value="WAN-HAI">WAN-HAI</option>
+              <option value="SITC">SITC</option>
+              <option value="STAR SHIPPING">STAR SHIPPING</option>
+              <option value="ONE">ONE</option>
+              <option value="ZIMLINE">ZIMLINE</option>
+              <option value="Umum / Gate">Umum / Gate Terminal</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tanggal Kalender</label>
+            <input type="date" class="form-control" id="filterNoticeDate">
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-item" style="font-size: 0.82rem;">
+              <input type="checkbox" id="chkShowDisabledNotices">
+              Tampilkan Edaran Yang Dinonaktifkan (Disabled)
+            </label>
+          </div>
+
+          <button class="btn btn-secondary btn-sm" id="btnResetNoticeFilter" style="width: 100%; margin-bottom: 1.5rem;">
+            Reset Filter Informasi
+          </button>
+
+          <div style="padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+            <h4 style="font-size: 0.95rem; margin-bottom: 1rem;"><i class="fa-solid fa-plus-circle" style="color: var(--accent-blue);"></i> Tambah Peraturan Pelayaran Baru</h4>
+
+            <form id="formAddNotice">
+              <div class="form-group">
+                <label class="form-label">Tipe Layanan *</label>
+                <select class="form-select" id="noticeServiceType" required>
+                  <option value="EKSPOR">EKSPOR</option>
+                  <option value="IMPOR">IMPOR</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Judul Peraturan / Edaran *</label>
+                <input type="text" class="form-control" id="noticeTitle" placeholder="Contoh: Prosedur Pengambilan DO Impor / Inspeksi Reefer" required>
+              </div>
+
+              <div class="grid-2" style="gap: 0.75rem;">
+                <div class="form-group">
+                  <label class="form-label">Kategori Pelayaran *</label>
+                  <select class="form-select" id="noticeCategory" required>
+                    <option value="HYUNDAI">HYUNDAI</option>
+                    <option value="HAPAG">HAPAG</option>
+                    <option value="SINOKOR">SINOKOR</option>
+                    <option value="HEUNG-A">HEUNG-A</option>
+                    <option value="RCL">RCL</option>
+                    <option value="WAN-HAI">WAN-HAI</option>
+                    <option value="SITC">SITC</option>
+                    <option value="STAR SHIPPING">STAR SHIPPING</option>
+                    <option value="ONE">ONE</option>
+                    <option value="ZIMLINE">ZIMLINE</option>
+                    <option value="Umum / Gate">Umum / Gate</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Prioritas *</label>
+                  <select class="form-select" id="noticePriority" required>
+                    <option value="Info">Info (Biru)</option>
+                    <option value="Warning">Warning (Kuning)</option>
+                    <option value="Danger">Danger (Merah)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Tanggal Publikasi *</label>
+                <input type="date" class="form-control" id="noticeDate" value="2026-07-25" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Isi Peraturan / Edaran *</label>
+                <textarea class="form-control" id="noticeBody" placeholder="Tuliskan peraturan khusus pelayaran atau instruksi gate..." required></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fa-solid fa-paper-plane"></i> Publikasikan Peraturan
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Right: News Timeline Feed -->
+        <div class="glass-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa-solid fa-bullhorn"></i> Edaran & Peraturan Pelayaran (<span id="noticeTypeTitleHeader">EKSPOR</span>)</h3>
+            <span class="badge badge-info" id="noticeDateDisplayBadge">Semua Pelayaran</span>
+          </div>
+
+          <div class="news-timeline" id="newsTimelineContainer">
+            <!-- Dynamically Populated by app.js -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 4: TARIF LIFT ON & LIFT OFF (LOLO) - FORMAT PER-BLOCK PELAYARAN EXCEL -->
+    <section id="tab-lolo" class="tab-content">
+      
+      <!-- Top Upload Excel Card -->
+      <div class="glass-card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa-solid fa-file-excel"></i> Upload Master Tarif LOLO (.xlsx / .csv)</h3>
+          <button class="btn btn-success btn-sm" id="btnDownloadLOLOExcelTemplate">
+            <i class="fa-solid fa-download"></i> Download Template Format Excel
+          </button>
+        </div>
+
+        <div class="excel-upload-zone" id="dropZoneLOLOExcel">
+          <input type="file" id="fileInputLOLOExcel" accept=".xlsx, .xls, .csv" style="display: none;">
+          <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up" style="color: var(--status-warning);"></i></div>
+          <div class="upload-title">Tarik & Lepas File Excel Tarif LIFT OFF / LIFT ON di sini</div>
+          <div class="upload-subtitle">Sistem otomatis mengenali file LIFT OFF (Per 1 Mei 2026) dan LIFT ON (Per 20 April 2026)!</div>
+        </div>
+      </div>
+
+      <!-- Main Tariff Container Card with Sub-Tabs & Block View -->
+      <div class="glass-card">
+        <div class="card-header" style="flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 class="card-title"><i class="fa-solid fa-table-cells-large"></i> Tarif LOLO Per-Block Pelayaran (Format Sesuai Excel Asli)</h3>
+          </div>
+
+          <!-- Sub-Tab Toggle Buttons for LIFT OFF vs LIFT ON -->
+          <div style="display: flex; gap: 0.5rem; margin-left: auto; flex-wrap: wrap;">
+            <button class="btn btn-primary lolo-subtab-btn active" id="btnLoloTabLiftOff" data-type="LIFTOFF" style="background: #ea580c; border-color: #c2410c;">
+              <i class="fa-solid fa-truck-ramp-box"></i> INFORMASI HARGA LIFT OFF (Per 1 Mei 2026)
+            </button>
+            <button class="btn btn-secondary lolo-subtab-btn" id="btnLoloTabLiftOn" data-type="LIFTON">
+              <i class="fa-solid fa-truck-moving"></i> INFORMASI HARGA LIFT ON (Per 20 April 2026)
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Header Summary Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div style="font-size: 1.15rem; font-family: 'Outfit', sans-serif; font-weight: 800; color: var(--accent-blue);" id="loloActiveTabTitleHeader">
+            TARIF LOLO PER 1 MEI 2026 - INFORMASI HARGA LIFT OFF
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <!-- View Mode Switch (Block Grid vs Table) -->
+            <button class="btn btn-secondary btn-sm" id="btnToggleLoloViewMode" style="border-radius: 20px;">
+              <i class="fa-solid fa-list-check"></i> Switch Ke Tampilan Tabel List
+            </button>
+
+            <select class="form-select" id="filterLOLOLine" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.8rem;">
+              <option value="">Semua Pelayaran</option>
+              <option value="HYUNDAI">HYUNDAI</option>
+              <option value="HAPAG">HAPAG</option>
+              <option value="SINOKOR">SINOKOR</option>
+              <option value="HEUNG-A">HEUNG-A</option>
+              <option value="RCL">RCL</option>
+              <option value="WAN-HAI">WAN-HAI</option>
+              <option value="SITC">SITC</option>
+              <option value="STAR SHIPPING">STAR SHIPPING</option>
+              <option value="ONE">ONE</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- PER-BLOCK SHIPPING LINE CARDS GRID VIEW (MATCHES EXCEL SCREENSHOT LAYOUT 100%) -->
+        <div class="shipping-block-grid" id="loloBlockGridContainer">
+          <!-- Dynamically Generated Colorful Cards for Each Shipping Line by app.js -->
+        </div>
+
+        <!-- OPTIONAL TABLE LIST VIEW (Hidden by default, can be toggled) -->
+        <div class="table-responsive" id="loloTableWrapper" style="display: none;">
+          <table class="data-table" id="tableLOLOTariffs">
+            <thead>
+              <tr>
+                <th>Shipping Line</th>
+                <th>Ukuran / Tipe Container</th>
+                <th id="loloPriceTableHeader">Harga Tarif Lift Off (Rp)</th>
+                <th>Tanggal Berlaku / Keterangan</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyLOLOTariffs">
+              <!-- Dynamically Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Payment Info & Transfer Bank Box (Exact Match to User Excel Image) -->
+        <div style="margin-top: 1.5rem; background: var(--bg-input); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: 12px;">
+          <h4 style="font-size: 0.95rem; margin-bottom: 0.85rem; color: var(--text-main);"><i class="fa-solid fa-credit-card" style="color: var(--accent-blue);"></i> INFORMASI PEMBAYARAN & SYARAT KASIR TERMINAL</h4>
+          
+          <div class="grid-2" style="gap: 1.5rem;">
+            <div>
+              <h5 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">METODE PEMBAYARAN DIKASIR:</h5>
+              <div style="font-size: 0.85rem; font-weight: bold; color: var(--accent-blue); margin-bottom: 0.5rem;">
+                PEMBAYARAN VIA EDC (MANDIRI, BCA) / TRANSFER
+              </div>
+              <ul style="font-size: 0.8rem; line-height: 1.6; padding-left: 1.2rem; color: var(--text-muted);">
+                <li>MOHON CANTUMKAN NOMOR BL PADA SAAT MELAKUKAN TRANSFER</li>
+                <li>WAKTU PEMBAYARAN TRANSFER 06.00 S/D 21.00 WIB (SETELAH JAM 21.00 WIB HANYA MENERIMA PEMBAYARAN VIA EDC)</li>
+                <li>TRANSAKSI TRANSFER DILAKUKAN SAAT DIKASIR UNTUK MENGHINDARI APABILA ADA KENDALA</li>
+                <li>REFUND PEMBAYARAN TRANSFER DIAJUKAN DI LOKET PAJAK (REFUND MAKSIMAL 7 HARI KERJA DARI PENGAJUAN)</li>
+              </ul>
+            </div>
+
+            <div>
+              <h5 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">NOMOR REKENING RESMI:</h5>
+              <div style="background: rgba(0, 210, 255, 0.05); border: 1px dashed var(--border-color-highlight); padding: 0.85rem; border-radius: 8px;">
+                <div style="font-size: 0.8rem; color: var(--text-muted);">BANK MANDIRI</div>
+                <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); letter-spacing: 1px;">120-0011106791</div>
+                <div style="font-size: 0.85rem; font-weight: 600; color: var(--accent-blue);">A.N. PT DELTA KONTAINER DEPOT</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 5: CATATAN SERAH TERIMA SHIFT -->
+    <section id="tab-handover" class="tab-content">
+      <div class="glass-card">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa-solid fa-book-journal-whills"></i> Digital Shift Handover Logbook</h3>
+          <button class="btn btn-primary btn-sm" id="btnOpenHandoverModal">
+            <i class="fa-solid fa-plus"></i> Catat Serah Terima Baru
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Dari Shift -> Ke Shift</th>
+                <th>Supervisor Gate</th>
+                <th>Kondisi Pos & Peralatan</th>
+                <th>Peti Kemas Hold / Pending</th>
+                <th>Catatan Khusus</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyHandover">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL 1: PREVIEW & PRINT SKCR DOCUMENT -->
+  <div class="modal-backdrop" id="skcrPrintModal">
+    <div class="modal-container" style="max-width: 900px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-print"></i> Pratinjau Surat Keterangan Container Rusak</h3>
+        <button class="modal-close" data-close-modal="skcrPrintModal">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBodySKCR">
+        <!-- Rendered by skcr.js -->
+      </div>
+      <div class="modal-footer no-print">
+        <button class="btn btn-secondary" data-close-modal="skcrPrintModal">Tutup</button>
+        <button class="btn btn-primary" onclick="SKCRModule.printCertificate()"><i class="fa-solid fa-print"></i> Cetak / Simpan PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: PRINT OFFICIAL SHIPPING LINE NOTICE PDF -->
+  <div class="modal-backdrop" id="noticePrintModal">
+    <div class="modal-container" style="max-width: 800px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-file-pdf"></i> Cetak PDF Surat Edaran Pelayaran</h3>
+        <button class="modal-close" data-close-modal="noticePrintModal">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBodyNotice">
+        <!-- Rendered by app.js -->
+      </div>
+      <div class="modal-footer no-print">
+        <button class="btn btn-secondary" data-close-modal="noticePrintModal">Tutup</button>
+        <button class="btn btn-primary" onclick="App.printNoticeDocument()"><i class="fa-solid fa-print"></i> Cetak / Simpan PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: MENU SETTING (LOGO, STEMPEL, USER GATE PROFILE & RUNNING TEXT) -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-container" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-sliders"></i> Pengaturan Logo, Stempel & Running Text</h3>
+        <button class="modal-close" data-close-modal="settingsModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="formSettings">
+          <!-- Teks Berjalan Running Text Settings -->
+          <div style="background: rgba(0, 210, 255, 0.05); border: 1px solid var(--border-color-highlight); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+            <h4 style="font-size: 0.9rem; margin-bottom: 0.6rem; color: var(--accent-blue);"><i class="fa-solid fa-bullhorn"></i> Pengaturan Teks Berjalan (Running Text Gate)</h4>
+            
+            <div class="form-group">
+              <label class="checkbox-item" style="font-size: 0.85rem; font-weight: bold;">
+                <input type="checkbox" id="settingMarqueeActive" checked>
+                Aktifkan Teks Berjalan Pengingat Gate
+              </label>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Pesan Teks Berjalan Custom *</label>
+              <textarea class="form-control" id="settingMarqueeText" rows="3" placeholder="Tuliskan pengingat penting gate..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nama User Gate *</label>
+            <input type="text" class="form-control" id="settingUserNameGate" value="RIDWAN ALAMSYAH" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nama Perusahaan / Depot *</label>
+            <input type="text" class="form-control" id="settingCompanyName" value="PT DELTA KONTAINER DEPOT" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Jabatan *</label>
+            <input type="text" class="form-control" id="settingUserTitle" value="Gate Operasional" required>
+          </div>
+
+          <!-- Upload Logo Perusahaan -->
+          <div class="form-group">
+            <label class="form-label">Upload Gambar Logo Perusahaan (.PNG Transparan / .JPG)</label>
+            <input type="file" class="form-control" id="settingLogoFile" accept="image/*">
+            <div id="logoPreviewContainer" style="margin-top: 0.5rem; text-align: center;">
+              <!-- Preview logo img rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Upload Stempel Perusahaan -->
+          <div class="form-group">
+            <label class="form-label">Upload Gambar Stempel Perusahaan (.PNG Transparan / .JPG)</label>
+            <input type="file" class="form-control" id="settingStampFile" accept="image/*">
+            <div id="stampPreviewContainer" style="margin-top: 0.5rem; text-align: center;">
+              <!-- Preview stamp img rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Upload Tanda Tangan Digital -->
+          <div class="form-group">
+            <label class="form-label">Upload Gambar Tanda Tangan Digital (.PNG Transparan / .JPG)</label>
+            <input type="file" class="form-control" id="settingSignatureFile" accept="image/*">
+            <div id="signaturePreviewContainer" style="margin-top: 0.5rem; text-align: center;">
+              <!-- Preview sig img rendered by JS -->
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Seluruh Pengaturan
+          </button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal="settingsModal">Batal / Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: ADD HANDOVER LOG -->
+  <div class="modal-backdrop" id="handoverModal">
+    <div class="modal-container" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-pen-fancy"></i> Tambah Log Serah Terima Shift</h3>
+        <button class="modal-close" data-close-modal="handoverModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="formAddHandover">
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Shift Asal *</label>
+              <select class="form-select" id="hoShiftFrom" required>
+                <option value="Shift 1 (Pagi)">Shift 1 (Pagi)</option>
+                <option value="Shift 2 (Sore)">Shift 2 (Sore)</option>
+                <option value="Shift 3 (Malam)">Shift 3 (Malam)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Shift Tujuan *</label>
+              <select class="form-select" id="hoShiftTo" required>
+                <option value="Shift 2 (Sore)">Shift 2 (Sore)</option>
+                <option value="Shift 3 (Malam)">Shift 3 (Malam)</option>
+                <option value="Shift 1 (Pagi)">Shift 1 (Pagi)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Supervisor Penanggung Jawab *</label>
+            <input type="text" class="form-control" id="hoSupervisor" placeholder="Nama Supervisor" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Kondisi Pos & Alat *</label>
+            <textarea class="form-control" id="hoGateCondition" placeholder="Status timbangan, barrier gate, printer nota..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Kontainer Hold / Bermasalah</label>
+            <textarea class="form-control" id="hoPendingContainers" placeholder="Daftar nomor kontainer yang ditahan di pos..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Catatan Umum Shift Next</label>
+            <textarea class="form-control" id="hoGeneralNotes" placeholder="Pesan penting untuk shift selanjutnya..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Simpan Log Serah Terima</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal="handoverModal">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved.</div>
+      <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript App Entry -->
+  <script src="js/data.js"></script>
+  <script src="js/excel-parser.js"></script>
+  <script src="js/skcr.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
