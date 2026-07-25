@@ -32,8 +32,8 @@ const App = {
     signatureUrl: "",
     marqueeText: "⚠️ PENGINGAT GATE: Pastikan Cek Seal HAPAG & Remake Foto Floor SINOKOR Tujuan Hochiminh! | Wajib Cek Exception List Pelayaran ONE untuk Early Pick-Up. | Seal RCL Free Apabila Ada Email Konfirmasi.",
     marqueeActive: true,
-    supabaseUrl: "",
-    supabaseKey: ""
+    supabaseUrl: "https://seiscumgtgjxaimaaegp.supabase.co",
+    supabaseKey: "sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk"
   },
 
   init: function() {
@@ -291,8 +291,11 @@ const App = {
       document.getElementById('settingMarqueeText').value = App.settings.marqueeText;
       document.getElementById('settingMarqueeActive').checked = App.settings.marqueeActive;
 
-      document.getElementById('settingSupabaseUrl').value = localStorage.getItem('portgate_supabase_url') || "";
-      document.getElementById('settingSupabaseKey').value = localStorage.getItem('portgate_supabase_key') || "";
+      const activeUrl = localStorage.getItem('portgate_supabase_url') || SupabaseDB.url || "https://seiscumgtgjxaimaaegp.supabase.co";
+      const activeKey = localStorage.getItem('portgate_supabase_key') || SupabaseDB.key || "sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk";
+
+      document.getElementById('settingSupabaseUrl').value = activeUrl;
+      document.getElementById('settingSupabaseKey').value = activeKey;
 
       App.renderStampPreviews();
       App.openModal('settingsModal');
