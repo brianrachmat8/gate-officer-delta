@@ -4,8 +4,8 @@
    ========================================================================== */
 
 const SupabaseDB = {
-  // Default Supabase Configuration (Replace with user's credentials or load from settings)
-  url: localStorage.getItem('portgate_supabase_url') || '',
+  // Pre-configured Supabase Project URL
+  url: localStorage.getItem('portgate_supabase_url') || 'https://seiscumgtgjxaimaaegp.supabase.co',
   key: localStorage.getItem('portgate_supabase_key') || '',
   client: null,
   isConfigured: false,
@@ -22,12 +22,12 @@ const SupabaseDB = {
         SupabaseDB.isConfigured = false;
       }
     } else {
-      console.log("ℹ️ Supabase credentials not set yet. Running in offline/localStorage mode.");
+      console.log("ℹ️ Supabase credentials pending key entry.");
     }
   },
 
   setCredentials: function(url, key) {
-    SupabaseDB.url = url.trim();
+    SupabaseDB.url = url.trim() || 'https://seiscumgtgjxaimaaegp.supabase.co';
     SupabaseDB.key = key.trim();
     localStorage.setItem('portgate_supabase_url', SupabaseDB.url);
     localStorage.setItem('portgate_supabase_key', SupabaseDB.key);
