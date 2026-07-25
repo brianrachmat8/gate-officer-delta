@@ -11,9 +11,12 @@ const SupabaseDB = {
   isConfigured: false,
 
   init: function() {
-    if (typeof supabase !== 'undefined' && SupabaseDB.url && SupabaseDB.key) {
+    const activeUrl = SupabaseDB.url || localStorage.getItem('portgate_supabase_url') || 'https://seiscumgtgjxaimaaegp.supabase.co';
+    const activeKey = SupabaseDB.key || localStorage.getItem('portgate_supabase_key') || '';
+
+    if (typeof supabase !== 'undefined' && activeUrl && activeKey) {
       try {
-        SupabaseDB.client = supabase.createClient(SupabaseDB.url, SupabaseDB.key);
+        SupabaseDB.client = supabase.createClient(activeUrl, activeKey);
         SupabaseDB.isConfigured = true;
         console.log("⚡ Supabase Cloud Database Connected Successfully!");
         SupabaseDB.subscribeToRealtimeChanges();
