@@ -1,0 +1,9 @@
+{
+  "name": "gate-officer-delta",
+  "version": "1.0.0",
+  "description": "Terminal & Gate Information System",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
