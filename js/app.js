@@ -1,7 +1,7 @@
 /* ==========================================================================
-   PortGate Logistics Hub - Main Application Controller
+   PortGate / Gate Officer Delta - Main Application Controller
    Handles Settings, Copy-Paste SKCR, Delete SKCR/Notices, LocalStorage Roster Persistence,
-   EKSPOR vs IMPOR Service Type Filter, Per-Block Shipping Line Cards for LOLO, & Soft Cream Theme
+   Supabase Cloud DB Sync, EKSPOR vs IMPOR Service Type Filter, & Per-Block Shipping Line Cards for LOLO
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -21,7 +21,7 @@ const App = {
   activeLOLOFilter: "",
   currentActiveNoticeId: null,
 
-  // Settings State with LocalStorage Persistence
+  // Settings State with LocalStorage & Supabase Credentials
   settings: {
     userNameGate: "RIDWAN ALAMSYAH",
     companyName: "PT DELTA KONTAINER DEPOT",
@@ -30,14 +30,24 @@ const App = {
     stampUrl: "",
     signatureUrl: "",
     marqueeText: "⚠️ PENGINGAT GATE: Pastikan Cek Seal HAPAG & Remake Foto Floor SINOKOR Tujuan Hochiminh! | Wajib Cek Exception List Pelayaran ONE untuk Early Pick-Up. | Seal RCL Free Apabila Ada Email Konfirmasi.",
-    marqueeActive: true
+    marqueeActive: true,
+    supabaseUrl: "",
+    supabaseKey: ""
   },
 
   init: function() {
     App.loadSettings();
+    SupabaseDB.init();
+
     App.loadRosterFromStorage();
     App.loadSKCRFromStorage();
     App.loadNoticesFromStorage();
+    
+    // If Supabase is configured, trigger Cloud sync
+    if (SupabaseDB.isConfigured) {
+      SupabaseDB.syncAllFromCloud();
+    }
+
     App.startClock();
     App.setupThemeToggle();
     App.setupTabNavigation();
@@ -125,6 +135,7 @@ const App = {
         timestamp: Date.now()
       };
       localStorage.setItem('portgate_matrix_roster', JSON.stringify(rosterPayload));
+      SupabaseDB.saveRoster(matrixDatesList, matrixRosterData);
     } catch(e) {
       console.error("Failed to save roster to storage:", e);
     }
@@ -245,6 +256,9 @@ const App = {
       document.getElementById('settingMarqueeText').value = App.settings.marqueeText;
       document.getElementById('settingMarqueeActive').checked = App.settings.marqueeActive;
 
+      document.getElementById('settingSupabaseUrl').value = localStorage.getItem('portgate_supabase_url') || "";
+      document.getElementById('settingSupabaseKey').value = localStorage.getItem('portgate_supabase_key') || "";
+
       App.renderStampPreviews();
       App.openModal('settingsModal');
     });
@@ -298,12 +312,18 @@ const App = {
 
       App.saveSettings(newSettings);
 
+      const spUrl = document.getElementById('settingSupabaseUrl').value.trim();
+      const spKey = document.getElementById('settingSupabaseKey').value.trim();
+      if (spUrl && spKey) {
+        SupabaseDB.setCredentials(spUrl, spKey);
+      }
+
       document.getElementById('skcrUserNameGate').value = App.settings.userNameGate;
       document.getElementById('skcrCompanyName').value = App.settings.companyName;
       document.getElementById('skcrUserTitle').value = App.settings.userTitle;
 
       App.closeModal('settingsModal');
-      alert("Pengaturan profil user gate, logo, stempel & running text berhasil disimpan!");
+      alert("Pengaturan profil user gate, logo, stempel & kredensial Supabase Cloud berhasil disimpan!");
     });
   },
 
@@ -403,6 +423,8 @@ const App = {
       document.getElementById('skcrUserTitle').value = App.settings.userTitle;
 
       App.saveSKCRToStorage();
+      SupabaseDB.saveSKCR(newRecord);
+
       App.renderSKCRTable();
       App.updateKPIs();
 
@@ -450,6 +472,7 @@ const App = {
     if (confirm(`Apakah Anda yakin ingin MENGHAPUS dokumen Surat Keterangan Rusak No. ${skcrId}?`)) {
       skcrData = skcrData.filter(item => item.id !== skcrId);
       App.saveSKCRToStorage();
+      SupabaseDB.deleteSKCR(skcrId);
       App.renderSKCRTable();
       App.updateKPIs();
       alert(`Dokumen SKCR No. ${skcrId} berhasil dihapus!`);
@@ -595,7 +618,7 @@ const App = {
     App.updateStaffFilterOptions();
     App.renderMatrixScheduleTable();
     App.updateKPIs();
-    alert(`🎉 File Excel Matriks Berhasil Di-Upload & TERSIMPAN PERMANEN!\nMenampilkan jadwal untuk ${newRoster.length} petugas gate across ${newDates.length} tanggal!`);
+    alert(`🎉 File Excel Matriks Berhasil Di-Upload!\nJadwal ${newRoster.length} petugas gate across ${newDates.length} tanggal tersimpan & ter-sync realtime!`);
   },
 
   renderMatrixScheduleTable: function(searchTerm = "") {
@@ -732,8 +755,10 @@ const App = {
 
       operationalAnnouncements.unshift(newNotice);
       App.saveNoticesToStorage();
+      SupabaseDB.saveNotice(newNotice);
+
       form.reset();
-      
+
       if (newNotice.serviceType === "IMPOR") {
         btnImpor.click();
       } else {
@@ -741,7 +766,7 @@ const App = {
       }
 
       App.updateKPIs();
-      alert(`Peraturan / Edaran pelayaran (${newNotice.serviceType}) berhasil dipublikasikan!`);
+      alert(`Peraturan / Edaran pelayaran (${newNotice.serviceType}) berhasil dipublikasikan & ter-sync realtime!`);
     });
 
     document.getElementById('newsTimelineContainer').addEventListener('click', (e) => {
@@ -770,6 +795,7 @@ const App = {
     if (confirm(`Apakah Anda yakin ingin MENGHAPUS edaran operasional ini secara permanen?`)) {
       operationalAnnouncements = operationalAnnouncements.filter(n => n.id !== noticeId);
       App.saveNoticesToStorage();
+      SupabaseDB.deleteNotice(noticeId);
       App.renderNoticeFeed();
       App.updateKPIs();
       alert("Edaran operasional berhasil dihapus!");
@@ -787,6 +813,8 @@ const App = {
     }
 
     App.saveNoticesToStorage();
+    SupabaseDB.saveNotice(notice);
+
     App.renderNoticeFeed();
     App.updateKPIs();
   },

@@ -16,6 +16,9 @@
   <!-- SheetJS for Excel Reading/Parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
+  <!-- Supabase Cloud DB Client SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/print.css">
@@ -48,8 +51,8 @@
           <span id="liveClockDisplay">25 Jul 2026 | 12:00 WIB</span>
         </div>
 
-        <button id="btnOpenSettings" class="btn btn-secondary btn-sm" style="border-radius: 20px;" title="Pengaturan Logo, Stempel & Running Text">
-          <i class="fa-solid fa-gear"></i> Setting Logo & Running Text
+        <button id="btnOpenSettings" class="btn btn-secondary btn-sm" style="border-radius: 20px;" title="Pengaturan Logo, Supabase Cloud & Running Text">
+          <i class="fa-solid fa-gear"></i> Setting Logo & Supabase Cloud
         </button>
 
         <button id="themeToggleBtn" class="theme-toggle-btn" title="Ganti Tema Gelap / Soft Cream">
@@ -284,7 +287,7 @@
           <input type="file" id="fileInputExcel" accept=".xlsx, .xls, .csv" style="display: none;">
           <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
           <div class="upload-title">Tarik & Lepas File Excel Jadwal (Format Multi-Blok Vertikal) di sini</div>
-          <div class="upload-subtitle">💾 File Excel yang di-upload akan <strong>TERSISIP PERMANEN</strong> di memori browser dan tidak hilang saat di-refresh!</div>
+          <div class="upload-subtitle">💾 Tersambung dengan Supabase Cloud: File di-upload akan <strong>LANGSUNG TER-SYNC REALTME</strong> di seluruh HP/Laptop petugas gate!</div>
         </div>
       </div>
 
@@ -698,15 +701,30 @@
     </div>
   </div>
 
-  <!-- MODAL 3: MENU SETTING (LOGO, STEMPEL, USER GATE PROFILE & RUNNING TEXT) -->
+  <!-- MODAL 3: MENU SETTING (LOGO, STEMPEL, USER GATE PROFILE, SUPABASE CLOUD & RUNNING TEXT) -->
   <div class="modal-backdrop" id="settingsModal">
     <div class="modal-container" style="max-width: 650px;">
       <div class="modal-header">
-        <h3 class="modal-title"><i class="fa-solid fa-sliders"></i> Pengaturan Logo, Stempel & Running Text</h3>
+        <h3 class="modal-title"><i class="fa-solid fa-sliders"></i> Pengaturan Logo, Supabase Cloud & Running Text</h3>
         <button class="modal-close" data-close-modal="settingsModal">&times;</button>
       </div>
       <div class="modal-body">
         <form id="formSettings">
+          <!-- Supabase Cloud Database Realtime Credentials Box -->
+          <div style="background: rgba(16, 185, 129, 0.06); border: 1px solid var(--status-success); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+            <h4 style="font-size: 0.9rem; margin-bottom: 0.6rem; color: var(--status-success);"><i class="fa-solid fa-database"></i> Integrasi Supabase Cloud Database (Multi-HP Realtime Sync)</h4>
+            
+            <div class="form-group">
+              <label class="form-label">Supabase Project URL</label>
+              <input type="text" class="form-control" id="settingSupabaseUrl" placeholder="https://your-project.supabase.co">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Supabase Anon Key</label>
+              <input type="password" class="form-control" id="settingSupabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+            </div>
+          </div>
+
           <!-- Teks Berjalan Running Text Settings -->
           <div style="background: rgba(0, 210, 255, 0.05); border: 1px solid var(--border-color-highlight); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
             <h4 style="font-size: 0.9rem; margin-bottom: 0.6rem; color: var(--accent-blue);"><i class="fa-solid fa-bullhorn"></i> Pengaturan Teks Berjalan (Running Text Gate)</h4>
@@ -822,7 +840,7 @@
 
           <div class="form-group">
             <label class="form-label">Catatan Umum Shift Next</label>
-            <textarea class="form-control" id="hoGeneralNotes" placeholder="Pesan penting untuk shift selanjutnya..."></textarea>
+            <textarea class="form-control" id="hoGeneralNotes" placeholder="Pesan penting megenai shift selanjutnya..."></textarea>
           </div>
 
           <button type="submit" class="btn btn-primary" style="width: 100%;">Simpan Log Serah Terima</button>
@@ -844,6 +862,7 @@
 
   <!-- Main JavaScript App Entry -->
   <script src="js/data.js"></script>
+  <script src="js/supabase-db.js"></script>
   <script src="js/excel-parser.js"></script>
   <script src="js/skcr.js"></script>
   <script src="js/app.js"></script>
