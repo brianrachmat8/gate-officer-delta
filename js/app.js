@@ -2,7 +2,7 @@
    PortGate / Gate Officer Delta - Main Application Controller
    Handles Settings, Copy-Paste SKCR, Delete SKCR/Notices, LocalStorage Roster Persistence,
    Supabase Cloud DB Sync, EKSPOR vs IMPOR Service Type Filter, Per-Block Shipping Line Cards for LOLO,
-   & User Module Profile Duty Hub
+   User Module Profile Duty Hub, & 3-Theme Selector (Soft Cream, Soft Pink & Dark)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -200,12 +200,45 @@ const App = {
 
   setupThemeToggle: function() {
     const btn = document.getElementById('themeToggleBtn');
+    if (!btn) return;
+
+    // Check if user has saved theme preference or default to light (Warm Soft Cream)
+    const savedTheme = localStorage.getItem('portgate_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    App.updateThemeBtnIcon(savedTheme);
+
     btn.addEventListener('click', () => {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', newTheme);
-      btn.innerHTML = newTheme === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      let nextTheme = 'light';
+
+      if (currentTheme === 'light') {
+        nextTheme = 'pink';
+      } else if (currentTheme === 'pink') {
+        nextTheme = 'dark';
+      } else {
+        nextTheme = 'light';
+      }
+
+      document.documentElement.setAttribute('data-theme', nextTheme);
+      localStorage.setItem('portgate_theme', nextTheme);
+      App.updateThemeBtnIcon(nextTheme);
     });
+  },
+
+  updateThemeBtnIcon: function(theme) {
+    const btn = document.getElementById('themeToggleBtn');
+    if (!btn) return;
+
+    if (theme === 'light') {
+      btn.innerHTML = `<i class="fa-solid fa-sun" style="color: #d97706;"></i> Soft Cream`;
+      btn.title = "Tema Aktif: Soft Cream. Klik untuk ganti ke Soft Pink.";
+    } else if (theme === 'pink') {
+      btn.innerHTML = `<i class="fa-solid fa-heart" style="color: #ec4899;"></i> Soft Pink`;
+      btn.title = "Tema Aktif: Soft Pink. Klik untuk ganti ke Dark Mode.";
+    } else {
+      btn.innerHTML = `<i class="fa-solid fa-moon" style="color: #3b82f6;"></i> Dark Mode`;
+      btn.title = "Tema Aktif: Dark Mode. Klik untuk ganti ke Soft Cream.";
+    }
   },
 
   setupTabNavigation: function() {
