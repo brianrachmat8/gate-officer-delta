@@ -4,15 +4,15 @@
    ========================================================================== */
 
 const SupabaseDB = {
-  // Pre-configured Supabase Project URL
+  // Pre-configured Supabase Credentials
   url: localStorage.getItem('portgate_supabase_url') || 'https://seiscumgtgjxaimaaegp.supabase.co',
-  key: localStorage.getItem('portgate_supabase_key') || '',
+  key: localStorage.getItem('portgate_supabase_key') || 'sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk',
   client: null,
   isConfigured: false,
 
   init: function() {
     const activeUrl = SupabaseDB.url || localStorage.getItem('portgate_supabase_url') || 'https://seiscumgtgjxaimaaegp.supabase.co';
-    const activeKey = SupabaseDB.key || localStorage.getItem('portgate_supabase_key') || '';
+    const activeKey = SupabaseDB.key || localStorage.getItem('portgate_supabase_key') || 'sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk';
 
     if (typeof supabase !== 'undefined' && activeUrl && activeKey) {
       try {
@@ -31,7 +31,7 @@ const SupabaseDB = {
 
   setCredentials: function(url, key) {
     SupabaseDB.url = url.trim() || 'https://seiscumgtgjxaimaaegp.supabase.co';
-    SupabaseDB.key = key.trim();
+    SupabaseDB.key = key.trim() || 'sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk';
     localStorage.setItem('portgate_supabase_url', SupabaseDB.url);
     localStorage.setItem('portgate_supabase_key', SupabaseDB.key);
 
