@@ -1,7 +1,8 @@
 /* ==========================================================================
    PortGate / Gate Officer Delta - Main Application Controller
    Handles Settings, Copy-Paste SKCR, Delete SKCR/Notices, LocalStorage Roster Persistence,
-   Supabase Cloud DB Sync, EKSPOR vs IMPOR Service Type Filter, & Per-Block Shipping Line Cards for LOLO
+   Supabase Cloud DB Sync, EKSPOR vs IMPOR Service Type Filter, Per-Block Shipping Line Cards for LOLO,
+   & User Module Profile Duty Hub
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -59,6 +60,7 @@ const App = {
     App.setupNoticeModule();
     App.setupLOLOTariffModule();
     App.setupHandoverModule();
+    App.setupUserGuideModule();
     App.setupGlobalSearch();
     App.renderAll();
   },
@@ -322,6 +324,7 @@ const App = {
       document.getElementById('skcrCompanyName').value = App.settings.companyName;
       document.getElementById('skcrUserTitle').value = App.settings.userTitle;
 
+      App.updateUserProfileDisplay();
       App.closeModal('settingsModal');
       alert("Pengaturan profil user gate, logo, stempel & kredensial Supabase Cloud berhasil disimpan!");
     });
@@ -1289,6 +1292,36 @@ const App = {
     `).join('');
   },
 
+  setupUserGuideModule: function() {
+    const userSelect = document.getElementById('userDutySelect');
+    if (!userSelect) return;
+
+    userSelect.value = App.settings.userNameGate || "RIDWAN ALAMSYAH";
+
+    userSelect.addEventListener('change', (e) => {
+      const selectedUser = e.target.value;
+      App.settings.userNameGate = selectedUser;
+      App.saveSettings({ userNameGate: selectedUser });
+
+      document.getElementById('skcrUserNameGate').value = selectedUser;
+
+      App.updateUserProfileDisplay();
+      alert(`Profil petugas aktif berhasil diubah ke ${selectedUser}!`);
+    });
+
+    App.updateUserProfileDisplay();
+  },
+
+  updateUserProfileDisplay: function() {
+    const nameEl = document.getElementById('userProfileNameDisplay');
+    const titleEl = document.getElementById('userProfileTitleDisplay');
+    const companyEl = document.getElementById('userProfileCompanyDisplay');
+
+    if (nameEl) nameEl.textContent = App.settings.userNameGate || "RIDWAN ALAMSYAH";
+    if (titleEl) titleEl.textContent = App.settings.userTitle || "Gate Operasional";
+    if (companyEl) companyEl.textContent = App.settings.companyName || "PT DELTA KONTAINER DEPOT";
+  },
+
   setupGlobalSearch: function() {
     const searchInput = document.getElementById('globalContainerSearch');
     searchInput.addEventListener('input', (e) => {
@@ -1314,6 +1347,7 @@ const App = {
     App.renderNoticeFeed();
     App.renderLOLOTariffs();
     App.renderHandoverTable();
+    App.updateUserProfileDisplay();
     App.updateKPIs();
   }
 };
