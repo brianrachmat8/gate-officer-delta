@@ -272,9 +272,9 @@ const SupabaseDB = {
     SupabaseDB.client
       .channel('public:gate_skcr')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_skcr' }, async payload => {
-        console.log('🔄 Live Realtime SKCR Update Received:', payload);
+        console.log('🔄 Live Realtime SKCR Event Received:', payload);
         const cloudSKCR = await SupabaseDB.loadAllSKCR();
-        if (cloudSKCR && Array.isArray(cloudSKCR) && cloudSKCR.length > 0 && window.App) {
+        if (Array.isArray(cloudSKCR) && window.App) {
           skcrData = cloudSKCR;
           try {
             localStorage.setItem('portgate_skcr_data', JSON.stringify(skcrData));
@@ -289,9 +289,9 @@ const SupabaseDB = {
     SupabaseDB.client
       .channel('public:gate_notices')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_notices' }, async payload => {
-        console.log('🔄 Live Realtime Notice Update Received:', payload);
+        console.log('🔄 Live Realtime Notice Event Received:', payload);
         const cloudNotices = await SupabaseDB.loadAllNotices();
-        if (cloudNotices && Array.isArray(cloudNotices) && cloudNotices.length > 0 && window.App) {
+        if (Array.isArray(cloudNotices) && window.App) {
           operationalAnnouncements = cloudNotices;
           try {
             localStorage.setItem('portgate_notices_data', JSON.stringify(operationalAnnouncements));
@@ -306,7 +306,7 @@ const SupabaseDB = {
     SupabaseDB.client
       .channel('public:gate_settings')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_settings' }, async payload => {
-        console.log('🔄 Live Realtime Settings/Branding Update Received:', payload);
+        console.log('🔄 Live Realtime Settings/Branding Event Received:', payload);
         const cloudSettings = await SupabaseDB.loadSettings();
         if (cloudSettings && window.App) {
           App.applyCloudSettings(cloudSettings);
@@ -344,7 +344,7 @@ const SupabaseDB = {
 
     // SKCR
     const cloudSKCR = await SupabaseDB.loadAllSKCR();
-    if (cloudSKCR && Array.isArray(cloudSKCR) && cloudSKCR.length > 0) {
+    if (Array.isArray(cloudSKCR)) {
       skcrData = cloudSKCR;
       try {
         localStorage.setItem('portgate_skcr_data', JSON.stringify(skcrData));
@@ -353,7 +353,7 @@ const SupabaseDB = {
 
     // Notices / Peraturan
     const cloudNotices = await SupabaseDB.loadAllNotices();
-    if (cloudNotices && Array.isArray(cloudNotices) && cloudNotices.length > 0) {
+    if (Array.isArray(cloudNotices) && cloudNotices.length > 0) {
       operationalAnnouncements = cloudNotices;
       try {
         localStorage.setItem('portgate_notices_data', JSON.stringify(operationalAnnouncements));
