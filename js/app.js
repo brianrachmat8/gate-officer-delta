@@ -1593,10 +1593,10 @@ ${log.generalNotes}
 ${log.responseText ? `
 💬 *Tanggapan / Respon Shift:*
 _"${log.responseText}"_
-(Direspon oleh ${log.respondedBy} pukul ${log.respondedAt})
+(Direspon oleh ${log.respondedBy} pada ${log.respondedAtDate || log.date} pukul ${log.respondedAtTime || log.respondedAt})
 ` : ''}
 ---
-_Diposting via Terminal System Gate Officer Delta_`;
+_Diposting via Terminal System Gate Officer Operasional_`;
   },
 
   shareHandoverToWA: function(handoverId) {
