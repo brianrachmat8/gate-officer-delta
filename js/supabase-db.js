@@ -251,6 +251,42 @@ const SupabaseDB = {
     }
   },
 
+  // Sync Shift Handover Logs
+  saveHandover: async function(logRecord) {
+    if (!SupabaseDB.isConfigured) return;
+    try {
+      const payloadObj = {
+        id: logRecord.id,
+        date: logRecord.date || new Date().toISOString().split('T')[0],
+        payload: logRecord,
+        created_at: new Date().toISOString()
+      };
+      const { error } = await SupabaseDB.client
+        .from('gate_handover')
+        .upsert(payloadObj, { onConflict: 'id' });
+
+      if (error) console.error("Error saving handover log to Supabase:", error);
+      else console.log("☁️ Handover Log synced to Supabase Cloud!");
+    } catch(e) {
+      console.error("Supabase Handover Save Exception:", e);
+    }
+  },
+
+  loadAllHandovers: async function() {
+    if (!SupabaseDB.isConfigured) return null;
+    try {
+      const { data, error } = await SupabaseDB.client
+        .from('gate_handover')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error || !data) return null;
+      return data.map(item => item.payload || item);
+    } catch(e) {
+      return null;
+    }
+  },
+
   // Real-time Subscriptions across all online devices/phones
   subscribeToRealtimeChanges: function() {
     if (!SupabaseDB.isConfigured || !SupabaseDB.client) return;
@@ -317,6 +353,22 @@ const SupabaseDB = {
       })
       .subscribe();
 
+    // Listen to changes in gate_handover (Serah Terima Shift)
+    SupabaseDB.client
+      .channel('public:gate_handover')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_handover' }, async payload => {
+        console.log('🔄 Live Realtime Handover Log Event Received:', payload);
+        const cloudHandovers = await SupabaseDB.loadAllHandovers();
+        if (Array.isArray(cloudHandovers) && window.App) {
+          shiftHandoverLogs = cloudHandovers;
+          try {
+            localStorage.setItem('portgate_handover_data', JSON.stringify(shiftHandoverLogs));
+          } catch(e) {}
+          App.renderHandoverTable();
+        }
+      })
+      .subscribe();
+
     // Listen to changes in gate_settings (Logo, TTD, Stamp, Profile)
     SupabaseDB.client
       .channel('public:gate_settings')
@@ -377,6 +429,15 @@ const SupabaseDB = {
       // Auto-seed initial 7 notices to Cloud if table is currently empty
       console.log("🌱 Auto-seeding initial 7 operational notices to Supabase Cloud...");
       operationalAnnouncements.forEach(n => SupabaseDB.saveNotice(n));
+    }
+
+    // Handover Logs
+    const cloudHandovers = await SupabaseDB.loadAllHandovers();
+    if (Array.isArray(cloudHandovers) && cloudHandovers.length > 0) {
+      shiftHandoverLogs = cloudHandovers;
+      try {
+        localStorage.setItem('portgate_handover_data', JSON.stringify(shiftHandoverLogs));
+      } catch(e) {}
     }
 
     if (window.App) {

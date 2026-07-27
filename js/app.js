@@ -43,6 +43,7 @@ const App = {
     App.loadRosterFromStorage();
     App.loadSKCRFromStorage();
     App.loadNoticesFromStorage();
+    App.loadHandoverFromStorage();
     
     // If Supabase is configured, trigger Cloud sync
     if (SupabaseDB.isConfigured) {
@@ -213,6 +214,24 @@ const App = {
     }
     // Fallback: If localStorage notice data is empty or invalid, clear key so initial seed notices from data.js are used
     localStorage.removeItem('portgate_notices_data');
+  },
+
+  saveHandoverToStorage: function() {
+    localStorage.setItem('portgate_handover_data', JSON.stringify(shiftHandoverLogs));
+  },
+
+  loadHandoverFromStorage: function() {
+    const saved = localStorage.getItem('portgate_handover_data');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          shiftHandoverLogs = parsed;
+        }
+      } catch(e) {
+        console.error("Failed to load handover logs data:", e);
+      }
+    }
   },
 
   startClock: function() {
@@ -1367,10 +1386,14 @@ const App = {
       };
 
       shiftHandoverLogs.unshift(newLog);
+      App.saveHandoverToStorage();
+      SupabaseDB.saveHandover(newLog);
+
       document.getElementById('formAddHandover').reset();
       App.closeModal('handoverModal');
 
       App.renderHandoverTable();
+      alert(`Catatan Serah Terima Shift (${newLog.shiftFrom} -> ${newLog.shiftTo}) berhasil disimpan & ter-sync realtime!`);
     });
   },
 
