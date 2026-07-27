@@ -60,7 +60,7 @@ const SKCRModule = {
       vesselVoyage: formData.vesselVoyage.toUpperCase().trim(),
       consignee: formData.consignee || formData.shippingLine,
       gateLane: formData.gateLane || "Gate 01",
-      userNameGate: formData.userNameGate || "RIDWAN ALAMSYAH",
+      userNameGate: formData.userNameGate || "RIDWAN",
       companyName: formData.companyName || "PT DELTA KONTAINER DEPOT",
       userTitle: formData.userTitle || "Gate Operasional",
       damageSeverity: formData.damageSeverity || "Major Damage",

@@ -1380,17 +1380,15 @@ const App = {
 
     const settings = App.getSettings();
     const companyName = settings.companyName || "PT DELTA KONTAINER DEPOT";
-    const userName = settings.userNameGate || "RIDWAN ALAMSYAH";
+    const userName = settings.userNameGate || "RIDWAN";
     const userTitle = settings.userTitle || "Gate Operasional";
     const logoUrl = settings.logoUrl || "";
     const stampUrl = settings.stampUrl || "";
     const signatureUrl = settings.signatureUrl || "";
 
-    const dateFormatted = new Date(notice.date).toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
+    const dateFormatted = (typeof SKCRModule !== 'undefined' && SKCRModule.formatIndonesianDateStr)
+      ? SKCRModule.formatIndonesianDateStr(notice.date)
+      : notice.date;
 
     const modalContent = `
       <div class="notice-official-document">
