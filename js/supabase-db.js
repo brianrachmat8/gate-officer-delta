@@ -237,6 +237,17 @@ const SupabaseDB = {
         if (payload.new && payload.new.dates && payload.new.roster) {
           matrixDatesList = payload.new.dates;
           matrixRosterData = payload.new.roster;
+
+          try {
+            localStorage.setItem('portgate_matrix_roster', JSON.stringify({
+              dates: matrixDatesList,
+              roster: matrixRosterData,
+              timestamp: Date.now()
+            }));
+          } catch(e) {
+            console.error("Failed to update local storage on roster realtime event:", e);
+          }
+
           if (window.App) {
             App.updateStaffFilterOptions();
             App.renderMatrixScheduleTable();
@@ -302,6 +313,16 @@ const SupabaseDB = {
     if (cloudRoster && cloudRoster.dates && cloudRoster.roster) {
       matrixDatesList = cloudRoster.dates;
       matrixRosterData = cloudRoster.roster;
+
+      try {
+        localStorage.setItem('portgate_matrix_roster', JSON.stringify({
+          dates: matrixDatesList,
+          roster: matrixRosterData,
+          timestamp: Date.now()
+        }));
+      } catch(e) {
+        console.error("Failed to update local storage on cloud roster sync:", e);
+      }
     }
 
     // SKCR
