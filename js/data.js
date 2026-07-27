@@ -4,18 +4,28 @@
    ========================================================================== */
 
 const SHIPPING_LINES = [
-  "HYUNDAI",
   "HAPAG",
   "SINOKOR",
   "HEUNG-A",
   "RCL",
   "WAN-HAI",
   "SITC",
-  "STAR SHIPPING",
   "ONE",
   "ZIMLINE",
   "HMM"
 ];
+
+const SHIPPING_CONSIGNEE_MAP = {
+  "HAPAG": "PT Hapag-Lloyd AG",
+  "SINOKOR": "PT Sinokor Merchant Marine Co., Ltd.",
+  "HEUNG-A": "Heung-A Line Co., Ltd.",
+  "RCL": "PT Regional Container Lines",
+  "WAN-HAI": "PT Wan Hai Lines",
+  "SITC": "PT SITC Indonesia",
+  "ONE": "PT Ocean Network Express",
+  "ZIMLINE": "PT Star Shipping Indonesia",
+  "HMM": "PT HMM Indonesia"
+};
 
 // Initial SKCR (Surat Keterangan Container Rusak) Records
 let skcrData = [

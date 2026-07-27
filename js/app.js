@@ -505,6 +505,18 @@ const App = {
       }
     });
 
+    const shippingLineSelect = document.getElementById('skcrShippingLine');
+    const consigneeInput = document.getElementById('skcrConsignee');
+
+    if (shippingLineSelect && consigneeInput) {
+      shippingLineSelect.addEventListener('change', (e) => {
+        const selectedLine = e.target.value;
+        if (typeof SHIPPING_CONSIGNEE_MAP !== 'undefined' && SHIPPING_CONSIGNEE_MAP[selectedLine]) {
+          consigneeInput.value = SHIPPING_CONSIGNEE_MAP[selectedLine];
+        }
+      });
+    }
+
     rawTextArea.addEventListener('input', () => {
       const parsed = SKCRModule.parseContainerBatch(rawTextArea.value);
       countBadge.textContent = `${parsed.length} / 100 Container`;
