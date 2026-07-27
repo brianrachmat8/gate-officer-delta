@@ -1585,12 +1585,16 @@ const App = {
 
 🔄 *Pergantian Shift:* ${log.shiftFrom} ➔ ${log.shiftTo}
 👤 *Supervisor / Petugas:* ${log.supervisor}
-🚦 *Kondisi Pos & Peralatan:* ${log.gateCondition}
+🚦 *Keterangan Kondisi & Alat:* ${log.gateCondition}
 📦 *Container Hold / Pending:* ${log.pendingContainers}
 
 📝 *Catatan Khusus Operasional:*
 ${log.generalNotes}
-
+${log.responseText ? `
+💬 *Tanggapan / Respon Shift:*
+_"${log.responseText}"_
+(Direspon oleh ${log.respondedBy} pukul ${log.respondedAt})
+` : ''}
 ---
 _Diposting via Terminal System Gate Officer Delta_`;
   },
@@ -1635,6 +1639,7 @@ _Diposting via Terminal System Gate Officer Delta_`;
     document.getElementById('tbodyHandover').addEventListener('click', (e) => {
       const btnWA = e.target.closest('.btn-share-wa-handover');
       const btnCopy = e.target.closest('.btn-copy-wa-handover');
+      const btnRespond = e.target.closest('.btn-respond-handover');
 
       if (btnWA) {
         const hId = btnWA.getAttribute('data-id');
@@ -1644,6 +1649,30 @@ _Diposting via Terminal System Gate Officer Delta_`;
       if (btnCopy) {
         const hId = btnCopy.getAttribute('data-id');
         App.copyHandoverToClipboard(hId);
+      }
+
+      if (btnRespond) {
+        const hId = btnRespond.getAttribute('data-id');
+        const logIndex = shiftHandoverLogs.findIndex(l => l.id === hId);
+        if (logIndex >= 0) {
+          const log = shiftHandoverLogs[logIndex];
+          const defaultVal = log.responseText || "";
+          const userResp = prompt("Masukkan tanggapan/konfirmasi dari Shift Anda (misal: 'Diterima, printer sudah IT perbaiki' atau 'Diterima & Sesuai'):", defaultVal);
+          if (userResp !== null) {
+            log.responseText = userResp.trim();
+            log.respondedBy = App.getSettings().userNameGate || "RIDWAN";
+            
+            // Format time string
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            log.respondedAt = timeStr;
+
+            App.saveHandoverToStorage();
+            SupabaseDB.saveHandover(log);
+            App.renderHandoverTable();
+            alert("✅ Tanggapan serah terima berhasil disimpan & ter-sync realtime!");
+          }
+        }
       }
     });
 
@@ -1680,6 +1709,7 @@ _Diposting via Terminal System Gate Officer Delta_`;
 
   renderHandoverTable: function() {
     const tbody = document.getElementById('tbodyHandover');
+    if (!tbody) return;
     tbody.innerHTML = shiftHandoverLogs.map(log => `
       <tr>
         <td style="white-space: nowrap;"><strong>${App.escapeHTML(log.date)}</strong></td>
@@ -1687,14 +1717,27 @@ _Diposting via Terminal System Gate Officer Delta_`;
         <td style="white-space: nowrap;"><strong>${App.escapeHTML(log.supervisor)}</strong></td>
         <td>${App.escapeHTML(log.gateCondition)}</td>
         <td style="white-space: nowrap;"><strong style="color: var(--status-danger);">${App.escapeHTML(log.pendingContainers)}</strong></td>
-        <td>${App.escapeHTML(log.generalNotes)}</td>
+        <td>
+          <div>${App.escapeHTML(log.generalNotes)}</div>
+          ${log.responseText ? `
+            <div style="margin-top: 0.5rem; padding: 0.4rem 0.6rem; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; border-radius: 6px; font-size: 0.76rem; color: var(--text-main);">
+              <div style="font-weight: 700; color: #059669; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.15rem;">
+                <i class="fa-solid fa-reply"></i> Respon oleh ${App.escapeHTML(log.respondedBy)} (${App.escapeHTML(log.respondedAt)}):
+              </div>
+              <div style="font-style: italic;">"${App.escapeHTML(log.responseText)}"</div>
+            </div>
+          ` : ''}
+        </td>
         <td style="white-space: nowrap; text-align: center;">
-          <div style="display: flex; gap: 0.3rem; justify-content: center;">
+          <div style="display: flex; gap: 0.3rem; justify-content: center; align-items: center;">
+            <button class="btn btn-primary btn-sm btn-respond-handover" data-id="${log.id}" style="padding: 0.25rem 0.5rem; font-size: 0.73rem; background: var(--accent-blue);" title="Tulis Tanggapan / Konfirmasi Serah Terima">
+              <i class="fa-solid fa-comment-dots"></i> ${log.responseText ? 'Edit' : 'Respon'}
+            </button>
             <button class="btn btn-success btn-sm btn-share-wa-handover" data-id="${log.id}" style="padding: 0.25rem 0.5rem; font-size: 0.73rem; background-color: #25D366; border-color: #25D366; color: white;" title="Buka Langsung WhatsApp">
               <i class="fa-brands fa-whatsapp"></i> Kirim WA
             </button>
             <button class="btn btn-secondary btn-sm btn-copy-wa-handover" data-id="${log.id}" style="padding: 0.25rem 0.5rem; font-size: 0.73rem;" title="Salin Teks Format WA ke Clipboard">
-              <i class="fa-solid fa-copy"></i> Salin Teks
+              <i class="fa-solid fa-copy"></i> Salin
             </button>
           </div>
         </td>
