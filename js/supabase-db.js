@@ -89,18 +89,27 @@ const SupabaseDB = {
   saveSKCR: async function(skcrRecord) {
     if (!SupabaseDB.isConfigured) return;
     try {
-      const payloadObj = {
-        id: skcrRecord.id,
-        date: skcrRecord.date || new Date().toISOString().split('T')[0],
-        payload: skcrRecord,
-        created_at: new Date().toISOString()
-      };
-      const { data, error } = await SupabaseDB.client
+      // First attempt: direct object upsert
+      let { error } = await SupabaseDB.client
         .from('gate_skcr')
-        .upsert(payloadObj, { onConflict: 'id' });
+        .upsert(skcrRecord, { onConflict: 'id' });
 
-      if (error) console.error("Error saving SKCR to Supabase:", error);
-      else console.log("☁️ SKCR Record synced to Supabase Cloud!");
+      if (error) {
+        console.warn("Direct SKCR upsert encountered schema warning, trying payload fallback...", error.message);
+        const payloadObj = {
+          id: skcrRecord.id,
+          date: skcrRecord.date || new Date().toISOString().split('T')[0],
+          payload: skcrRecord
+        };
+        const res = await SupabaseDB.client
+          .from('gate_skcr')
+          .upsert(payloadObj, { onConflict: 'id' });
+
+        if (res.error) console.error("Error saving SKCR to Supabase:", res.error);
+        else console.log("☁️ SKCR Record synced to Supabase Cloud (Payload Fallback)!");
+      } else {
+        console.log("☁️ SKCR Record synced to Supabase Cloud!");
+      }
     } catch(e) {
       console.error("Supabase SKCR Save Exception:", e);
     }
