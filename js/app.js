@@ -1487,16 +1487,15 @@ const App = {
     }, 1200);
   },
 
-  shareHandoverToWA: function(handoverId) {
+  getFormattedHandoverText: function(handoverId) {
     const log = shiftHandoverLogs.find(l => l.id === handoverId);
-    if (!log) return;
+    if (!log) return "";
 
     const formattedDate = (typeof SKCRModule !== 'undefined' && SKCRModule.formatIndonesianDateStr)
       ? SKCRModule.formatIndonesianDateStr(log.date)
       : log.date;
 
-    const messageText = 
-`📋 *LAPORAN SERAH TERIMA SHIFT GATE*
+    return `📋 *LAPORAN SERAH TERIMA SHIFT GATE*
 🏢 *PT DELTA KONTAINER DEPOT*
 📅 *Tanggal:* ${formattedDate}
 
@@ -1510,9 +1509,38 @@ ${log.generalNotes}
 
 ---
 _Diposting via Terminal System Gate Officer Delta_`;
+  },
 
+  shareHandoverToWA: function(handoverId) {
+    const messageText = App.getFormattedHandoverText(handoverId);
+    if (!messageText) return;
     const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(messageText)}`;
     window.open(waUrl, '_blank');
+  },
+
+  copyHandoverToClipboard: function(handoverId) {
+    const messageText = App.getFormattedHandoverText(handoverId);
+    if (!messageText) return;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(messageText).then(() => {
+        alert("✅ Format Laporan Serah Terima Shift berhasil disalin ke Clipboard!\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
+      }).catch(() => {
+        App.fallbackCopyText(messageText);
+      });
+    } else {
+      App.fallbackCopyText(messageText);
+    }
+  },
+
+  fallbackCopyText: function(text) {
+    const tempInput = document.createElement("textarea");
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    alert("✅ Format Laporan Serah Terima Shift berhasil disalin ke Clipboard!\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
   },
 
   setupHandoverModule: function() {
@@ -1522,9 +1550,16 @@ _Diposting via Terminal System Gate Officer Delta_`;
 
     document.getElementById('tbodyHandover').addEventListener('click', (e) => {
       const btnWA = e.target.closest('.btn-share-wa-handover');
+      const btnCopy = e.target.closest('.btn-copy-wa-handover');
+
       if (btnWA) {
         const hId = btnWA.getAttribute('data-id');
         App.shareHandoverToWA(hId);
+      }
+
+      if (btnCopy) {
+        const hId = btnCopy.getAttribute('data-id');
+        App.copyHandoverToClipboard(hId);
       }
     });
 
@@ -1570,9 +1605,14 @@ _Diposting via Terminal System Gate Officer Delta_`;
         <td style="white-space: nowrap;"><strong style="color: var(--status-danger);">${App.escapeHTML(log.pendingContainers)}</strong></td>
         <td>${App.escapeHTML(log.generalNotes)}</td>
         <td style="white-space: nowrap; text-align: center;">
-          <button class="btn btn-success btn-sm btn-share-wa-handover" data-id="${log.id}" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; background-color: #25D366; border-color: #25D366; color: white;" title="Share Laporan Ke Grup WhatsApp">
-            <i class="fa-brands fa-whatsapp"></i> Kirim WA
-          </button>
+          <div style="display: flex; gap: 0.3rem; justify-content: center;">
+            <button class="btn btn-success btn-sm btn-share-wa-handover" data-id="${log.id}" style="padding: 0.25rem 0.5rem; font-size: 0.73rem; background-color: #25D366; border-color: #25D366; color: white;" title="Buka Langsung WhatsApp">
+              <i class="fa-brands fa-whatsapp"></i> Kirim WA
+            </button>
+            <button class="btn btn-secondary btn-sm btn-copy-wa-handover" data-id="${log.id}" style="padding: 0.25rem 0.5rem; font-size: 0.73rem;" title="Salin Teks Format WA ke Clipboard">
+              <i class="fa-solid fa-copy"></i> Salin Teks
+            </button>
+          </div>
         </td>
       </tr>
     `).join('');
