@@ -133,9 +133,20 @@ const SupabaseDB = {
   saveNotice: async function(noticeRecord) {
     if (!SupabaseDB.isConfigured) return;
     try {
+      const payload = {
+        id: noticeRecord.id,
+        date: noticeRecord.date || new Date().toISOString().split('T')[0],
+        time: noticeRecord.time || "08:00",
+        title: noticeRecord.title || "",
+        category: noticeRecord.category || "UMUM",
+        priority: noticeRecord.priority || "Info",
+        author: noticeRecord.author || "Gate Ops",
+        body: noticeRecord.body || "",
+        status: noticeRecord.status || "Active"
+      };
       const { data, error } = await SupabaseDB.client
         .from('gate_notices')
-        .upsert(noticeRecord, { onConflict: 'id' });
+        .upsert(payload, { onConflict: 'id' });
 
       if (error) console.error("Error saving notice to Supabase:", error);
       else console.log("☁️ Notice synced to Supabase Cloud!");
