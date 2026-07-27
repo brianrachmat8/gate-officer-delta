@@ -1218,6 +1218,37 @@ const App = {
       }
     });
 
+    const btnToggleUpload = document.getElementById('btnToggleLOLOExcelUpload');
+    const iconToggle = document.getElementById('iconToggleLOLOUpload');
+    const textToggle = document.getElementById('textToggleLOLOUpload');
+
+    const updateUploadPanelState = (isMinimized) => {
+      if (isMinimized) {
+        dropZone.style.display = 'none';
+        if (iconToggle) iconToggle.className = 'fa-solid fa-chevron-down';
+        if (textToggle) textToggle.textContent = 'Expand Panel Upload';
+        if (btnToggleUpload) btnToggleUpload.className = 'btn btn-primary btn-sm';
+      } else {
+        dropZone.style.display = 'block';
+        if (iconToggle) iconToggle.className = 'fa-solid fa-chevron-up';
+        if (textToggle) textToggle.textContent = 'Minimize Panel';
+        if (btnToggleUpload) btnToggleUpload.className = 'btn btn-secondary btn-sm';
+      }
+    };
+
+    // Restore saved state (default true / minimized)
+    const isSavedMinimized = localStorage.getItem('portgate_lolo_excel_upload_minimized') !== 'false';
+    updateUploadPanelState(isSavedMinimized);
+
+    if (btnToggleUpload) {
+      btnToggleUpload.addEventListener('click', () => {
+        const isCurrentlyHidden = dropZone.style.display === 'none';
+        const newState = !isCurrentlyHidden;
+        localStorage.setItem('portgate_lolo_excel_upload_minimized', newState ? 'true' : 'false');
+        updateUploadPanelState(newState);
+      });
+    }
+
     fileInput.addEventListener('change', (e) => {
       if (e.target.files.length > 0) {
         ExcelParser.parseLOLOTariffFile(e.target.files[0], App.onLOLOExcelParsed);

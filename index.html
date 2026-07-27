@@ -537,12 +537,17 @@
       <div class="glass-card" style="margin-bottom: 1.5rem;">
         <div class="card-header">
           <h3 class="card-title"><i class="fa-solid fa-file-excel"></i> Upload Master Tarif LOLO (.xlsx / .csv)</h3>
-          <button class="btn btn-success btn-sm" id="btnDownloadLOLOExcelTemplate">
-            <i class="fa-solid fa-download"></i> Download Template Format Excel
-          </button>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn btn-success btn-sm" id="btnDownloadLOLOExcelTemplate">
+              <i class="fa-solid fa-download"></i> Download Template Format Excel
+            </button>
+            <button class="btn btn-primary btn-sm" id="btnToggleLOLOExcelUpload">
+              <i class="fa-solid fa-chevron-down" id="iconToggleLOLOUpload"></i> <span id="textToggleLOLOUpload">Expand Panel Upload</span>
+            </button>
+          </div>
         </div>
 
-        <div class="excel-upload-zone" id="dropZoneLOLOExcel">
+        <div class="excel-upload-zone" id="dropZoneLOLOExcel" style="display: none;">
           <input type="file" id="fileInputLOLOExcel" accept=".xlsx, .xls, .csv" style="display: none;">
           <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up" style="color: var(--status-warning);"></i></div>
           <div class="upload-title">Tarik & Lepas File Excel Tarif LIFT OFF / LIFT ON di sini</div>
