@@ -263,7 +263,7 @@ const SupabaseDB = {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_skcr' }, async payload => {
         console.log('🔄 Live Realtime SKCR Update Received:', payload);
         const cloudSKCR = await SupabaseDB.loadAllSKCR();
-        if (cloudSKCR && window.App) {
+        if (cloudSKCR && Array.isArray(cloudSKCR) && cloudSKCR.length > 0 && window.App) {
           skcrData = cloudSKCR;
           try {
             localStorage.setItem('portgate_skcr_data', JSON.stringify(skcrData));
@@ -280,7 +280,7 @@ const SupabaseDB = {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_notices' }, async payload => {
         console.log('🔄 Live Realtime Notice Update Received:', payload);
         const cloudNotices = await SupabaseDB.loadAllNotices();
-        if (cloudNotices && window.App) {
+        if (cloudNotices && Array.isArray(cloudNotices) && cloudNotices.length > 0 && window.App) {
           operationalAnnouncements = cloudNotices;
           try {
             localStorage.setItem('portgate_notices_data', JSON.stringify(operationalAnnouncements));
@@ -316,7 +316,7 @@ const SupabaseDB = {
 
     // Roster
     const cloudRoster = await SupabaseDB.loadRoster();
-    if (cloudRoster && cloudRoster.dates && cloudRoster.roster) {
+    if (cloudRoster && cloudRoster.dates && cloudRoster.roster && cloudRoster.dates.length > 0) {
       matrixDatesList = cloudRoster.dates;
       matrixRosterData = cloudRoster.roster;
 
@@ -333,7 +333,7 @@ const SupabaseDB = {
 
     // SKCR
     const cloudSKCR = await SupabaseDB.loadAllSKCR();
-    if (cloudSKCR) {
+    if (cloudSKCR && Array.isArray(cloudSKCR) && cloudSKCR.length > 0) {
       skcrData = cloudSKCR;
       try {
         localStorage.setItem('portgate_skcr_data', JSON.stringify(skcrData));
@@ -342,11 +342,15 @@ const SupabaseDB = {
 
     // Notices / Peraturan
     const cloudNotices = await SupabaseDB.loadAllNotices();
-    if (cloudNotices) {
+    if (cloudNotices && Array.isArray(cloudNotices) && cloudNotices.length > 0) {
       operationalAnnouncements = cloudNotices;
       try {
         localStorage.setItem('portgate_notices_data', JSON.stringify(operationalAnnouncements));
       } catch(e) {}
+    } else if (operationalAnnouncements && operationalAnnouncements.length > 0) {
+      // Auto-seed initial 7 notices to Cloud if table is currently empty
+      console.log("🌱 Auto-seeding initial 7 operational notices to Supabase Cloud...");
+      operationalAnnouncements.forEach(n => SupabaseDB.saveNotice(n));
     }
 
     if (window.App) {
