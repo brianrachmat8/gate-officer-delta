@@ -1596,7 +1596,7 @@ _"${log.responseText}"_
 (Direspon oleh ${log.respondedBy} pada ${log.respondedAtDate || log.date} pukul ${log.respondedAtTime || log.respondedAt})
 ` : ''}
 ---
-_Diposting via Terminal System Gate Officer Operasional_`;
+_Sistem Informasi Gate Officer_`;
   },
 
   shareHandoverToWA: function(handoverId) {
