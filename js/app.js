@@ -749,6 +749,7 @@ const App = {
     });
 
     App.updateStaffFilterOptions();
+    App.updateMonthFilterOptions();
   },
 
   updateStaffFilterOptions: function() {
@@ -763,9 +764,57 @@ const App = {
     `;
   },
 
+  updateMonthFilterOptions: function() {
+    const select = document.getElementById('filterRosterMonth');
+    const headerTitle = document.getElementById('rosterTitleHeader');
+    if (!select || !matrixDatesList || matrixDatesList.length === 0) return;
+
+    const monthNamesMap = {
+      "Jan": "Januari 2026",
+      "Feb": "Februari 2026",
+      "Mar": "Maret 2026",
+      "Apr": "April 2026",
+      "May": "Mei 2026",
+      "Jun": "Juni 2026",
+      "Jul": "Juli 2026",
+      "Aug": "Agustus 2026",
+      "Sep": "September 2026",
+      "Oct": "Oktober 2026",
+      "Nov": "November 2026",
+      "Dec": "Desember 2026"
+    };
+
+    const startDate = matrixDatesList[0];
+    const endDate = matrixDatesList[matrixDatesList.length - 1];
+
+    if (headerTitle) {
+      headerTitle.innerHTML = `<i class="fa-solid fa-table-cells"></i> Matriks Shift Gate Utuh (${startDate} s/d ${endDate} 2026)`;
+    }
+
+    const uniqueMonths = [];
+    matrixDatesList.forEach(d => {
+      const parts = d.split('-');
+      if (parts.length >= 2) {
+        const m = parts[1].trim();
+        if (!uniqueMonths.includes(m)) {
+          uniqueMonths.push(m);
+        }
+      }
+    });
+
+    let optionsHtml = `<option value="">🗓️ Semua Tanggal (${startDate} s/d ${endDate})</option>`;
+    uniqueMonths.forEach(m => {
+      const label = monthNamesMap[m] || m;
+      optionsHtml += `<option value="${m}">${label}</option>`;
+    });
+
+    select.innerHTML = optionsHtml;
+  },
+
   onExcelRosterParsed: function(newRoster, newDates) {
     App.saveRosterToStorage();
     App.updateStaffFilterOptions();
+    App.updateMonthFilterOptions();
     App.renderMatrixScheduleTable();
     App.updateKPIs();
     alert(`🎉 File Excel Matriks Berhasil Di-Upload!\nJadwal ${newRoster.length} petugas gate across ${newDates.length} tanggal tersimpan & ter-sync realtime!`);
@@ -1500,6 +1549,7 @@ const App = {
   renderAll: function() {
     App.renderSKCRTable();
     App.updateStaffFilterOptions();
+    App.updateMonthFilterOptions();
     App.renderMatrixScheduleTable();
     App.renderNoticeFeed();
     App.renderLOLOTariffs();

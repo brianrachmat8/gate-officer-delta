@@ -317,6 +317,7 @@ const SupabaseDB = {
 
           if (window.App) {
             App.updateStaffFilterOptions();
+            App.updateMonthFilterOptions();
             App.renderMatrixScheduleTable();
             App.updateKPIs();
           }
