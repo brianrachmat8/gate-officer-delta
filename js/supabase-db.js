@@ -138,7 +138,7 @@ const SupabaseDB = {
         shippingLine: item.shippingLine || item.consignee || 'HAPAG',
         sizeType: item.sizeType || '40 FT',
         vesselVoyage: item.vesselVoyage || 'MV SAWASDEE BALI V.2405N',
-        userNameGate: item.userNameGate || 'RIDWAN ALAMSYAH',
+        userNameGate: item.userNameGate || 'RIDWAN',
         companyName: item.companyName || 'PT DELTA KONTAINER DEPOT',
         userTitle: item.userTitle || 'Gate Operasional',
         containerCount: item.containerCount || (item.containers ? item.containers.length : 1),

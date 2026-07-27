@@ -24,7 +24,7 @@ const App = {
 
   // Settings State with LocalStorage & Supabase Credentials
   settings: {
-    userNameGate: "RIDWAN ALAMSYAH",
+    userNameGate: "RIDWAN",
     companyName: "PT DELTA KONTAINER DEPOT",
     userTitle: "Gate Operasional",
     logoUrl: "",
