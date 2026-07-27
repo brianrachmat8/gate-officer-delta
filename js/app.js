@@ -131,11 +131,51 @@ const App = {
 
   applyCloudSettings: function(cloudSettings) {
     if (!cloudSettings) return;
-    App.settings = { ...App.settings, ...cloudSettings };
+    const activeLogo = cloudSettings.logoUrl || App.settings.logoUrl;
+    const activeStamp = cloudSettings.stampUrl || App.settings.stampUrl;
+    const activeSig = cloudSettings.signatureUrl || App.settings.signatureUrl;
+
+    App.settings = { 
+      ...App.settings, 
+      ...cloudSettings,
+      logoUrl: activeLogo,
+      stampUrl: activeStamp,
+      signatureUrl: activeSig
+    };
     localStorage.setItem('portgate_settings', JSON.stringify(App.settings));
     App.updateMarqueeUI();
     App.renderStampPreviews();
     App.updateUserProfileDisplay();
+  },
+
+  compressImageFile: function(file, maxWidth, maxHeight, callback) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        if (height > maxHeight) {
+          width = Math.round((width * maxHeight) / height);
+          height = maxHeight;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/png', 0.85);
+        callback(dataUrl);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   },
 
   getSettings: function() {
@@ -350,39 +390,33 @@ const App = {
     document.getElementById('settingLogoFile').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          App.settings.logoUrl = event.target.result;
+        App.compressImageFile(file, 450, 450, (dataUrl) => {
+          App.settings.logoUrl = dataUrl;
           App.renderStampPreviews();
-          App.saveSettings({ logoUrl: event.target.result });
-        };
-        reader.readAsDataURL(file);
+          App.saveSettings({ logoUrl: dataUrl });
+        });
       }
     });
 
     document.getElementById('settingStampFile').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          App.settings.stampUrl = event.target.result;
+        App.compressImageFile(file, 450, 450, (dataUrl) => {
+          App.settings.stampUrl = dataUrl;
           App.renderStampPreviews();
-          App.saveSettings({ stampUrl: event.target.result });
-        };
-        reader.readAsDataURL(file);
+          App.saveSettings({ stampUrl: dataUrl });
+        });
       }
     });
 
     document.getElementById('settingSignatureFile').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          App.settings.signatureUrl = event.target.result;
+        App.compressImageFile(file, 450, 450, (dataUrl) => {
+          App.settings.signatureUrl = dataUrl;
           App.renderStampPreviews();
-          App.saveSettings({ signatureUrl: event.target.result });
-        };
-        reader.readAsDataURL(file);
+          App.saveSettings({ signatureUrl: dataUrl });
+        });
       }
     });
 
