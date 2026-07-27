@@ -144,10 +144,12 @@ const App = {
     const activeLogo = cloudSettings.logoUrl || App.settings.logoUrl;
     const activeStamp = cloudSettings.stampUrl || App.settings.stampUrl;
     const activeSig = cloudSettings.signatureUrl || App.settings.signatureUrl;
+    const localUser = localStorage.getItem('portgate_active_user') || App.settings.userNameGate;
 
     App.settings = { 
       ...App.settings, 
       ...cloudSettings,
+      userNameGate: localUser,
       logoUrl: activeLogo,
       stampUrl: activeStamp,
       signatureUrl: activeSig
@@ -523,9 +525,10 @@ const App = {
 
     const skcrUserSelect = document.getElementById('skcrUserNameGate');
     if (skcrUserSelect) {
-      skcrUserSelect.value = App.settings.userNameGate || "RIDWAN ALAMSYAH";
+      skcrUserSelect.value = localStorage.getItem('portgate_active_user') || App.settings.userNameGate || "RIDWAN";
       skcrUserSelect.addEventListener('change', (e) => {
         const selectedUser = e.target.value;
+        localStorage.setItem('portgate_active_user', selectedUser);
         App.settings.userNameGate = selectedUser;
         App.saveSettings({ userNameGate: selectedUser });
 
@@ -1534,10 +1537,11 @@ const App = {
     const userSelect = document.getElementById('userDutySelect');
     if (!userSelect) return;
 
-    userSelect.value = App.settings.userNameGate || "RIDWAN ALAMSYAH";
+    userSelect.value = localStorage.getItem('portgate_active_user') || App.settings.userNameGate || "RIDWAN";
 
     userSelect.addEventListener('change', (e) => {
       const selectedUser = e.target.value;
+      localStorage.setItem('portgate_active_user', selectedUser);
       App.settings.userNameGate = selectedUser;
       App.saveSettings({ userNameGate: selectedUser });
 
