@@ -95,9 +95,13 @@ const SupabaseDB = {
   saveSKCR: async function(skcrRecord) {
     if (!SupabaseDB.isConfigured) return;
     try {
+      const getLocalDate = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      };
       const payload = {
         id: skcrRecord.id,
-        date: skcrRecord.date || new Date().toISOString().split('T')[0],
+        date: skcrRecord.date || getLocalDate(),
         containers: skcrRecord.containers || [skcrRecord.containerNo || 'SNKO8923410'],
         consignee: skcrRecord.consignee || skcrRecord.shippingLine || 'PT DELTA KONTAINER',
         shippingline: skcrRecord.shippingLine || 'HAPAG',
@@ -137,6 +141,10 @@ const SupabaseDB = {
   loadAllSKCR: async function() {
     if (!SupabaseDB.isConfigured) return null;
     try {
+      const getLocalDate = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      };
       const { data, error } = await SupabaseDB.client
         .from('gate_skcr')
         .select('*')
@@ -145,7 +153,7 @@ const SupabaseDB = {
       if (error || !data) return null;
       return data.map(item => ({
         id: item.id,
-        date: item.date || new Date().toISOString().split('T')[0],
+        date: item.date || getLocalDate(),
         containers: item.containers || [item.containerno || 'SNKO8923410'],
         containerNo: item.containerno || (item.containers ? item.containers[0] : 'SNKO8923410'),
         consignee: item.consignee || 'PT GLOBAL CARGO LOGISTICS',

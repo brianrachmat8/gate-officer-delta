@@ -39,6 +39,14 @@ const SKCRModule = {
     return `SKCR-${year}-${month}${randomNum}`;
   },
 
+  getLocalDateISOString: function() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  },
+
   // Save new SKCR Statement Record
   createSKCR: function(formData) {
     const containers = SKCRModule.parseContainerBatch(formData.containerRawText);
@@ -50,7 +58,7 @@ const SKCRModule = {
 
     const newRecord = {
       id: SKCRModule.generateId(),
-      date: formData.date || new Date().toISOString().split('T')[0],
+      date: formData.date || SKCRModule.getLocalDateISOString(),
       time: formData.time || new Date().toTimeString().slice(0, 5),
       containers: containers, // Array of container numbers (up to 100)
       containerCount: containers.length,
