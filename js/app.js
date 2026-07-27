@@ -656,27 +656,27 @@ const App = {
 
       return `
         <tr>
-          <td style="text-align: center; font-size: 0.78rem; font-weight: bold; color: var(--text-muted);">${idx + 1}</td>
-          <td><strong style="font-size: 0.78rem; word-break: break-word;">${App.escapeHTML(item.id)}</strong></td>
-          <td style="white-space: nowrap; font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">${App.escapeHTML(item.date)}</td>
-          <td>
-            <div style="display: flex; flex-direction: column; gap: 0.2rem; align-items: flex-start;">
-              <span class="badge badge-shipping-line" style="font-weight: 800; font-size: 0.72rem; padding: 0.15rem 0.5rem; text-transform: uppercase;">${App.escapeHTML(sLine)}</span>
-              <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-main); word-break: break-word;">${App.escapeHTML(consigneeName)}</span>
+          <td style="text-align: center; font-size: 0.72rem; font-weight: bold; color: var(--text-muted); padding: 0.35rem 0.2rem;">${idx + 1}</td>
+          <td style="padding: 0.35rem 0.4rem;"><strong style="font-size: 0.74rem; word-break: break-all;">${App.escapeHTML(item.id)}</strong></td>
+          <td style="white-space: nowrap; font-size: 0.74rem; font-weight: 600; color: var(--text-muted); padding: 0.35rem 0.4rem;">${App.escapeHTML(item.date)}</td>
+          <td style="padding: 0.35rem 0.4rem;">
+            <div style="display: flex; flex-direction: column; gap: 0.15rem; align-items: flex-start;">
+              <span class="badge badge-shipping-line" style="font-weight: 800; font-size: 0.68rem; padding: 0.1rem 0.4rem; text-transform: uppercase;">${App.escapeHTML(sLine)}</span>
+              <span style="font-size: 0.72rem; font-weight: 600; color: var(--text-main); word-break: break-word; line-height: 1.2;">${App.escapeHTML(consigneeName)}</span>
             </div>
           </td>
-          <td>
-            <strong style="color: var(--accent-blue); font-size: 0.82rem;">${App.escapeHTML(mainContainer)}</strong>
-            ${cCount > 1 ? `<span class="badge badge-info" style="margin-left:0.25rem; font-size: 0.7rem; padding: 0.15rem 0.4rem;">+${cCount - 1} cont</span>` : ''}
+          <td style="padding: 0.35rem 0.4rem;">
+            <strong style="color: var(--accent-blue); font-size: 0.76rem;">${App.escapeHTML(mainContainer)}</strong>
+            ${cCount > 1 ? `<span class="badge badge-info" style="margin-left:0.15rem; font-size: 0.65rem; padding: 0.1rem 0.3rem;">+${cCount - 1} cont</span>` : ''}
           </td>
-          <td><span style="font-size: 0.76rem; color: var(--text-muted); display: block; word-break: break-word;">${App.escapeHTML(item.vesselVoyage || '-')}</span></td>
-          <td style="white-space: nowrap; text-align: center;">
-            <div style="display: flex; gap: 0.25rem; justify-content: center;">
-              <button class="btn btn-primary btn-sm btn-print-skcr" data-id="${item.id}" style="padding: 0.25rem 0.5rem; font-size: 0.73rem;">
+          <td style="padding: 0.35rem 0.4rem;"><span style="font-size: 0.7rem; color: var(--text-muted); display: block; word-break: break-word; line-height: 1.2;">${App.escapeHTML(item.vesselVoyage || '-')}</span></td>
+          <td style="white-space: nowrap; text-align: center; padding: 0.35rem 0.4rem;">
+            <div style="display: flex; gap: 0.2rem; justify-content: center;">
+              <button class="btn btn-primary btn-sm btn-print-skcr" data-id="${item.id}" style="padding: 0.2rem 0.45rem; font-size: 0.7rem;">
                 <i class="fa-solid fa-print"></i> Cetak (${cCount})
               </button>
-              <button class="btn btn-secondary btn-sm btn-delete-skcr" data-id="${item.id}" style="color: var(--status-danger); padding: 0.25rem 0.4rem; font-size: 0.73rem;" title="Hapus Dokumen SKCR Ini">
-                <i class="fa-solid fa-trash-can"></i> Hapus
+              <button class="btn btn-secondary btn-sm btn-delete-skcr" data-id="${item.id}" style="color: var(--status-danger); padding: 0.2rem 0.4rem; font-size: 0.7rem;" title="Hapus Dokumen SKCR Ini">
+                <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
           </td>
