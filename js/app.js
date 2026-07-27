@@ -865,14 +865,7 @@ const App = {
   },
 
   onExcelRosterParsed: function(newRoster, newDates) {
-    if (newDates && newDates.length > 0) {
-      // Force start strictly on Monday 27-Jul (drop any Sunday 26-Jul or earlier date)
-      while (newDates.length > 0 && newDates[0] !== "27-Jul" && (newDates[0] === "26-Jul" || newDates[0].includes("26"))) {
-        const dropped = newDates.shift();
-        newRoster.forEach(r => {
-          if (r.shifts && r.shifts[dropped]) delete r.shifts[dropped];
-        });
-      }
+    if (newDates && newDates.length > 0 && newRoster && newRoster.length > 0) {
       matrixDatesList = newDates;
       matrixRosterData = newRoster;
     }
@@ -882,7 +875,7 @@ const App = {
     App.updateMonthFilterOptions();
     App.renderMatrixScheduleTable();
     App.updateKPIs();
-    alert(`🎉 File Excel Matriks Berhasil Di-Upload!\nJadwal ${newRoster.length} petugas gate across ${newDates.length} tanggal tersimpan & ter-sync realtime!\n\n(Matriks dikunci otomatis dimulai dari SENIN ${newDates[0]})`);
+    alert(`🎉 File Excel Matriks Berhasil Di-Upload!\nJadwal ${newRoster.length} petugas gate across ${newDates.length} tanggal (${newDates[0]} s/d ${newDates[newDates.length - 1]}) tersimpan & ter-sync realtime!`);
   },
 
   getDayNameIndonesian: function(dateStr) {

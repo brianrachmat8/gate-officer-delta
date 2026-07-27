@@ -132,7 +132,6 @@ const ExcelParser = {
             currentColDateMap = {};
 
             dateCandidates.forEach(item => {
-              if (item.date === "26-Jul") return; // Never accept 26-Jul header
               if (!allDatesList.includes(item.date)) {
                 allDatesList.push(item.date);
               }
