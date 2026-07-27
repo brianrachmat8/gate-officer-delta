@@ -110,23 +110,36 @@ const OFFICIAL_WEEKLY_SHIFTS = {
   "AGUM":      ["S-ACC DO", "P-IN", "M-OUT", "P-IN", "P-ACC DO", "S-ACC DO", "S-OUT", "P-IN", "P-OUT", "P-ACC DO", "M-OUT", "P-IN", "M-OUT", "P-ACC DO", "P-IN", "P-IN", "P-IN", "P-IN", "P-IN", "P-IN"]
 };
 
+// Precise Daily Shift Mapping per Staff (Matching exact Excel spreadsheet rows)
 function generateFullRosterShifts(staffName) {
   const shifts = {};
-  const weeklyPatterns = OFFICIAL_WEEKLY_SHIFTS[staffName] || Array(20).fill("P-IN");
+
+  // Group OFF days:
+  // AGUS & BRIAN: OFF on Saturdays (6th day of week)
+  // ARIP, NURHIKMAH, INDRA, RIDWAN: OFF on Fridays (5th day of week)
+  // SYAHRUL, BAYU, IRFAN, AGUM: OFF on Fridays (5th day of week)
+
+  const weeklyShiftCodes = OFFICIAL_WEEKLY_SHIFTS[staffName] || Array(20).fill("P-IN");
 
   matrixDatesList.forEach((d, index) => {
     const weekIndex = Math.floor(index / 7);
-    const dayInWeek = index % 7;
-    const baseCode = weeklyPatterns[weekIndex] || "P-IN";
+    const dayInWeek = index % 7; // 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
+    const baseCode = weeklyShiftCodes[weekIndex] || "P-IN";
 
-    if (dayInWeek === 5) {
-      shifts[d] = "OFF";
-    } else if (dayInWeek === 6) {
+    if (dayInWeek === 6) {
+      // Sunday is Overtime (OT)
       shifts[d] = "OT";
+    } else if (staffName === "AGUS" || staffName === "BRIAN") {
+      // Saturday OFF for AGUS & BRIAN
+      if (dayInWeek === 5) shifts[d] = "OFF";
+      else shifts[d] = baseCode;
     } else {
-      shifts[d] = baseCode;
+      // Friday OFF for ARIP, SYAHRUL, NURHIKMAH, BAYU, INDRA, IRFAN, RIDWAN, AGUM
+      if (dayInWeek === 4) shifts[d] = "OFF";
+      else shifts[d] = baseCode;
     }
   });
+
   return shifts;
 }
 
