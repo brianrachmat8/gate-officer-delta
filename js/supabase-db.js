@@ -265,6 +265,9 @@ const SupabaseDB = {
         const cloudSKCR = await SupabaseDB.loadAllSKCR();
         if (cloudSKCR && window.App) {
           skcrData = cloudSKCR;
+          try {
+            localStorage.setItem('portgate_skcr_data', JSON.stringify(skcrData));
+          } catch(e) {}
           App.renderSKCRTable();
           App.updateKPIs();
         }
@@ -279,6 +282,9 @@ const SupabaseDB = {
         const cloudNotices = await SupabaseDB.loadAllNotices();
         if (cloudNotices && window.App) {
           operationalAnnouncements = cloudNotices;
+          try {
+            localStorage.setItem('portgate_notices_data', JSON.stringify(operationalAnnouncements));
+          } catch(e) {}
           App.renderNoticeFeed();
           App.updateKPIs();
         }
@@ -327,14 +333,20 @@ const SupabaseDB = {
 
     // SKCR
     const cloudSKCR = await SupabaseDB.loadAllSKCR();
-    if (cloudSKCR && cloudSKCR.length > 0) {
+    if (cloudSKCR) {
       skcrData = cloudSKCR;
+      try {
+        localStorage.setItem('portgate_skcr_data', JSON.stringify(skcrData));
+      } catch(e) {}
     }
 
-    // Notices
+    // Notices / Peraturan
     const cloudNotices = await SupabaseDB.loadAllNotices();
-    if (cloudNotices && cloudNotices.length > 0) {
+    if (cloudNotices) {
       operationalAnnouncements = cloudNotices;
+      try {
+        localStorage.setItem('portgate_notices_data', JSON.stringify(operationalAnnouncements));
+      } catch(e) {}
     }
 
     if (window.App) {
