@@ -114,10 +114,10 @@ const OFFICIAL_WEEKLY_SHIFTS = {
 function generateFullRosterShifts(staffName) {
   const shifts = {};
 
-  // Group OFF days:
-  // AGUS & BRIAN: OFF on Saturdays (6th day of week)
-  // ARIP, NURHIKMAH, INDRA, RIDWAN: OFF on Fridays (5th day of week)
-  // SYAHRUL, BAYU, IRFAN, AGUM: OFF on Fridays (5th day of week)
+  // OFF day assignment per spreadsheet:
+  // AGUS: OFF on Saturdays (dayInWeek === 5)
+  // ARIP, BRIAN, SYAHRUL, NURHIKMAH, BAYU, INDRA, IRFAN, RIDWAN, AGUM: OFF on Fridays (dayInWeek === 4)
+  // All 10 Staff Members: OT on Sundays (dayInWeek === 6)
 
   const weeklyShiftCodes = OFFICIAL_WEEKLY_SHIFTS[staffName] || Array(20).fill("P-IN");
 
@@ -127,14 +127,14 @@ function generateFullRosterShifts(staffName) {
     const baseCode = weeklyShiftCodes[weekIndex] || "P-IN";
 
     if (dayInWeek === 6) {
-      // Sunday is Overtime (OT)
+      // Sunday is Overtime (OT) for ALL 10 staff members
       shifts[d] = "OT";
-    } else if (staffName === "AGUS" || staffName === "BRIAN") {
-      // Saturday OFF for AGUS & BRIAN
+    } else if (staffName === "AGUS") {
+      // Saturday OFF for AGUS
       if (dayInWeek === 5) shifts[d] = "OFF";
       else shifts[d] = baseCode;
     } else {
-      // Friday OFF for ARIP, SYAHRUL, NURHIKMAH, BAYU, INDRA, IRFAN, RIDWAN, AGUM
+      // Friday OFF for ARIP, BRIAN, SYAHRUL, NURHIKMAH, BAYU, INDRA, IRFAN, RIDWAN, AGUM
       if (dayInWeek === 4) shifts[d] = "OFF";
       else shifts[d] = baseCode;
     }
