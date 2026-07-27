@@ -108,22 +108,19 @@ let matrixDatesList = [
 
 // Weekly Shift Assignments for all 5 blocks (20 weeks = 140 days)
 const OFFICIAL_WEEKLY_SHIFTS = {
-  "AGUS":      ["P-OUT", "S-IN", "P-ACC DO", "S-ACC DO", "P-OUT", "S-IN", "S-ACC DO", "M-IN", "S-ACC DO", "S-IN", "S-ACC DO", "S-IN", "P-IN", "S-IN", "P-ACC DO", "M-OUT", "P-IN", "P-IN", "S-IN", "P-ACC DO"],
-  "ARIP":      ["M-IN", "S-OUT", "S-ACC DO", "P-ACC DO", "S-IN", "P-IN", "S-ACC DO", "S-OUT", "M-OUT", "S-OUT", "M-IN", "M-IN", "P-OUT", "M-IN", "P-OUT", "M-IN", "M-IN", "M-IN", "M-IN", "M-IN"],
-  "BRIAN":     ["S-OUT", "M-IN", "P-IN", "P-ACC DO", "P-OUT", "M-IN", "P-IN", "P-ACC DO", "S-ACC DO", "M-IN", "P-OUT", "P-ACC DO", "S-IN", "S-IN", "P-IN", "P-IN", "S-IN", "S-IN", "P-IN", "P-OUT"],
-  "SYAHRUL":   ["P-IN", "P-OUT", "S-IN", "P-ACC DO", "M-IN", "P-IN", "M-OUT", "P-IN", "P-IN", "P-OUT", "P-IN", "OFF", "P-ACC DO", "P-ACC DO", "S-ACC DO", "S-OUT", "P-ACC DO", "P-ACC DO", "P-ACC DO", "P-ACC DO"],
-  "NURHIKMAH": ["P-OUT", "M-OUT", "S-IN", "P-OUT", "S-OUT", "P-OUT", "M-IN", "OFF", "P-ACC DO", "S-OUT", "P-OUT", "P-IN", "S-OUT", "P-IN", "S-OUT", "P-ACC DO", "M-IN", "M-IN", "P-OUT", "S-IN"],
-  "BAYU":      ["S-IN", "S-ACC DO", "P-ACC DO", "P-IN", "P-IN", "S-OUT", "P-ACC DO", "M-OUT", "S-OUT", "M-OUT", "S-IN", "S-OUT", "S-ACC DO", "S-OUT", "M-IN", "P-IN", "S-OUT", "S-OUT", "S-OUT", "M-OUT"],
-  "INDRA":     ["P-ACC DO", "P-IN", "M-IN", "S-OUT", "S-ACC DO", "P-ACC DO", "P-IN", "S-IN", "M-IN", "P-IN", "P-ACC DO", "M-OUT", "M-IN", "P-OUT", "P-IN", "S-OUT", "P-OUT", "P-OUT", "P-ACC DO", "S-OUT"],
-  "IRFAN":     ["S-ACC DO", "P-ACC DO", "S-OUT", "M-IN", "M-OUT", "P-IN", "P-ACC DO", "S-IN", "S-IN", "P-IN", "S-OUT", "S-ACC DO", "P-IN", "P-IN", "S-ACC DO", "S-ACC DO", "S-ACC DO", "S-ACC DO", "S-IN", "P-ACC DO"],
-  "RIDWAN":    ["M-OUT", "S-OUT", "M-IN", "S-OUT", "M-OUT", "P-IN", "M-OUT", "P-ACC DO", "M-IN", "P-ACC DO", "OFF", "P-IN", "M-OUT", "M-OUT", "M-OUT", "P-ACC DO", "M-OUT", "M-OUT", "M-OUT", "S-IN"],
-  "AGUM":      ["S-ACC DO", "P-IN", "M-OUT", "P-IN", "P-ACC DO", "S-ACC DO", "S-OUT", "P-IN", "P-OUT", "P-ACC DO", "M-OUT", "P-IN", "M-OUT", "P-ACC DO", "P-IN", "P-IN", "P-IN", "P-IN", "P-IN", "P-IN"]
+  "AGUS":      ["P-ACC DO", "S-IN", "P-OUT", "M-IN", "P-ACC DO", "S-IN", "S-ACC DO", "M-IN", "S-ACC DO", "S-IN", "S-ACC DO", "S-IN", "P-IN", "S-IN", "P-ACC DO", "M-OUT", "P-IN", "P-IN", "S-IN", "P-ACC DO"],
+  "ARIP":      ["M-IN", "S-IN", "P-ACC DO", "S-ACC DO", "S-IN", "P-IN", "S-ACC DO", "S-OUT", "M-OUT", "S-OUT", "M-IN", "M-IN", "P-OUT", "M-IN", "P-OUT", "M-IN", "M-IN", "M-IN", "M-IN", "M-IN"],
+  "BRIAN":     ["M-OUT", "S-OUT", "P-IN", "S-IN", "P-OUT", "M-IN", "P-IN", "P-ACC DO", "S-ACC DO", "M-IN", "P-OUT", "P-ACC DO", "S-IN", "S-IN", "P-IN", "P-IN", "S-IN", "S-IN", "P-IN", "P-OUT"],
+  "SYAHRUL":   ["P-IN", "M-IN", "S-IN", "P-ACC DO", "M-IN", "P-IN", "M-OUT", "P-IN", "P-IN", "P-OUT", "P-IN", "OFF", "P-ACC DO", "P-ACC DO", "S-ACC DO", "S-OUT", "P-ACC DO", "P-ACC DO", "P-ACC DO", "P-ACC DO"],
+  "NURHIKMAH": ["P-OUT", "M-OUT", "S-IN", "P-IN", "S-OUT", "P-OUT", "M-IN", "OFF", "P-ACC DO", "S-OUT", "P-OUT", "P-IN", "S-OUT", "P-IN", "S-OUT", "P-ACC DO", "M-IN", "M-IN", "P-OUT", "S-IN"],
+  "BAYU":      ["S-IN", "P-IN", "S-ACC DO", "P-OUT", "P-IN", "S-OUT", "P-ACC DO", "M-OUT", "S-OUT", "M-OUT", "S-IN", "S-OUT", "S-ACC DO", "S-OUT", "M-IN", "P-IN", "S-OUT", "S-OUT", "S-OUT", "M-OUT"],
+  "INDRA":     ["S-OUT", "P-OUT", "M-IN", "S-IN", "S-ACC DO", "P-ACC DO", "P-IN", "S-IN", "M-IN", "P-IN", "P-ACC DO", "M-OUT", "M-IN", "P-OUT", "P-IN", "S-OUT", "P-OUT", "P-OUT", "P-ACC DO", "S-OUT"],
+  "IRFAN":     ["P-IN", "S-ACC DO", "P-IN", "M-OUT", "M-OUT", "P-IN", "P-ACC DO", "S-IN", "S-IN", "P-IN", "S-OUT", "S-ACC DO", "P-IN", "P-IN", "S-ACC DO", "S-ACC DO", "S-ACC DO", "S-ACC DO", "S-IN", "P-ACC DO"],
+  "RIDWAN":    ["S-IN", "P-ACC DO", "S-OUT", "P-IN", "M-OUT", "P-IN", "M-OUT", "P-ACC DO", "M-IN", "P-ACC DO", "OFF", "P-IN", "M-OUT", "M-OUT", "M-OUT", "P-ACC DO", "M-OUT", "M-OUT", "M-OUT", "S-IN"],
+  "AGUM":      ["S-ACC DO", "P-IN", "M-OUT", "S-OUT", "P-ACC DO", "S-ACC DO", "S-OUT", "P-IN", "P-OUT", "P-ACC DO", "M-OUT", "P-IN", "M-OUT", "P-ACC DO", "P-IN", "P-IN", "P-IN", "P-IN", "P-IN", "P-IN"]
 };
 
-// Dynamic Daily Shift Mapping:
-// - Shift 3 Malam (M-*): OFF on Saturday (dayInWeek === 5), works Friday
-// - Shift 1 Pagi (P-*) & Shift 2 Sore (S-*): OFF on Friday (dayInWeek === 4), works Saturday
-// - Sunday (dayInWeek === 6): OT (Shift 1 Pagi Overtime) for designated officers
+// Dynamic Daily Shift Mapping matching official spreadsheet logic
 function generateFullRosterShifts(staffName) {
   const shifts = {};
   const weeklyShiftCodes = OFFICIAL_WEEKLY_SHIFTS[staffName] || Array(20).fill("P-IN");
@@ -135,16 +132,21 @@ function generateFullRosterShifts(staffName) {
     const isNightShift = baseCode.toUpperCase().startsWith("M-");
 
     if (dayInWeek === 6) {
-      // Sunday is OT (Shift 1 Pagi Overtime)
-      shifts[d] = "OT";
+      // Sunday OT vs OFF
+      if (staffName === "AGUS" || staffName === "SYAHRUL" || staffName === "NURHIKMAH") {
+        shifts[d] = "OT";
+      } else if (staffName === "ARIP" || staffName === "BRIAN") {
+        shifts[d] = (weekIndex % 2 === 0) ? "S-IN" : "S-OUT";
+      } else {
+        shifts[d] = "OFF";
+      }
     } else if (isNightShift) {
       // Shift 3 Malam gets OFF on Saturday
       if (dayInWeek === 5) shifts[d] = "OFF";
       else shifts[d] = baseCode;
     } else {
-      // Shift 1 Pagi & Shift 2 Sore get OFF on Friday
-      if (dayInWeek === 4) shifts[d] = "OFF";
-      else shifts[d] = baseCode;
+      // Normal Working Days Mon-Sat
+      shifts[d] = baseCode;
     }
   });
 
