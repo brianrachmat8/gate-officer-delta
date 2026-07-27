@@ -89,9 +89,15 @@ const SupabaseDB = {
   saveSKCR: async function(skcrRecord) {
     if (!SupabaseDB.isConfigured) return;
     try {
+      const payloadObj = {
+        id: skcrRecord.id,
+        date: skcrRecord.date || new Date().toISOString().split('T')[0],
+        payload: skcrRecord,
+        created_at: new Date().toISOString()
+      };
       const { data, error } = await SupabaseDB.client
         .from('gate_skcr')
-        .upsert(skcrRecord, { onConflict: 'id' });
+        .upsert(payloadObj, { onConflict: 'id' });
 
       if (error) console.error("Error saving SKCR to Supabase:", error);
       else console.log("☁️ SKCR Record synced to Supabase Cloud!");
@@ -122,8 +128,8 @@ const SupabaseDB = {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) return null;
-      return data;
+      if (error || !data) return null;
+      return data.map(item => item.payload || item);
     } catch(e) {
       return null;
     }
