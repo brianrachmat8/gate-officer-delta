@@ -1656,21 +1656,34 @@ _Diposting via Terminal System Gate Officer Delta_`;
         const logIndex = shiftHandoverLogs.findIndex(l => l.id === hId);
         if (logIndex >= 0) {
           const log = shiftHandoverLogs[logIndex];
-          const defaultVal = log.responseText || "";
-          const userResp = prompt("Masukkan tanggapan/konfirmasi dari Shift Anda (misal: 'Diterima, printer sudah IT perbaiki' atau 'Diterima & Sesuai'):", defaultVal);
-          if (userResp !== null) {
-            log.responseText = userResp.trim();
-            log.respondedBy = App.getSettings().userNameGate || "RIDWAN";
+          
+          // Prompt 1: Get Officer's Name
+          const defaultName = log.respondedBy || App.getSettings().userNameGate || "RIDWAN";
+          const officerName = prompt("Masukkan NAMA PETUGAS yang merespon serah terima ini:", defaultName);
+          if (officerName !== null && officerName.trim() !== "") {
             
-            // Format time string
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
-            log.respondedAt = timeStr;
+            // Prompt 2: Get Response/Acknowledge text
+            const defaultVal = log.responseText || "Diterima & Sesuai";
+            const userResp = prompt(`Masukkan tanggapan/konfirmasi dari ${officerName.trim().toUpperCase()} (misal: 'Diterima & Sesuai' atau 'Diterima, printer sudah IT perbaiki'):`, defaultVal);
+            
+            if (userResp !== null) {
+              log.respondedBy = officerName.trim().toUpperCase();
+              log.responseText = userResp.trim();
+              
+              // Generate Current local Date and Time in WIB / Jakarta
+              const now = new Date();
+              const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+              const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+              
+              log.respondedAtDate = dateStr;
+              log.respondedAtTime = timeStr;
+              log.respondedAt = timeStr; // Legacy fallback
 
-            App.saveHandoverToStorage();
-            SupabaseDB.saveHandover(log);
-            App.renderHandoverTable();
-            alert("✅ Tanggapan serah terima berhasil disimpan & ter-sync realtime!");
+              App.saveHandoverToStorage();
+              SupabaseDB.saveHandover(log);
+              App.renderHandoverTable();
+              alert("✅ Tanggapan serah terima berhasil disimpan & ter-sync realtime!");
+            }
           }
         }
       }
@@ -1722,7 +1735,7 @@ _Diposting via Terminal System Gate Officer Delta_`;
           ${log.responseText ? `
             <div style="margin-top: 0.5rem; padding: 0.4rem 0.6rem; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; border-radius: 6px; font-size: 0.76rem; color: var(--text-main);">
               <div style="font-weight: 700; color: #059669; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.15rem;">
-                <i class="fa-solid fa-reply"></i> Respon oleh ${App.escapeHTML(log.respondedBy)} (${App.escapeHTML(log.respondedAt)}):
+                <i class="fa-solid fa-reply"></i> Respon oleh ${App.escapeHTML(log.respondedBy)} (${App.escapeHTML(log.respondedAtDate || log.date)} pukul ${App.escapeHTML(log.respondedAtTime || log.respondedAt)}):
               </div>
               <div style="font-style: italic;">"${App.escapeHTML(log.responseText)}"</div>
             </div>
