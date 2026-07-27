@@ -767,9 +767,11 @@ const App = {
       ExcelParser.downloadTemplate();
     });
 
-    document.getElementById('btnResetSavedRoster').addEventListener('click', () => {
-      if (confirm("Apakah Anda yakin ingin MENGHAPUS file Excel yang tersimpan dan mengembalikan jadwal ke default?")) {
+    document.getElementById('btnResetSavedRoster').addEventListener('click', async () => {
+      if (confirm("Apakah Anda yakin ingin RESET ULANG data jadwal ke default (mulai Senin 27-Jul s/d 13-Dec 2026)?")) {
         localStorage.removeItem('portgate_matrix_roster');
+        await SupabaseDB.resetRosterToDefault();
+        alert("✅ Master data jadwal berhasil di-reset total ke default (Senin 27-Jul 2026)!");
         location.reload();
       }
     });

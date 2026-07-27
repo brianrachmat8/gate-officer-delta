@@ -64,6 +64,47 @@ const SupabaseDB = {
     }
   },
 
+  resetRosterToDefault: async function() {
+    if (!SupabaseDB.isConfigured) return;
+    try {
+      const defaultDates = [
+        "27-Jul","28-Jul","29-Jul","30-Jul","31-Jul","01-Aug","02-Aug","03-Aug","04-Aug","05-Aug",
+        "06-Aug","07-Aug","08-Aug","09-Aug","10-Aug","11-Aug","12-Aug","13-Aug","14-Aug","15-Aug",
+        "16-Aug","17-Aug","18-Aug","19-Aug","20-Aug","21-Aug","22-Aug","23-Aug","24-Aug","25-Aug",
+        "26-Aug","27-Aug","28-Aug","29-Aug","30-Aug","31-Aug","01-Sep","02-Sep","03-Sep","04-Sep",
+        "05-Sep","06-Sep","07-Sep","08-Sep","09-Sep","10-Sep","11-Sep","12-Sep","13-Sep","14-Sep",
+        "15-Sep","16-Sep","17-Sep","18-Sep","19-Sep","20-Sep","21-Sep","22-Sep","23-Sep","24-Sep",
+        "25-Sep","26-Sep","27-Sep","28-Sep","29-Sep","30-Sep","01-Oct","02-Oct","03-Oct","04-Oct",
+        "05-Oct","06-Oct","07-Oct","08-Oct","09-Oct","10-Oct","11-Oct","12-Oct","13-Oct","14-Oct",
+        "15-Oct","16-Oct","17-Oct","18-Oct","19-Oct","20-Oct","21-Oct","22-Oct","23-Oct","24-Oct",
+        "25-Oct","26-Oct","27-Oct","28-Oct","29-Oct","30-Oct","31-Oct","01-Nov","02-Nov","03-Nov",
+        "04-Nov","05-Nov","06-Nov","07-Nov","08-Nov","09-Nov","10-Nov","11-Nov","12-Nov","13-Nov",
+        "14-Nov","15-Nov","16-Nov","17-Nov","18-Nov","19-Nov","20-Nov","21-Nov","22-Nov","23-Nov",
+        "24-Nov","25-Nov","26-Nov","27-Nov","28-Nov","29-Nov","30-Nov","01-Dec","02-Dec","03-Dec",
+        "04-Dec","05-Dec","06-Dec","07-Dec","08-Dec","09-Dec","10-Dec","11-Dec","12-Dec","13-Dec"
+      ];
+
+      const defaultRoster = typeof OFFICIAL_WEEKLY_SHIFTS !== 'undefined'
+        ? Object.keys(OFFICIAL_WEEKLY_SHIFTS).map(name => ({
+            name: name,
+            shifts: generateFullRosterShifts(name)
+          }))
+        : [];
+
+      const payload = {
+        id: 'latest_roster',
+        dates: defaultDates,
+        roster: defaultRoster,
+        updated_at: new Date().toISOString()
+      };
+
+      await SupabaseDB.client.from('gate_roster').upsert(payload, { onConflict: 'id' });
+      console.log("☁️ Supabase Cloud Roster Reset to Default (27-Jul start)!");
+    } catch(e) {
+      console.error("Error resetting Supabase Roster:", e);
+    }
+  },
+
   // Load Roster Schedule Matrix from Cloud
   loadRoster: async function() {
     if (!SupabaseDB.isConfigured) return null;

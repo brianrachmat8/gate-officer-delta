@@ -45,9 +45,15 @@ const ExcelParser = {
           if (val === undefined || val === null) return "";
 
           if (val instanceof Date && !isNaN(val.getTime())) {
-            // Prevent UTC timezone shift (e.g. 2026-07-27 00:00 UTC stays 27-Jul)
-            const monthIdx = val.getUTCMonth();
-            const dayNum = val.getUTCDate();
+            // Bulletproof WIB (Jakarta UTC+7) vs UTC date extraction
+            let dayNum = val.getDate();
+            let monthIdx = val.getMonth();
+
+            if (val.getHours() >= 17) {
+              dayNum = val.getUTCDate();
+              monthIdx = val.getUTCMonth();
+            }
+
             const day = String(dayNum).padStart(2, '0');
             const month = MONTH_NAMES[monthIdx];
             return `${day}-${month}`;
