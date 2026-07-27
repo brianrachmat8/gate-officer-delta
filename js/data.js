@@ -63,73 +63,85 @@ let skcrData = [
   }
 ];
 
-// Matrix Dates Header Range (All 5 vertical blocks from 09-Mar all the way to 26-Jul)
+// Matrix Dates Header Range (5 vertical blocks: 27-Jul 2026 to 13-Dec 2026)
 let matrixDatesList = [
-  // Block 1: 09-Mar to 05-Apr
-  "09-Mar", "10-Mar", "11-Mar", "12-Mar", "13-Mar", "14-Mar", "15-Mar",
-  "16-Mar", "17-Mar", "18-Mar", "19-Mar", "20-Mar", "21-Mar", "22-Mar",
-  "23-Mar", "24-Mar", "25-Mar", "26-Mar", "27-Mar", "28-Mar", "29-Mar",
-  "30-Mar", "31-Mar", "01-Apr", "02-Apr", "03-Apr", "04-Apr", "05-Apr",
-  // Block 2: 06-Apr to 03-May
-  "06-Apr", "07-Apr", "08-Apr", "09-Apr", "10-Apr", "11-Apr", "12-Apr",
-  "13-Apr", "14-Apr", "15-Apr", "16-Apr", "17-Apr", "18-Apr", "19-Apr",
-  "20-Apr", "21-Apr", "22-Apr", "23-Apr", "24-Apr", "25-Apr", "26-Apr",
-  "27-Apr", "28-Apr", "29-Apr", "30-Apr", "01-May", "02-May", "03-May",
-  // Block 3: 04-May to 31-May
-  "04-May", "05-May", "06-May", "07-May", "08-May", "09-May", "10-May",
-  "11-May", "12-May", "13-May", "14-May", "15-May", "16-May", "17-May",
-  "18-May", "19-May", "20-May", "21-May", "22-May", "23-May", "24-May",
-  "25-May", "26-May", "27-May", "28-May", "29-May", "30-May", "31-May",
-  // Block 4: 01-Jun to 28-Jun
-  "01-Jun", "02-Jun", "03-Jun", "04-Jun", "05-Jun", "06-Jun", "07-Jun",
-  "08-Jun", "09-Jun", "10-Jun", "11-Jun", "12-Jun", "13-Jun", "14-Jun",
-  "15-Jun", "16-Jun", "17-Jun", "18-Jun", "19-Jun", "20-Jun", "21-Jun",
-  "22-Jun", "23-Jun", "24-Jun", "25-Jun", "26-Jun", "27-Jun", "28-Jun",
-  // Block 5: 29-Jun to 26-Jul
-  "29-Jun", "30-Jun", "01-Jul", "02-Jul", "03-Jul", "04-Jul", "05-Jul",
-  "06-Jul", "07-Jul", "08-Jul", "09-Jul", "10-Jul", "11-Jul", "12-Jul",
-  "13-Jul", "14-Jul", "15-Jul", "16-Jul", "17-Jul", "18-Jul", "19-Jul",
-  "20-Jul", "21-Jul", "22-Jul", "23-Jul", "24-Jul", "25-Jul", "26-Jul"
+  // Block 1: 27-Jul to 23-Aug 2026
+  "27-Jul", "28-Jul", "29-Jul", "30-Jul", "31-Jul", "01-Aug", "02-Aug",
+  "03-Aug", "04-Aug", "05-Aug", "06-Aug", "07-Aug", "08-Aug", "09-Aug",
+  "10-Aug", "11-Aug", "12-Aug", "13-Aug", "14-Aug", "15-Aug", "16-Aug",
+  "17-Aug", "18-Aug", "19-Aug", "20-Aug", "21-Aug", "22-Aug", "23-Aug",
+
+  // Block 2: 24-Aug to 20-Sep 2026
+  "24-Aug", "25-Aug", "26-Aug", "27-Aug", "28-Aug", "29-Aug", "30-Aug",
+  "31-Aug", "01-Sep", "02-Sep", "03-Sep", "04-Sep", "05-Sep", "06-Sep",
+  "07-Sep", "08-Sep", "09-Sep", "10-Sep", "11-Sep", "12-Sep", "13-Sep",
+  "14-Sep", "15-Sep", "16-Sep", "17-Sep", "18-Sep", "19-Sep", "20-Sep",
+
+  // Block 3: 21-Sep to 18-Oct 2026
+  "21-Sep", "22-Sep", "23-Sep", "24-Sep", "25-Sep", "26-Sep", "27-Sep",
+  "28-Sep", "29-Sep", "30-Sep", "01-Oct", "02-Oct", "03-Oct", "04-Oct",
+  "05-Oct", "06-Oct", "07-Oct", "08-Oct", "09-Oct", "10-Oct", "11-Oct",
+  "12-Oct", "13-Oct", "14-Oct", "15-Oct", "16-Oct", "17-Oct", "18-Oct",
+
+  // Block 4: 19-Oct to 15-Nov 2026
+  "19-Oct", "20-Oct", "21-Oct", "22-Oct", "23-Oct", "24-Oct", "25-Oct",
+  "26-Oct", "27-Oct", "28-Oct", "29-Oct", "30-Oct", "31-Oct", "01-Nov",
+  "02-Nov", "03-Nov", "04-Nov", "05-Nov", "06-Nov", "07-Nov", "08-Nov",
+  "09-Nov", "10-Nov", "11-Nov", "12-Nov", "13-Nov", "14-Nov", "15-Nov",
+
+  // Block 5: 16-Nov to 13-Dec 2026
+  "16-Nov", "17-Nov", "18-Nov", "19-Nov", "20-Nov", "21-Nov", "22-Nov",
+  "23-Nov", "24-Nov", "25-Nov", "26-Nov", "27-Nov", "28-Nov", "29-Nov",
+  "30-Nov", "01-Dec", "02-Dec", "03-Dec", "04-Dec", "05-Dec", "06-Dec",
+  "07-Dec", "08-Dec", "09-Dec", "10-Dec", "11-Dec", "12-Dec", "13-Dec"
 ];
 
-// Generate Roster Shifts for all 5 blocks (09-Mar to 26-Jul)
+// Weekly Shift Assignments for all 5 blocks (20 weeks = 140 days)
+const OFFICIAL_WEEKLY_SHIFTS = {
+  "AGUS":      ["P-OUT", "S-IN", "P-ACC DO", "S-ACC DO", "P-OUT", "S-IN", "S-ACC DO", "M-IN", "S-ACC DO", "S-IN", "S-ACC DO", "S-IN", "P-IN", "S-IN", "P-ACC DO", "M-OUT", "P-IN", "P-IN", "S-IN", "P-ACC DO"],
+  "ARIP":      ["M-IN", "S-OUT", "S-ACC DO", "P-ACC DO", "S-IN", "P-IN", "S-ACC DO", "S-OUT", "M-OUT", "S-OUT", "M-IN", "M-IN", "P-OUT", "M-IN", "P-OUT", "M-IN", "M-IN", "M-IN", "M-IN", "M-IN"],
+  "BRIAN":     ["S-OUT", "M-IN", "P-IN", "P-ACC DO", "P-OUT", "M-IN", "P-IN", "P-ACC DO", "S-ACC DO", "M-IN", "P-OUT", "P-ACC DO", "S-IN", "S-IN", "P-IN", "P-IN", "S-IN", "S-IN", "P-IN", "P-OUT"],
+  "SYAHRUL":   ["P-IN", "P-OUT", "S-IN", "P-ACC DO", "M-IN", "P-IN", "M-OUT", "P-IN", "P-IN", "P-OUT", "P-IN", "OFF", "P-ACC DO", "P-ACC DO", "S-ACC DO", "S-OUT", "P-ACC DO", "P-ACC DO", "P-ACC DO", "P-ACC DO"],
+  "NURHIKMAH": ["P-OUT", "M-OUT", "S-IN", "P-OUT", "S-OUT", "P-OUT", "M-IN", "OFF", "P-ACC DO", "S-OUT", "P-OUT", "P-IN", "S-OUT", "P-IN", "S-OUT", "P-ACC DO", "M-IN", "M-IN", "P-OUT", "S-IN"],
+  "BAYU":      ["S-IN", "S-ACC DO", "P-ACC DO", "P-IN", "P-IN", "S-OUT", "P-ACC DO", "M-OUT", "S-OUT", "M-OUT", "S-IN", "S-OUT", "S-ACC DO", "S-OUT", "M-IN", "P-IN", "S-OUT", "S-OUT", "S-OUT", "M-OUT"],
+  "INDRA":     ["P-ACC DO", "P-IN", "M-IN", "S-OUT", "S-ACC DO", "P-ACC DO", "P-IN", "S-IN", "M-IN", "P-IN", "P-ACC DO", "M-OUT", "M-IN", "P-OUT", "P-IN", "S-OUT", "P-OUT", "P-OUT", "P-ACC DO", "S-OUT"],
+  "IRFAN":     ["S-ACC DO", "P-ACC DO", "S-OUT", "M-IN", "M-OUT", "P-IN", "P-ACC DO", "S-IN", "S-IN", "P-IN", "S-OUT", "S-ACC DO", "P-IN", "P-IN", "S-ACC DO", "S-ACC DO", "S-ACC DO", "S-ACC DO", "S-IN", "P-ACC DO"],
+  "RIDWAN":    ["M-OUT", "S-OUT", "M-IN", "S-OUT", "M-OUT", "P-IN", "M-OUT", "P-ACC DO", "M-IN", "P-ACC DO", "OFF", "P-IN", "M-OUT", "M-OUT", "M-OUT", "P-ACC DO", "M-OUT", "M-OUT", "M-OUT", "S-IN"],
+  "AGUM":      ["S-ACC DO", "P-IN", "M-OUT", "P-IN", "P-ACC DO", "S-ACC DO", "S-OUT", "P-IN", "P-OUT", "P-ACC DO", "M-OUT", "P-IN", "M-OUT", "P-ACC DO", "P-IN", "P-IN", "P-IN", "P-IN", "P-IN", "P-IN"]
+};
+
 function generateFullRosterShifts(staffName) {
   const shifts = {};
+  const weeklyPatterns = OFFICIAL_WEEKLY_SHIFTS[staffName] || Array(20).fill("P-IN");
+
   matrixDatesList.forEach((d, index) => {
-    const dayMod = index % 7;
-    if (dayMod === 5) {
+    const weekIndex = Math.floor(index / 7);
+    const dayInWeek = index % 7;
+    const baseCode = weeklyPatterns[weekIndex] || "P-IN";
+
+    if (dayInWeek === 5) {
       shifts[d] = "OFF";
-    } else if (dayMod === 6) {
+    } else if (dayInWeek === 6) {
       shifts[d] = "OT";
     } else {
-      if (staffName === "BAYU") shifts[d] = (index % 14 < 7) ? "S-ACC DO" : "S-OUT";
-      else if (staffName === "ARIP") shifts[d] = (index % 14 < 7) ? "P-IN" : "P-ACC DO";
-      else if (staffName === "BRIAN") shifts[d] = (index % 14 < 7) ? "M-IN" : "S-IN";
-      else if (staffName === "AGUS") shifts[d] = (index % 14 < 7) ? "P-OUT" : "M-IN";
-      else if (staffName === "IRFAN") shifts[d] = (index % 14 < 7) ? "P-IN" : "S-OUT";
-      else if (staffName === "RIDWAN") shifts[d] = (index % 14 < 7) ? "S-IN" : "P-IN";
-      else if (staffName === "SYAHRUL") shifts[d] = (index % 14 < 7) ? "S-OUT" : "P-OUT";
-      else if (staffName === "AGUM") shifts[d] = (index % 14 < 7) ? "P-IN" : "S-ACC DO";
-      else if (staffName === "NURHIKMAH") shifts[d] = (index % 14 < 7) ? "M-OUT" : "S-IN";
-      else if (staffName === "INDRA") shifts[d] = (index % 14 < 7) ? "M-IN" : "P-OUT";
-      else shifts[d] = "P-IN";
+      shifts[d] = baseCode;
     }
   });
   return shifts;
 }
 
-// Full Matrix Roster Data (AGUSTIKA -> IRFAN)
+// Full Matrix Roster Data (10 Staff Members matching official spreadsheet order)
 let matrixRosterData = [
-  { name: "BAYU", shifts: generateFullRosterShifts("BAYU") },
+  { name: "AGUS", shifts: generateFullRosterShifts("AGUS") },
   { name: "ARIP", shifts: generateFullRosterShifts("ARIP") },
   { name: "BRIAN", shifts: generateFullRosterShifts("BRIAN") },
-  { name: "AGUS", shifts: generateFullRosterShifts("AGUS") },
+  { name: "SYAHRUL", shifts: generateFullRosterShifts("SYAHRUL") },
+  { name: "NURHIKMAH", shifts: generateFullRosterShifts("NURHIKMAH") },
+  { name: "BAYU", shifts: generateFullRosterShifts("BAYU") },
+  { name: "INDRA", shifts: generateFullRosterShifts("INDRA") },
   { name: "IRFAN", shifts: generateFullRosterShifts("IRFAN") },
   { name: "RIDWAN", shifts: generateFullRosterShifts("RIDWAN") },
-  { name: "SYAHRUL", shifts: generateFullRosterShifts("SYAHRUL") },
-  { name: "AGUM", shifts: generateFullRosterShifts("AGUM") },
-  { name: "NURHIKMAH", shifts: generateFullRosterShifts("NURHIKMAH") },
-  { name: "INDRA", shifts: generateFullRosterShifts("INDRA") }
+  { name: "AGUM", shifts: generateFullRosterShifts("AGUM") }
 ];
 
 // Official Operational Rules per Shipping Line tagged with serviceType ("EKSPOR" / "IMPOR")

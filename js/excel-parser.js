@@ -38,6 +38,42 @@ const ExcelParser = {
           return;
         }
 
+        const MONTH_MAP = {
+          "01": "Jan", "02": "Feb", "03": "Mar", "04": "Apr", "05": "May", "06": "Jun",
+          "07": "Jul", "08": "Aug", "09": "Sep", "10": "Oct", "11": "Nov", "12": "Dec"
+        };
+
+        const normalizeDateStr = (rawVal) => {
+          if (!rawVal) return "";
+          if (rawVal instanceof Date) {
+            const day = String(rawVal.getDate()).padStart(2, '0');
+            const month = rawVal.toLocaleString('en-US', { month: 'short' });
+            return `${day}-${month}`;
+          }
+
+          let s = String(rawVal).trim();
+          if (s.toLowerCase().includes("jadwal") || s.toLowerCase().includes("bulan") || s.length > 20) return "";
+
+          // Match DD-MMM or DD-MMM-YYYY (e.g. 27-Jul or 27-Jul-2026)
+          let matchM = s.match(/(\d{1,2})[-/\s]([A-Za-z]{3})/i);
+          if (matchM) {
+            const day = String(matchM[1]).padStart(2, '0');
+            const month = matchM[2].charAt(0).toUpperCase() + matchM[2].slice(1, 3).toLowerCase();
+            return `${day}-${month}`;
+          }
+
+          // Match YYYY-MM-DD or DD/MM/YYYY
+          let matchD = s.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/) || s.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+          if (matchD) {
+            let day = matchD[1].length === 4 ? String(matchD[3]).padStart(2, '0') : String(matchD[1]).padStart(2, '0');
+            let mNum = matchD[1].length === 4 ? String(matchD[2]).padStart(2, '0') : String(matchD[2]).padStart(2, '0');
+            let month = MONTH_MAP[mNum] || "Jan";
+            return `${day}-${month}`;
+          }
+
+          return s;
+        };
+
         const allDatesList = [];
         const staffShiftMap = {};
         const staffNameOrder = [];
@@ -65,15 +101,7 @@ const ExcelParser = {
               const rawVal = row[c];
               if (rawVal === undefined || rawVal === null || String(rawVal).trim() === '') continue;
 
-              let dateStr = "";
-              if (rawVal instanceof Date) {
-                const day = String(rawVal.getDate()).padStart(2, '0');
-                const month = rawVal.toLocaleString('en-US', { month: 'short' });
-                dateStr = `${day}-${month}`;
-              } else {
-                dateStr = String(rawVal).trim();
-              }
-
+              const dateStr = normalizeDateStr(rawVal);
               if (dateStr && !dateStr.toLowerCase().includes("jadwal")) {
                 if (!allDatesList.includes(dateStr)) {
                   allDatesList.push(dateStr);
@@ -89,7 +117,10 @@ const ExcelParser = {
             let staffName = String(row[0] || row[1] || '').trim().toUpperCase();
             if (!staffName || staffName === 'UNDEFINED' || staffName.length < 2) continue;
 
-            if (staffName.includes("KET") || staffName.includes("JADWAL") || staffName.includes("DIBUAT") || staffName.includes("MENGETAHUI") || staffName.includes("SHIFT") || staffName.includes("KORD") || staffName.includes("NAMA")) {
+            const upperName = staffName.toUpperCase();
+            if (upperName.includes("KET") || upperName.includes("JADWAL") || upperName.includes("DIBUAT") || 
+                upperName.includes("MENGETAHUI") || upperName.includes("SHIFT") || upperName.includes("KORD") || 
+                upperName.includes("NAMA") || upperName.includes("MANAGER") || upperName.includes("OPS") || upperName.includes("NO")) {
               continue;
             }
 
