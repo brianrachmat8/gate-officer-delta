@@ -860,6 +860,28 @@ const App = {
     alert(`🎉 File Excel Matriks Berhasil Di-Upload!\nJadwal ${newRoster.length} petugas gate across ${newDates.length} tanggal tersimpan & ter-sync realtime!`);
   },
 
+  getDayNameIndonesian: function(dateStr) {
+    if (!dateStr) return '';
+    const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const monthMap = {
+      "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5,
+      "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11
+    };
+
+    const parts = String(dateStr).split('-');
+    if (parts.length >= 2) {
+      const day = parseInt(parts[0], 10);
+      const monthStr = parts[1];
+      const monthIdx = monthMap[monthStr] !== undefined ? monthMap[monthStr] : 6;
+      const year = parts[2] ? parseInt(parts[2], 10) : 2026;
+
+      const d = new Date(Date.UTC(year, monthIdx, day));
+      const dayIdx = d.getUTCDay();
+      return dayNames[dayIdx] || '';
+    }
+    return '';
+  },
+
   renderMatrixScheduleTable: function(searchTerm = "") {
     const thead = document.getElementById('theadMatrixSchedule');
     const tbody = document.getElementById('tbodyMatrixSchedule');
@@ -874,7 +896,20 @@ const App = {
     thead.innerHTML = `
       <tr>
         <th class="matrix-staff-col"><i class="fa-solid fa-user"></i> NAMA PETUGAS</th>
-        ${displayDates.map(d => `<th>${d}</th>`).join('')}
+        ${displayDates.map(d => {
+          const dayName = App.getDayNameIndonesian(d);
+          const isWeekend = (dayName === "Sabtu" || dayName === "Minggu");
+          const isFriday = (dayName === "Jumat");
+          const styleAttr = isWeekend 
+            ? 'style="background: rgba(239, 68, 68, 0.12); color: #ef4444;"' 
+            : (isFriday ? 'style="background: rgba(245, 158, 11, 0.12);"' : '');
+          return `
+            <th ${styleAttr}>
+              <div style="font-size: 0.65rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; opacity: 0.9;">${dayName}</div>
+              <div style="font-size: 0.8rem; font-weight: 800;">${d}</div>
+            </th>
+          `;
+        }).join('')}
       </tr>
     `;
 
