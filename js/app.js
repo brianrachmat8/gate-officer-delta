@@ -648,7 +648,7 @@ const App = {
       return matchLine && matchSearch;
     });
 
-    tbody.innerHTML = filtered.map(item => {
+    tbody.innerHTML = filtered.map((item, idx) => {
       const cCount = item.containerCount || (item.containers ? item.containers.length : 1);
       const mainContainer = item.primaryContainer || (item.containers && item.containers[0]) || item.containerNo || "SNKO8923410";
       const sLine = item.shippingLine || "HAPAG";
@@ -656,6 +656,7 @@ const App = {
 
       return `
         <tr>
+          <td style="text-align: center; font-size: 0.78rem; font-weight: bold; color: var(--text-muted);">${idx + 1}</td>
           <td><strong style="font-size: 0.78rem; word-break: break-word;">${App.escapeHTML(item.id)}</strong></td>
           <td style="white-space: nowrap; font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">${App.escapeHTML(item.date)}</td>
           <td>
@@ -1486,17 +1487,58 @@ const App = {
     }, 1200);
   },
 
+  shareHandoverToWA: function(handoverId) {
+    const log = shiftHandoverLogs.find(l => l.id === handoverId);
+    if (!log) return;
+
+    const formattedDate = (typeof SKCRModule !== 'undefined' && SKCRModule.formatIndonesianDateStr)
+      ? SKCRModule.formatIndonesianDateStr(log.date)
+      : log.date;
+
+    const messageText = 
+`📋 *LAPORAN SERAH TERIMA SHIFT GATE*
+🏢 *PT DELTA KONTAINER DEPOT*
+📅 *Tanggal:* ${formattedDate}
+
+🔄 *Pergantian Shift:* ${log.shiftFrom} ➔ ${log.shiftTo}
+👤 *Supervisor / Petugas:* ${log.supervisor}
+🚦 *Kondisi Pos & Peralatan:* ${log.gateCondition}
+📦 *Container Hold / Pending:* ${log.pendingContainers}
+
+📝 *Catatan Khusus Operasional:*
+${log.generalNotes}
+
+---
+_Diposting via Terminal System Gate Officer Delta_`;
+
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(messageText)}`;
+    window.open(waUrl, '_blank');
+  },
+
   setupHandoverModule: function() {
     document.getElementById('btnOpenHandoverModal').addEventListener('click', () => {
       App.openModal('handoverModal');
     });
 
+    document.getElementById('tbodyHandover').addEventListener('click', (e) => {
+      const btnWA = e.target.closest('.btn-share-wa-handover');
+      if (btnWA) {
+        const hId = btnWA.getAttribute('data-id');
+        App.shareHandoverToWA(hId);
+      }
+    });
+
     document.getElementById('formAddHandover').addEventListener('submit', (e) => {
       e.preventDefault();
 
+      const getLocalDate = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      };
+
       const newLog = {
         id: `LOG-${Date.now()}`,
-        date: new Date().toISOString().split('T')[0],
+        date: getLocalDate(),
         shiftFrom: document.getElementById('hoShiftFrom').value,
         shiftTo: document.getElementById('hoShiftTo').value,
         supervisor: document.getElementById('hoSupervisor').value,
@@ -1521,12 +1563,17 @@ const App = {
     const tbody = document.getElementById('tbodyHandover');
     tbody.innerHTML = shiftHandoverLogs.map(log => `
       <tr>
-        <td><strong>${log.date}</strong></td>
-        <td><span class="badge badge-info">${log.shiftFrom}</span> &rarr; <span class="badge badge-success">${log.shiftTo}</span></td>
-        <td><strong>${log.supervisor}</strong></td>
-        <td>${log.gateCondition}</td>
-        <td><strong style="color: var(--status-danger);">${log.pendingContainers}</strong></td>
-        <td>${log.generalNotes}</td>
+        <td style="white-space: nowrap;"><strong>${App.escapeHTML(log.date)}</strong></td>
+        <td style="white-space: nowrap;"><span class="badge badge-info">${App.escapeHTML(log.shiftFrom)}</span> &rarr; <span class="badge badge-success">${App.escapeHTML(log.shiftTo)}</span></td>
+        <td style="white-space: nowrap;"><strong>${App.escapeHTML(log.supervisor)}</strong></td>
+        <td>${App.escapeHTML(log.gateCondition)}</td>
+        <td style="white-space: nowrap;"><strong style="color: var(--status-danger);">${App.escapeHTML(log.pendingContainers)}</strong></td>
+        <td>${App.escapeHTML(log.generalNotes)}</td>
+        <td style="white-space: nowrap; text-align: center;">
+          <button class="btn btn-success btn-sm btn-share-wa-handover" data-id="${log.id}" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; background-color: #25D366; border-color: #25D366; color: white;" title="Share Laporan Ke Grup WhatsApp">
+            <i class="fa-brands fa-whatsapp"></i> Kirim WA
+          </button>
+        </td>
       </tr>
     `).join('');
   },

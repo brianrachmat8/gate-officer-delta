@@ -148,7 +148,7 @@ const SupabaseDB = {
       const { data, error } = await SupabaseDB.client
         .from('gate_skcr')
         .select('*')
-        .order('id', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error || !data) return null;
       return data.map(item => ({
