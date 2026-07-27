@@ -110,31 +110,29 @@ const OFFICIAL_WEEKLY_SHIFTS = {
   "AGUM":      ["S-ACC DO", "P-IN", "M-OUT", "P-IN", "P-ACC DO", "S-ACC DO", "S-OUT", "P-IN", "P-OUT", "P-ACC DO", "M-OUT", "P-IN", "M-OUT", "P-ACC DO", "P-IN", "P-IN", "P-IN", "P-IN", "P-IN", "P-IN"]
 };
 
-// Precise Daily Shift Mapping per Staff (Matching exact Excel spreadsheet rows)
+// Dynamic Daily Shift Mapping:
+// - Shift 3 Malam (M-*): OFF on Saturday (dayInWeek === 5), works Friday
+// - Shift 1 Pagi (P-*) & Shift 2 Sore (S-*): OFF on Friday (dayInWeek === 4), works Saturday
+// - Sunday (dayInWeek === 6): OT (Shift 1 Pagi Overtime) for designated officers
 function generateFullRosterShifts(staffName) {
   const shifts = {};
-
-  // OFF day assignment per spreadsheet:
-  // AGUS: OFF on Saturdays (dayInWeek === 5)
-  // ARIP, BRIAN, SYAHRUL, NURHIKMAH, BAYU, INDRA, IRFAN, RIDWAN, AGUM: OFF on Fridays (dayInWeek === 4)
-  // All 10 Staff Members: OT on Sundays (dayInWeek === 6)
-
   const weeklyShiftCodes = OFFICIAL_WEEKLY_SHIFTS[staffName] || Array(20).fill("P-IN");
 
   matrixDatesList.forEach((d, index) => {
     const weekIndex = Math.floor(index / 7);
     const dayInWeek = index % 7; // 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
     const baseCode = weeklyShiftCodes[weekIndex] || "P-IN";
+    const isNightShift = baseCode.toUpperCase().startsWith("M-");
 
     if (dayInWeek === 6) {
-      // Sunday is Overtime (OT) for ALL 10 staff members
+      // Sunday is OT (Shift 1 Pagi Overtime)
       shifts[d] = "OT";
-    } else if (staffName === "AGUS") {
-      // Saturday OFF for AGUS
+    } else if (isNightShift) {
+      // Shift 3 Malam gets OFF on Saturday
       if (dayInWeek === 5) shifts[d] = "OFF";
       else shifts[d] = baseCode;
     } else {
-      // Friday OFF for ARIP, BRIAN, SYAHRUL, NURHIKMAH, BAYU, INDRA, IRFAN, RIDWAN, AGUM
+      // Shift 1 Pagi & Shift 2 Sore get OFF on Friday
       if (dayInWeek === 4) shifts[d] = "OFF";
       else shifts[d] = baseCode;
     }
