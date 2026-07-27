@@ -89,27 +89,18 @@ const SupabaseDB = {
   saveSKCR: async function(skcrRecord) {
     if (!SupabaseDB.isConfigured) return;
     try {
-      // First attempt: direct object upsert
-      let { error } = await SupabaseDB.client
+      const payload = {
+        id: skcrRecord.id,
+        date: skcrRecord.date || new Date().toISOString().split('T')[0],
+        containers: skcrRecord.containers || [skcrRecord.containerNo || 'SNKO8923410'],
+        consignee: skcrRecord.consignee || skcrRecord.shippingLine || 'PT DELTA KONTAINER'
+      };
+      const { data, error } = await SupabaseDB.client
         .from('gate_skcr')
-        .upsert(skcrRecord, { onConflict: 'id' });
+        .upsert(payload, { onConflict: 'id' });
 
-      if (error) {
-        console.warn("Direct SKCR upsert encountered schema warning, trying payload fallback...", error.message);
-        const payloadObj = {
-          id: skcrRecord.id,
-          date: skcrRecord.date || new Date().toISOString().split('T')[0],
-          payload: skcrRecord
-        };
-        const res = await SupabaseDB.client
-          .from('gate_skcr')
-          .upsert(payloadObj, { onConflict: 'id' });
-
-        if (res.error) console.error("Error saving SKCR to Supabase:", res.error);
-        else console.log("☁️ SKCR Record synced to Supabase Cloud (Payload Fallback)!");
-      } else {
-        console.log("☁️ SKCR Record synced to Supabase Cloud!");
-      }
+      if (error) console.error("Error saving SKCR to Supabase:", error);
+      else console.log("☁️ SKCR Record synced to Supabase Cloud!");
     } catch(e) {
       console.error("Supabase SKCR Save Exception:", e);
     }
@@ -135,10 +126,24 @@ const SupabaseDB = {
       const { data, error } = await SupabaseDB.client
         .from('gate_skcr')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('id', { ascending: false });
 
       if (error || !data) return null;
-      return data.map(item => item.payload || item);
+      return data.map(item => ({
+        id: item.id,
+        date: item.date || new Date().toISOString().split('T')[0],
+        containers: item.containers || [item.containerNo || 'SNKO8923410'],
+        containerNo: item.containerNo || (item.containers ? item.containers[0] : 'SNKO8923410'),
+        consignee: item.consignee || 'PT STAR SHIPPING INDONESIA',
+        shippingLine: item.shippingLine || item.consignee || 'HAPAG',
+        sizeType: item.sizeType || '40 FT',
+        vesselVoyage: item.vesselVoyage || 'MV SAWASDEE BALI V.2405N',
+        userNameGate: item.userNameGate || 'RIDWAN ALAMSYAH',
+        companyName: item.companyName || 'PT DELTA KONTAINER DEPOT',
+        userTitle: item.userTitle || 'Gate Operasional',
+        containerCount: item.containerCount || (item.containers ? item.containers.length : 1),
+        primaryContainer: item.primaryContainer || (item.containers ? item.containers[0] : 'SNKO8923410')
+      }));
     } catch(e) {
       return null;
     }
@@ -411,7 +416,7 @@ const SupabaseDB = {
 
     // SKCR
     const cloudSKCR = await SupabaseDB.loadAllSKCR();
-    if (Array.isArray(cloudSKCR)) {
+    if (Array.isArray(cloudSKCR) && cloudSKCR.length > 0) {
       skcrData = cloudSKCR;
       try {
         localStorage.setItem('portgate_skcr_data', JSON.stringify(skcrData));
