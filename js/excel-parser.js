@@ -26,7 +26,7 @@ const ExcelParser = {
     reader.onload = function(e) {
       try {
         const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array', cellDates: true, raw: false });
+        const workbook = XLSX.read(data, { type: 'array', cellDates: false, raw: false });
 
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
