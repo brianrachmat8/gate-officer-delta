@@ -45,15 +45,12 @@ const ExcelParser = {
           if (val === undefined || val === null) return "";
 
           if (val instanceof Date && !isNaN(val.getTime())) {
-            // Prevent UTC timezone shift (e.g. 2026-07-27 00:00 UTC shifting to 2026-07-26 local)
-            const year = val.getUTCFullYear();
+            // Prevent UTC timezone shift (e.g. 2026-07-27 00:00 UTC stays 27-Jul)
             const monthIdx = val.getUTCMonth();
             const dayNum = val.getUTCDate();
             const day = String(dayNum).padStart(2, '0');
             const month = MONTH_NAMES[monthIdx];
-            const res = `${day}-${month}`;
-            if (res === "26-Jul") return "";
-            return res;
+            return `${day}-${month}`;
           }
 
           let s = String(val).trim();
@@ -66,9 +63,7 @@ const ExcelParser = {
             const mStr = matchMMM[2].toLowerCase();
             const mIdx = MONTH_NAMES.findIndex(m => m.toLowerCase() === mStr.slice(0, 3));
             const month = mIdx >= 0 ? MONTH_NAMES[mIdx] : mStr.charAt(0).toUpperCase() + mStr.slice(1, 3);
-            const res = `${day}-${month}`;
-            if (res === "26-Jul") return "";
-            return res;
+            return `${day}-${month}`;
           }
 
           // Match DD/MM or DD-MM or YYYY-MM-DD or DD.MM.YYYY
@@ -78,9 +73,7 @@ const ExcelParser = {
             let mNum = parseInt(matchNum[1].length === 4 ? matchNum[2] : matchNum[2], 10);
             if (mNum >= 1 && mNum <= 12) {
               const month = MONTH_NAMES[mNum - 1];
-              const res = `${day}-${month}`;
-              if (res === "26-Jul") return "";
-              return res;
+              return `${day}-${month}`;
             }
           }
 
@@ -92,18 +85,14 @@ const ExcelParser = {
               if (parsedCode && parsedCode.y && parsedCode.m && parsedCode.d) {
                 const day = String(parsedCode.d).padStart(2, '0');
                 const month = MONTH_NAMES[parsedCode.m - 1];
-                const res = `${day}-${month}`;
-                if (res === "26-Jul") return "";
-                return res;
+                return `${day}-${month}`;
               }
             }
             let jsDate = new Date((num - 25569) * 86400 * 1000);
             if (!isNaN(jsDate.getTime())) {
               const day = String(jsDate.getUTCDate()).padStart(2, '0');
               const month = MONTH_NAMES[jsDate.getUTCMonth()];
-              const res = `${day}-${month}`;
-              if (res === "26-Jul") return "";
-              return res;
+              return `${day}-${month}`;
             }
           }
 
@@ -221,14 +210,7 @@ const ExcelParser = {
         }));
 
         if (newMatrixRoster.length > 0) {
-          let finalDates = allDatesList.length > 0 ? allDatesList : matrixDatesList;
-          if (finalDates && finalDates[0] === "26-Jul") {
-            console.warn("🧹 Stripping legacy 26-Jul date from parsed Excel file!");
-            finalDates.shift();
-            newMatrixRoster.forEach(r => {
-              if (r.shifts && r.shifts["26-Jul"]) delete r.shifts["26-Jul"];
-            });
-          }
+          const finalDates = allDatesList.length > 0 ? allDatesList : matrixDatesList;
           matrixDatesList = finalDates;
           matrixRosterData = newMatrixRoster;
 
