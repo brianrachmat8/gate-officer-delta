@@ -160,6 +160,15 @@ const App = {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
+        // Invalidate stale cache if it contains outdated date headers (e.g. 09-Mar, 06-Apr)
+        const isStaleCache = parsed.dates && parsed.dates.some(d => d.includes("Mar") || d.includes("Apr") || d.includes("May") || d.includes("Jun"));
+
+        if (isStaleCache) {
+          console.warn("🧹 Purging outdated roster cache (09-Mar era) from localStorage...");
+          localStorage.removeItem('portgate_matrix_roster');
+          return;
+        }
+
         if (parsed.dates && parsed.dates.length > 0 && parsed.roster && parsed.roster.length > 0) {
           matrixDatesList = parsed.dates;
           matrixRosterData = parsed.roster;
