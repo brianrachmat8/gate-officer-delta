@@ -255,7 +255,12 @@ const ExcelParser = {
           if (rowText.includes("LIFT OFF")) isLiftOffSheet = true;
         }
 
-        // Try Grid Parser matching User Excel Screenshots (HYUNDAI, HAPAG, SINOKOR, HEUNG-A, RCL, WAN-HAI, SITC, STAR SHIPPING, ONE)
+        // Try Grid Parser matching User Excel Screenshots (HYUNDAI, HAPAG, SINOKOR, HEUNG-A, RCL, WAN-HAI, SITC, ONE)
+
+// ... line skip ...
+      ["WAN-HAI", "", "SITC", "", "ONE", ""],
+      ["20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT"],
+      [577200, 754800, 643800, 821400, 999000, 1343100]
         let gridPairsFound = false;
 
         for (let r = 0; r < rawJson.length - 2; r++) {
@@ -399,9 +404,9 @@ const ExcelParser = {
       ["HYUNDAI", "", "HAPAG", "", "SINOKOR", "", "HEUNG-A", "", "RCL", ""],
       ["20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT"],
       [976850, 1265400, 1093350, 1337550, 871350, 1104450, 871350, 1104450, 627150, 849150],
-      ["WAN-HAI", "", "SITC", "", "STAR SHIPPING", "", "ONE", ""],
-      ["20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT"],
-      [577200, 754800, 643800, 821400, 904650, 1148850, 999000, 1343100]
+      ["WAN-HAI", "", "SITC", "", "ONE", ""],
+      ["20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT"],
+      [577200, 754800, 643800, 821400, 999000, 1343100]
     ];
 
     const ws = XLSX.utils.aoa_to_sheet(templateData);

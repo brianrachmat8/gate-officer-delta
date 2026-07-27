@@ -134,7 +134,7 @@ const SupabaseDB = {
         date: item.date || new Date().toISOString().split('T')[0],
         containers: item.containers || [item.containerNo || 'SNKO8923410'],
         containerNo: item.containerNo || (item.containers ? item.containers[0] : 'SNKO8923410'),
-        consignee: item.consignee || 'PT STAR SHIPPING INDONESIA',
+        consignee: item.consignee || 'PT GLOBAL CARGO LOGISTICS',
         shippingLine: item.shippingLine || item.consignee || 'HAPAG',
         sizeType: item.sizeType || '40 FT',
         vesselVoyage: item.vesselVoyage || 'MV SAWASDEE BALI V.2405N',

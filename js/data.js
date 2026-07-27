@@ -11,7 +11,6 @@ const SHIPPING_LINES = [
   "RCL",
   "WAN-HAI",
   "SITC",
-  "STAR SHIPPING",
   "ONE",
   "ZIMLINE",
   "HMM"
@@ -30,7 +29,7 @@ let skcrData = [
     sizeType: "40ft High Cube (40HC)",
     shippingLine: "ONE",
     vesselVoyage: "INTERASIA ENGAGE V. N037",
-    consignee: "PT STAR SHIPPING INDONESIA",
+    consignee: "PT GLOBAL CARGO LOGISTICS",
     gateLane: "Gate 02 - Inbound",
     userNameGate: "RIDWAN ALAMSYAH",
     companyName: "PT DELTA KONTAINER DEPOT",
@@ -273,11 +272,7 @@ let loloTariffData = [
   { id: "LOLO-013", shippingLine: "SITC", sizeType: "20 FT", liftOn: 604950, liftOff: 643800, total: 1248750, notes: "Tarif Resmi SITC Line" },
   { id: "LOLO-014", shippingLine: "SITC", sizeType: "40 FT", liftOn: 782550, liftOff: 821400, total: 1603950, notes: "Tarif Resmi SITC Line" },
 
-  // 8. STAR SHIPPING
-  { id: "LOLO-015", shippingLine: "STAR SHIPPING", sizeType: "20 FT", liftOn: 588300, liftOff: 904650, total: 1492950, notes: "Tarif Resmi Star Shipping Line" },
-  { id: "LOLO-016", shippingLine: "STAR SHIPPING", sizeType: "40 FT", liftOn: 721500, liftOff: 1148850, total: 1870350, notes: "Tarif Resmi Star Shipping Line" },
-
-  // 9. ONE (OCEAN NETWORK EXPRESS)
+  // 8. ONE (OCEAN NETWORK EXPRESS)
   { id: "LOLO-017", shippingLine: "ONE", sizeType: "20 FT", liftOn: 627150, liftOff: 999000, total: 1626150, notes: "Tarif Resmi ONE (Exception List Check)" },
   { id: "LOLO-018", shippingLine: "ONE", sizeType: "40 FT", liftOn: 804750, liftOff: 1343100, total: 2147850, notes: "Tarif Resmi ONE (Exception List Check)" }
 ];
