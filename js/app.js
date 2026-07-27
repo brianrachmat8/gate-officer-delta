@@ -387,12 +387,6 @@ const App = {
       document.getElementById('settingMarqueeText').value = App.settings.marqueeText;
       document.getElementById('settingMarqueeActive').checked = App.settings.marqueeActive;
 
-      const activeUrl = localStorage.getItem('portgate_supabase_url') || SupabaseDB.url || "https://seiscumgtgjxaimaaegp.supabase.co";
-      const activeKey = localStorage.getItem('portgate_supabase_key') || SupabaseDB.key || "sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk";
-
-      document.getElementById('settingSupabaseUrl').value = activeUrl;
-      document.getElementById('settingSupabaseKey').value = activeKey;
-
       App.renderStampPreviews();
       App.openModal('settingsModal');
     });
@@ -443,19 +437,13 @@ const App = {
 
       App.saveSettings(newSettings);
 
-      const spUrl = document.getElementById('settingSupabaseUrl').value.trim();
-      const spKey = document.getElementById('settingSupabaseKey').value.trim();
-      if (spUrl && spKey) {
-        SupabaseDB.setCredentials(spUrl, spKey);
-      }
-
       document.getElementById('skcrUserNameGate').value = App.settings.userNameGate;
       document.getElementById('skcrCompanyName').value = App.settings.companyName;
       document.getElementById('skcrUserTitle').value = App.settings.userTitle;
 
       App.updateUserProfileDisplay();
       App.closeModal('settingsModal');
-      alert("Pengaturan profil user gate, logo, stempel & kredensial Supabase Cloud berhasil disimpan!");
+      alert("Pengaturan profil user gate, logo, stempel & teks berjalan berhasil disimpan!");
     });
   },
 
