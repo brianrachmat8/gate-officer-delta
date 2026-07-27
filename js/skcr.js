@@ -73,34 +73,48 @@ const SKCRModule = {
     return newRecord;
   },
 
+  formatIndonesianDateStr: function(dateStr) {
+    if (!dateStr) return '';
+    const parts = String(dateStr).split('-');
+    if (parts.length === 3) {
+      const year = parts[0];
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const months = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+      ];
+      return `${day} ${months[monthIdx] || ''} ${year}`;
+    }
+    return dateStr;
+  },
+
   // Render Official Surat Keterangan Document HTML inside Modal (1-Page A4 Compact Layout)
   renderCertificateModal: function(skcrRecord) {
     if (!skcrRecord) {
-      alert("Data SKCR tidak ditemukan.");
+      alert("Data SKCR tidak valid.");
       return;
     }
 
     SKCRModule.currentActiveSKCR = skcrRecord;
+    const escape = (typeof App !== 'undefined' && App.escapeHTML) ? App.escapeHTML : (str => str || '');
 
     // Get Settings (UserName, Company, Title, Logo URL, Stamp URL, Signature URL)
     const settings = (typeof App !== 'undefined' && App.getSettings) ? App.getSettings() : {
-      userNameGate: "RIDWAN ALAMSYAH",
+      userNameGate: "RIDWAN",
       companyName: "PT DELTA KONTAINER DEPOT",
       userTitle: "Gate Operasional"
     };
 
-    const userName = skcrRecord.userNameGate || settings.userNameGate || "RIDWAN ALAMSYAH";
+    const userName = skcrRecord.userNameGate || settings.userNameGate || "RIDWAN";
     const companyName = skcrRecord.companyName || settings.companyName || "PT DELTA KONTAINER DEPOT";
     const userTitle = skcrRecord.userTitle || settings.userTitle || "Gate Operasional";
     const logoUrl = settings.logoUrl || "";
     const stampUrl = settings.stampUrl || "";
     const signatureUrl = settings.signatureUrl || "";
 
-    const dateFormatted = new Date(skcrRecord.date).toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
+    const dateFormatted = SKCRModule.formatIndonesianDateStr(skcrRecord.date);
+    const consigneeName = skcrRecord.consignee || skcrRecord.shippingLine || "PT DELTA KONTAINER";
 
     const containersList = skcrRecord.containers && skcrRecord.containers.length > 0 
       ? skcrRecord.containers 
@@ -137,7 +151,6 @@ const SKCRModule = {
     // Render Side-by-Side Tables
     let multiColTablesHtml = `<div class="skcr-multi-col-wrapper">`;
     columnsData.forEach(colItems => {
-      const escape = (typeof App !== 'undefined' && App.escapeHTML) ? App.escapeHTML : (str => str || '');
       let rowsHtml = "";
       colItems.forEach(item => {
         rowsHtml += `
@@ -168,7 +181,6 @@ const SKCRModule = {
     });
     multiColTablesHtml += `</div>`;
 
-    const escape = (typeof App !== 'undefined' && App.escapeHTML) ? App.escapeHTML : (str => str || '');
     const modalContent = `
       <div class="skcr-certificate-document" id="skcrDocumentPrintable">
         <!-- Letterhead Header -->
@@ -243,7 +255,7 @@ const SKCRModule = {
         <div class="skcr-signature-block">
           <div class="skcr-sig-right">
             <div class="skcr-sig-city-date">Jakarta, ${dateFormatted}</div>
-            <div class="skcr-sig-company">${companyName}</div>
+            <div class="skcr-sig-company">${escape(companyName)}</div>
 
             <div class="skcr-stamp-signature-wrapper">
               ${stampUrl ? `<img src="${stampUrl}" class="skcr-stamp-img" alt="Stempel Perusahaan">` : `
@@ -254,13 +266,13 @@ const SKCRModule = {
 
               ${signatureUrl ? `<img src="${signatureUrl}" class="skcr-signature-img" alt="Tanda Tangan Digital">` : `
                 <div style="z-index: 2; font-family: 'Brush Script MT', cursive, sans-serif; font-size: 1.8rem; color: #1e3a8a;">
-                  ${userName}
+                  ${escape(userName)}
                 </div>
               `}
             </div>
 
-            <div class="skcr-sig-person-name">${userName.toUpperCase()}</div>
-            <div class="skcr-sig-person-title">${userTitle}</div>
+            <div class="skcr-sig-person-name">${escape(userName.toUpperCase())}</div>
+            <div class="skcr-sig-person-title">${escape(userTitle)}</div>
           </div>
         </div>
       </div>
