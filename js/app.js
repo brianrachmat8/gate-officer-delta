@@ -517,6 +517,21 @@ const App = {
       });
     }
 
+    const skcrUserSelect = document.getElementById('skcrUserNameGate');
+    if (skcrUserSelect) {
+      skcrUserSelect.value = App.settings.userNameGate || "RIDWAN ALAMSYAH";
+      skcrUserSelect.addEventListener('change', (e) => {
+        const selectedUser = e.target.value;
+        App.settings.userNameGate = selectedUser;
+        App.saveSettings({ userNameGate: selectedUser });
+
+        const userDutySelect = document.getElementById('userDutySelect');
+        if (userDutySelect) userDutySelect.value = selectedUser;
+
+        App.updateUserProfileDisplay();
+      });
+    }
+
     rawTextArea.addEventListener('input', () => {
       const parsed = SKCRModule.parseContainerBatch(rawTextArea.value);
       countBadge.textContent = `${parsed.length} / 100 Container`;
