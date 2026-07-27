@@ -606,6 +606,34 @@ const App = {
   setupExcelRosterModule: function() {
     const dropZone = document.getElementById('dropZoneExcel');
     const fileInput = document.getElementById('fileInputExcel');
+    const btnToggleUpload = document.getElementById('btnToggleExcelUpload');
+    const iconToggle = document.getElementById('iconToggleUpload');
+    const textToggle = document.getElementById('textToggleUpload');
+
+    const updateUploadPanelState = (isMinimized) => {
+      if (isMinimized) {
+        dropZone.style.display = 'none';
+        if (iconToggle) iconToggle.className = 'fa-solid fa-chevron-down';
+        if (textToggle) textToggle.textContent = 'Expand Panel Upload';
+        btnToggleUpload.className = 'btn btn-primary btn-sm';
+      } else {
+        dropZone.style.display = 'block';
+        if (iconToggle) iconToggle.className = 'fa-solid fa-chevron-up';
+        if (textToggle) textToggle.textContent = 'Minimize Panel';
+        btnToggleUpload.className = 'btn btn-secondary btn-sm';
+      }
+    };
+
+    // Restore saved state
+    const isSavedMinimized = localStorage.getItem('portgate_excel_upload_minimized') === 'true';
+    updateUploadPanelState(isSavedMinimized);
+
+    btnToggleUpload.addEventListener('click', () => {
+      const isCurrentlyHidden = dropZone.style.display === 'none';
+      const newState = !isCurrentlyHidden;
+      localStorage.setItem('portgate_excel_upload_minimized', newState ? 'true' : 'false');
+      updateUploadPanelState(newState);
+    });
 
     dropZone.addEventListener('click', () => fileInput.click());
 

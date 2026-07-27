@@ -272,25 +272,28 @@
 
     <!-- TAB 2: JADWAL ANGGOTA GATE & UPLOAD EXCEL (ALL 5 BLOCKS UP TO 26 JULY) -->
     <section id="tab-roster" class="tab-content">
-      <div class="glass-card" style="margin-bottom: 1.5rem;">
+      <div class="glass-card" style="margin-bottom: 1.5rem;" id="excelUploadCard">
         <div class="card-header">
           <h3 class="card-title"><i class="fa-solid fa-file-excel"></i> Upload File Excel Shift Matriks (.xlsx / .csv)</h3>
-          <div style="display: flex; gap: 0.5rem;">
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm" id="btnToggleExcelUpload" title="Minimize / Expand Panel Upload Excel">
+              <i class="fa-solid fa-chevron-up" id="iconToggleUpload"></i> <span id="textToggleUpload">Minimize Panel</span>
+            </button>
             <button class="btn btn-success btn-sm" id="btnDownloadExcelTemplate">
-              <i class="fa-solid fa-download"></i> Download Template Excel Matriks
+              <i class="fa-solid fa-download"></i> Template Excel
             </button>
             <button class="btn btn-secondary btn-sm" id="btnResetSavedRoster" style="color: var(--status-danger);" title="Reset File Excel Upload Ke Default">
-              <i class="fa-solid fa-rotate-left"></i> Reset Ke Default
+              <i class="fa-solid fa-rotate-left"></i> Reset
             </button>
           </div>
         </div>
 
         <!-- Excel Drag & Drop Upload Zone -->
-        <div class="excel-upload-zone" id="dropZoneExcel">
+        <div class="excel-upload-zone" id="dropZoneExcel" style="transition: all 0.3s ease;">
           <input type="file" id="fileInputExcel" accept=".xlsx, .xls, .csv" style="display: none;">
           <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
           <div class="upload-title">Tarik & Lepas File Excel Jadwal (Format Multi-Blok Vertikal) di sini</div>
-          <div class="upload-subtitle">💾 Tersambung dengan Supabase Cloud: File di-upload akan <strong>LANGSUNG TER-SYNC REALTME</strong> di seluruh HP/Laptop petugas gate!</div>
+          <div class="upload-subtitle">💾 Tersambung dengan Supabase Cloud: File di-upload akan <strong>LANGSUNG TER-SYNC REALTIME</strong> di seluruh HP/Laptop petugas gate!</div>
         </div>
       </div>
 
