@@ -234,6 +234,17 @@ const App = {
         console.error("Failed to load roster from storage:", e);
       }
     }
+
+    // Safety guard: Ensure matrixDatesList ALWAYS starts on 27-Jul (Senin)
+    if (matrixDatesList && matrixDatesList[0] === "26-Jul") {
+      console.warn("🧹 Stripping legacy 26-Jul start date from active matrixDatesList...");
+      matrixDatesList.shift();
+      if (matrixRosterData) {
+        matrixRosterData.forEach(r => {
+          if (r.shifts && r.shifts["26-Jul"]) delete r.shifts["26-Jul"];
+        });
+      }
+    }
   },
 
   saveSKCRToStorage: function() {

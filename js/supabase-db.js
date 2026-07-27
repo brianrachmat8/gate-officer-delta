@@ -80,8 +80,13 @@ const SupabaseDB = {
       }
 
       if (data && data.dates && data.dates[0] === "26-Jul") {
-        console.warn("🔧 Fixing legacy 26-Jul offset in Supabase Cloud roster data...");
-        data.dates[0] = "27-Jul";
+        console.warn("🔧 Stripping legacy 26-Jul start date from Supabase Cloud roster data...");
+        data.dates.shift();
+        if (data.roster && Array.isArray(data.roster)) {
+          data.roster.forEach(r => {
+            if (r.shifts && r.shifts["26-Jul"]) delete r.shifts["26-Jul"];
+          });
+        }
       }
 
       return data;
@@ -324,6 +329,14 @@ const SupabaseDB = {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_roster' }, payload => {
         console.log('🔄 Live Realtime Roster Update Received:', payload);
         if (payload.new && payload.new.dates && payload.new.roster) {
+          if (payload.new.dates[0] === "26-Jul") {
+            payload.new.dates.shift();
+            if (payload.new.roster && Array.isArray(payload.new.roster)) {
+              payload.new.roster.forEach(r => {
+                if (r.shifts && r.shifts["26-Jul"]) delete r.shifts["26-Jul"];
+              });
+            }
+          }
           matrixDatesList = payload.new.dates;
           matrixRosterData = payload.new.roster;
 
@@ -423,6 +436,14 @@ const SupabaseDB = {
     // Roster
     const cloudRoster = await SupabaseDB.loadRoster();
     if (cloudRoster && cloudRoster.dates && cloudRoster.roster && cloudRoster.dates.length > 0) {
+      if (cloudRoster.dates[0] === "26-Jul") {
+        cloudRoster.dates.shift();
+        if (cloudRoster.roster && Array.isArray(cloudRoster.roster)) {
+          cloudRoster.roster.forEach(r => {
+            if (r.shifts && r.shifts["26-Jul"]) delete r.shifts["26-Jul"];
+          });
+        }
+      }
       matrixDatesList = cloudRoster.dates;
       matrixRosterData = cloudRoster.roster;
 
