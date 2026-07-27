@@ -78,6 +78,12 @@ const SupabaseDB = {
         console.error("Error fetching roster from Supabase:", error);
         return null;
       }
+
+      if (data && data.dates && data.dates[0] === "26-Jul") {
+        console.warn("🔧 Fixing legacy 26-Jul offset in Supabase Cloud roster data...");
+        data.dates[0] = "27-Jul";
+      }
+
       return data;
     } catch(e) {
       console.error("Supabase Roster Fetch Exception:", e);
