@@ -137,13 +137,14 @@ const SKCRModule = {
     // Render Side-by-Side Tables
     let multiColTablesHtml = `<div class="skcr-multi-col-wrapper">`;
     columnsData.forEach(colItems => {
+      const escape = (typeof App !== 'undefined' && App.escapeHTML) ? App.escapeHTML : (str => str || '');
       let rowsHtml = "";
       colItems.forEach(item => {
         rowsHtml += `
           <tr>
             <td style="text-align: center; width: 26px; font-weight: bold;">${item.num}</td>
-            <td><strong>${item.containerNo}</strong></td>
-            <td style="text-align: center; width: 50px;">${shortSize}</td>
+            <td><strong>${escape(item.containerNo)}</strong></td>
+            <td style="text-align: center; width: 50px;">${escape(shortSize)}</td>
           </tr>
         `;
       });
@@ -167,6 +168,7 @@ const SKCRModule = {
     });
     multiColTablesHtml += `</div>`;
 
+    const escape = (typeof App !== 'undefined' && App.escapeHTML) ? App.escapeHTML : (str => str || '');
     const modalContent = `
       <div class="skcr-certificate-document" id="skcrDocumentPrintable">
         <!-- Letterhead Header -->
@@ -174,7 +176,7 @@ const SKCRModule = {
           <div class="skcr-letterhead-left">
             ${logoUrl ? `<img src="${logoUrl}" class="skcr-company-logo" alt="Logo Perusahaan">` : ''}
             <div>
-              <div class="skcr-company-title">${companyName}</div>
+              <div class="skcr-company-title">${escape(companyName)}</div>
               <div class="skcr-company-sub">CONTAINER DEPOT & GATE LOGISTICS TERMINAL SERVICES</div>
               <div class="skcr-company-address">Jl. Madya Kebantenan No. 8, Semper Timur, Cilincing Jakarta</div>
               <div class="skcr-company-contact">Phone : +62 21 21485050 &nbsp;|&nbsp; Fax : +62 21 21485532</div>
@@ -182,13 +184,13 @@ const SKCRModule = {
           </div>
           <div class="skcr-letterhead-right">
             <div>Pos Gate Operations</div>
-            <div>Ref: ${skcrRecord.id}</div>
+            <div>Ref: ${escape(skcrRecord.id)}</div>
           </div>
         </div>
 
         <div class="skcr-official-title">
           <h2>SURAT KETERANGAN CONTAINER RUSAK</h2>
-          <div class="doc-num">Nomor: ${skcrRecord.id}</div>
+          <div class="doc-num">Nomor: ${escape(skcrRecord.id)}</div>
         </div>
 
         <div class="skcr-statement-text">
@@ -199,17 +201,17 @@ const SKCRModule = {
           <tr>
             <td class="skcr-field-label">Nama</td>
             <td class="skcr-field-colon">:</td>
-            <td><strong>${userName.toUpperCase()}</strong></td>
+            <td><strong>${escape(userName.toUpperCase())}</strong></td>
           </tr>
           <tr>
             <td class="skcr-field-label">Perusahaan</td>
             <td class="skcr-field-colon">:</td>
-            <td><strong>${companyName.toUpperCase()}</strong></td>
+            <td><strong>${escape(companyName.toUpperCase())}</strong></td>
           </tr>
           <tr>
             <td class="skcr-field-label">Jabatan</td>
             <td class="skcr-field-colon">:</td>
-            <td><strong>${userTitle}</strong></td>
+            <td><strong>${escape(userTitle)}</strong></td>
           </tr>
         </table>
 
@@ -224,12 +226,12 @@ const SKCRModule = {
           <tr>
             <td class="skcr-field-label">Nama Kapal</td>
             <td class="skcr-field-colon">:</td>
-            <td><strong>${skcrRecord.vesselVoyage}</strong></td>
+            <td><strong>${escape(skcrRecord.vesselVoyage)}</strong></td>
           </tr>
           <tr>
             <td class="skcr-field-label">Consignee</td>
             <td class="skcr-field-colon">:</td>
-            <td><strong>${skcrRecord.consignee || skcrRecord.shippingLine}</strong></td>
+            <td><strong>${escape(consigneeName)}</strong></td>
           </tr>
         </table>
 
