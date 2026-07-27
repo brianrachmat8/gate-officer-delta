@@ -77,10 +77,18 @@ const ExcelParser = {
           // Handle Excel serial date numbers (e.g. 46230 -> 27-Jul-2026)
           let num = parseFloat(s);
           if (!isNaN(num) && num > 40000 && num < 60000) {
-            let jsDate = new Date((num - (25567 + 2)) * 86400 * 1000);
+            if (typeof XLSX !== 'undefined' && XLSX.SSF && XLSX.SSF.parse_date_code) {
+              const parsedCode = XLSX.SSF.parse_date_code(num);
+              if (parsedCode && parsedCode.y && parsedCode.m && parsedCode.d) {
+                const day = String(parsedCode.d).padStart(2, '0');
+                const month = MONTH_NAMES[parsedCode.m - 1];
+                return `${day}-${month}`;
+              }
+            }
+            let jsDate = new Date((num - 25569) * 86400 * 1000);
             if (!isNaN(jsDate.getTime())) {
-              const day = String(jsDate.getDate()).padStart(2, '0');
-              const month = MONTH_NAMES[jsDate.getMonth()];
+              const day = String(jsDate.getUTCDate()).padStart(2, '0');
+              const month = MONTH_NAMES[jsDate.getUTCMonth()];
               return `${day}-${month}`;
             }
           }
