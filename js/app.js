@@ -123,6 +123,18 @@ const App = {
     App.settings = { ...App.settings, ...newSettings };
     localStorage.setItem('portgate_settings', JSON.stringify(App.settings));
     App.updateMarqueeUI();
+    if (typeof SupabaseDB !== 'undefined' && SupabaseDB.isConfigured) {
+      SupabaseDB.saveSettings(App.settings);
+    }
+  },
+
+  applyCloudSettings: function(cloudSettings) {
+    if (!cloudSettings) return;
+    App.settings = { ...App.settings, ...cloudSettings };
+    localStorage.setItem('portgate_settings', JSON.stringify(App.settings));
+    App.updateMarqueeUI();
+    App.renderStampPreviews();
+    App.updateUserProfileDisplay();
   },
 
   getSettings: function() {
@@ -308,6 +320,7 @@ const App = {
         reader.onload = (event) => {
           App.settings.logoUrl = event.target.result;
           App.renderStampPreviews();
+          App.saveSettings({ logoUrl: event.target.result });
         };
         reader.readAsDataURL(file);
       }
@@ -320,6 +333,7 @@ const App = {
         reader.onload = (event) => {
           App.settings.stampUrl = event.target.result;
           App.renderStampPreviews();
+          App.saveSettings({ stampUrl: event.target.result });
         };
         reader.readAsDataURL(file);
       }
@@ -332,6 +346,7 @@ const App = {
         reader.onload = (event) => {
           App.settings.signatureUrl = event.target.result;
           App.renderStampPreviews();
+          App.saveSettings({ signatureUrl: event.target.result });
         };
         reader.readAsDataURL(file);
       }

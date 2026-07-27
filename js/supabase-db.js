@@ -173,6 +173,58 @@ const SupabaseDB = {
     }
   },
 
+  // Sync App Settings (Logo, Stamp, Signature, Profile, Marquee)
+  saveSettings: async function(settingsPayload) {
+    if (!SupabaseDB.isConfigured) return;
+    try {
+      const payload = {
+        id: 'global_settings',
+        user_name_gate: settingsPayload.userNameGate || '',
+        company_name: settingsPayload.companyName || '',
+        user_title: settingsPayload.userTitle || '',
+        logo_url: settingsPayload.logoUrl || '',
+        stamp_url: settingsPayload.stampUrl || '',
+        signature_url: settingsPayload.signatureUrl || '',
+        marquee_text: settingsPayload.marqueeText || '',
+        marquee_active: settingsPayload.marqueeActive !== undefined ? settingsPayload.marqueeActive : true,
+        updated_at: new Date().toISOString()
+      };
+      const { data, error } = await SupabaseDB.client
+        .from('gate_settings')
+        .upsert(payload, { onConflict: 'id' });
+
+      if (error) console.error("Error saving settings to Supabase:", error);
+      else console.log("☁️ Global Settings & Branding synced to Supabase Cloud!");
+    } catch(e) {
+      console.error("Supabase Settings Save Exception:", e);
+    }
+  },
+
+  loadSettings: async function() {
+    if (!SupabaseDB.isConfigured) return null;
+    try {
+      const { data, error } = await SupabaseDB.client
+        .from('gate_settings')
+        .select('*')
+        .eq('id', 'global_settings')
+        .single();
+
+      if (error) return null;
+      return {
+        userNameGate: data.user_name_gate,
+        companyName: data.company_name,
+        userTitle: data.user_title,
+        logoUrl: data.logo_url,
+        stampUrl: data.stamp_url,
+        signatureUrl: data.signature_url,
+        marqueeText: data.marquee_text,
+        marqueeActive: data.marquee_active
+      };
+    } catch(e) {
+      return null;
+    }
+  },
+
   // Real-time Subscriptions across all online devices/phones
   subscribeToRealtimeChanges: function() {
     if (!SupabaseDB.isConfigured || !SupabaseDB.client) return;
@@ -221,11 +273,29 @@ const SupabaseDB = {
         }
       })
       .subscribe();
+
+    // Listen to changes in gate_settings (Logo, TTD, Stamp, Profile)
+    SupabaseDB.client
+      .channel('public:gate_settings')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_settings' }, async payload => {
+        console.log('🔄 Live Realtime Settings/Branding Update Received:', payload);
+        const cloudSettings = await SupabaseDB.loadSettings();
+        if (cloudSettings && window.App) {
+          App.applyCloudSettings(cloudSettings);
+        }
+      })
+      .subscribe();
   },
 
   // Full Cloud Sync Trigger
   syncAllFromCloud: async function() {
     if (!SupabaseDB.isConfigured) return;
+
+    // Settings (Logo, Stamp, TTD, Profile, Marquee)
+    const cloudSettings = await SupabaseDB.loadSettings();
+    if (cloudSettings && window.App) {
+      App.applyCloudSettings(cloudSettings);
+    }
 
     // Roster
     const cloudRoster = await SupabaseDB.loadRoster();
