@@ -240,18 +240,6 @@ let operationalAnnouncements = [
     author: "HEUNG-A Ops",
     body: "• Seluruh peti kemas HEUNG-A tipe 20GP & 40HC wajib dicek kebersihan lantai dan bebas dari bau bahan kimia berbahaya sebelum serah terima.",
     status: "Active"
-  },
-  {
-    id: "NOTE-UMUM-008",
-    date: "2026-07-24",
-    time: "17:00",
-    title: "Instruksi Kalibrasi Timbangan & Keamanan K3 Pos Gate",
-    category: "Umum / Gate",
-    serviceType: "EKSPOR",
-    priority: "Warning",
-    author: "Superintendent Gate Operations",
-    body: "• Timbangan Digital Gate 2 dialihkan sementara ke Gate 3 untuk sertifikasi kalibrasi tahunan.\n• Seluruh pengemudi truk wajib menggunakan rompi K3 dan helm keselamatan selama berada di jalur gate depo.",
-    status: "Active"
   }
 ];
 
