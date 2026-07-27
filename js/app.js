@@ -202,11 +202,17 @@ const App = {
     const saved = localStorage.getItem('portgate_notices_data');
     if (saved) {
       try {
-        operationalAnnouncements = JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          operationalAnnouncements = parsed;
+          return;
+        }
       } catch(e) {
         console.error("Failed to load notices data:", e);
       }
     }
+    // Fallback: If localStorage notice data is empty or invalid, clear key so initial seed notices from data.js are used
+    localStorage.removeItem('portgate_notices_data');
   },
 
   startClock: function() {
@@ -887,7 +893,9 @@ const App = {
     const displayBadge = document.getElementById('noticeDateDisplayBadge');
 
     let filtered = operationalAnnouncements.filter(n => {
-      const matchType = !n.serviceType || n.serviceType === App.activeNoticeServiceType;
+      const itemType = (n.serviceType || 'EKSPOR').toUpperCase();
+      const activeType = (App.activeNoticeServiceType || 'EKSPOR').toUpperCase();
+      const matchType = (itemType === activeType);
       const matchCategory = !App.activeNoticeCategoryFilter || n.category === App.activeNoticeCategoryFilter;
       const matchDate = !App.activeNoticeDateFilter || n.date === App.activeNoticeDateFilter;
       const matchStatus = App.showDisabledNotices ? true : (n.status !== "Disabled");
@@ -1397,6 +1405,10 @@ const App = {
     document.getElementById('kpiGateDuty').textContent = matrixRosterData.length;
     const activeNotices = operationalAnnouncements.filter(n => n.status !== "Disabled").length;
     document.getElementById('kpiActiveNotices').textContent = activeNotices;
+
+    const infoBadge = document.getElementById('infoCountBadge');
+    if (infoBadge) infoBadge.textContent = activeNotices;
+
     document.getElementById('kpiTotalLOLORates').textContent = loloTariffData.length;
   },
 
