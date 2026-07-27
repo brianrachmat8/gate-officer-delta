@@ -211,14 +211,15 @@ const App = {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // Invalidate stale cache if it contains outdated date headers (e.g. 09-Mar, 06-Apr, or 26-Jul offset)
+        // Invalidate stale cache if it contains outdated date headers (e.g. 09-Mar, 06-Apr, 26-Jul, or 12-Dec offset)
         const isStaleCache = parsed.dates && (
           parsed.dates.some(d => d.includes("Mar") || d.includes("Apr") || d.includes("May") || d.includes("Jun")) ||
-          parsed.dates[0] === "26-Jul"
+          parsed.dates[0] === "26-Jul" ||
+          parsed.dates[parsed.dates.length - 1] === "12-Dec"
         );
 
         if (isStaleCache) {
-          console.warn("🧹 Purging outdated roster cache (26-Jul/March era) from localStorage...");
+          console.warn("🧹 Purging outdated roster cache (26-Jul/12-Dec era) from localStorage...");
           localStorage.removeItem('portgate_matrix_roster');
           return;
         }
