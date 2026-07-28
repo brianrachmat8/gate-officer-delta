@@ -126,7 +126,7 @@
 .skcr-company-title {
   font-size: 1.2rem;
   font-weight: bold;
-  text-transform: uppercase;
+  text-transform: none;
   color: #000;
   line-height: 1.1;
   letter-spacing: 0.5px;
