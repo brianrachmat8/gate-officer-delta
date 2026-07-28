@@ -69,7 +69,7 @@ const SKCRModule = {
       consignee: formData.consignee || formData.shippingLine,
       gateLane: formData.gateLane || "Gate 01",
       userNameGate: formData.userNameGate || "RIDWAN",
-      companyName: formData.companyName || "DELTA",
+      companyName: formData.companyName || "Delta",
       userTitle: formData.userTitle || "Gate Operasional",
       damageSeverity: formData.damageSeverity || "Major Damage",
       damagedComponents: formData.damagedComponents || ["Dinding / Body Container", "Lantai / Floor Panel"],
@@ -110,12 +110,12 @@ const SKCRModule = {
     // Get Settings (UserName, Company, Title, Logo URL, Stamp URL, Signature URL)
     const settings = (typeof App !== 'undefined' && App.getSettings) ? App.getSettings() : {
       userNameGate: "RIDWAN",
-      companyName: "DELTA",
+      companyName: "Delta",
       userTitle: "Gate Operasional"
     };
 
     const userName = skcrRecord.userNameGate || settings.userNameGate || "RIDWAN";
-    const companyName = skcrRecord.companyName || settings.companyName || "DELTA";
+    const companyName = skcrRecord.companyName || settings.companyName || "Delta";
     const userTitle = skcrRecord.userTitle || settings.userTitle || "Gate Operasional";
     const logoUrl = settings.logoUrl || "";
     const stampUrl = settings.stampUrl || "";
@@ -196,7 +196,7 @@ const SKCRModule = {
           <div class="skcr-letterhead-left">
             ${logoUrl ? `<img src="${logoUrl}" class="skcr-company-logo" alt="Logo Perusahaan">` : ''}
             <div>
-              <div class="skcr-company-title">DELTA</div>
+              <div class="skcr-company-title">Delta</div>
               <div class="skcr-company-sub">Kontainer Depot</div>
               <div class="skcr-company-address">Jl. Madya Kebantenan No. 8, Semper Timur, Cilincing Jakarta</div>
               <div class="skcr-company-contact">Phone : +62 21 21485050 &nbsp;|&nbsp; Fax : +62 21 21485532</div>

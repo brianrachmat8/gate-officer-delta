@@ -25,7 +25,7 @@ const App = {
   // Settings State with LocalStorage & Supabase Credentials
   settings: {
     userNameGate: "RIDWAN",
-    companyName: "DELTA",
+    companyName: "Delta",
     userTitle: "Gate Operasional",
     logoUrl: "",
     stampUrl: "",
@@ -1481,7 +1481,7 @@ const App = {
           <div class="skcr-letterhead-left">
             ${logoUrl ? `<img src="${logoUrl}" class="skcr-company-logo" alt="Logo Perusahaan">` : ''}
             <div>
-              <div class="skcr-company-title">DELTA</div>
+              <div class="skcr-company-title">Delta</div>
               <div class="skcr-company-sub">Kontainer Depot</div>
               <div class="skcr-company-address">Jl. Madya Kebantenan No. 8, Semper Timur, Cilincing Jakarta</div>
               <div class="skcr-company-contact">Phone : +62 21 21485050 &nbsp;|&nbsp; Fax : +62 21 21485532</div>
