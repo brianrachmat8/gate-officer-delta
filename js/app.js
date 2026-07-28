@@ -1580,11 +1580,15 @@ const App = {
       : log.date;
 
     return `📋 *LAPORAN SERAH TERIMA SHIFT GATE*
-🏢 *Delta Kontainer Depot*
 
 📅 *Tanggal:* ${formattedDate}
-🔄 *Pergantian Shift:* ${log.shiftFrom} ➔ ${log.shiftTo}
-👤 *Supervisor / Petugas:* ${log.supervisor}
+
+🔄 *Pergantian Shift:*
+${log.shiftFrom} ➔ ${log.shiftTo}
+
+👤 *Supervisor / Petugas:*
+${log.supervisor}
+
 🚦 *Keterangan Kondisi & Alat:* ${log.gateCondition}
 📦 *Container Hold / Pending:* ${log.pendingContainers}
 
