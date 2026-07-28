@@ -133,11 +133,10 @@
 }
 
 .skcr-company-sub {
-  font-size: 0.7rem;
-  font-family: Arial, sans-serif;
+  font-size: 0.85rem;
   font-weight: bold;
-  color: #1f2937;
-  margin-top: 1px;
+  color: #000;
+  margin-top: 2px;
 }
 
 .skcr-company-address, .skcr-company-contact {
