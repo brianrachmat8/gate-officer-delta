@@ -25,7 +25,7 @@ const App = {
   // Settings State with LocalStorage & Supabase Credentials
   settings: {
     userNameGate: "RIDWAN",
-    companyName: "PT DELTA KONTAINER DEPOT",
+    companyName: "DELTA",
     userTitle: "Gate Operasional",
     logoUrl: "",
     stampUrl: "",
@@ -1464,7 +1464,7 @@ const App = {
     App.currentActiveNoticeId = noticeId;
 
     const settings = App.getSettings();
-    const companyName = settings.companyName || "PT DELTA KONTAINER DEPOT";
+    const companyName = settings.companyName || "DELTA";
     const userName = settings.userNameGate || "RIDWAN";
     const userTitle = settings.userTitle || "Gate Operasional";
     const logoUrl = settings.logoUrl || "";
@@ -1482,7 +1482,7 @@ const App = {
             ${logoUrl ? `<img src="${logoUrl}" class="skcr-company-logo" alt="Logo Perusahaan">` : ''}
             <div>
               <div class="skcr-company-title">${companyName}</div>
-              <div class="skcr-company-sub">CONTAINER DEPOT & GATE LOGISTICS TERMINAL SERVICES</div>
+              <div class="skcr-company-sub">Kontainer Depot</div>
               <div class="skcr-company-address">Jl. Madya Kebantenan No. 8, Semper Timur, Cilincing Jakarta</div>
               <div class="skcr-company-contact">Phone : +62 21 21485050 &nbsp;|&nbsp; Fax : +62 21 21485532</div>
             </div>
