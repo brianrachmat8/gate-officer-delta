@@ -1580,20 +1580,20 @@ const App = {
       : log.date;
 
     return `📋 *LAPORAN SERAH TERIMA SHIFT GATE*
-🏢 *PT DELTA KONTAINER DEPOT*
-📅 *Tanggal:* ${formattedDate}
+🏢 *Delta Kontainer Depot*
 
+📅 *Tanggal:* ${formattedDate}
 🔄 *Pergantian Shift:* ${log.shiftFrom} ➔ ${log.shiftTo}
 👤 *Supervisor / Petugas:* ${log.supervisor}
 🚦 *Keterangan Kondisi & Alat:* ${log.gateCondition}
 📦 *Container Hold / Pending:* ${log.pendingContainers}
 
 📝 *Catatan Khusus Operasional:*
-${log.generalNotes}
+_${log.generalNotes}_
 ${log.responseText ? `
 💬 *Tanggapan / Respon Shift:*
 _"${log.responseText}"_
-(Direspon oleh ${log.respondedBy} pada ${log.respondedAtDate || log.date} pukul ${log.respondedAtTime || log.respondedAt})
+— Direspon oleh ${log.respondedBy} pada ${log.respondedAtDate || log.date} pukul ${log.respondedAtTime || log.respondedAt}
 ` : ''}
 ---
 _Sistem Informasi Gate Officer_`;
