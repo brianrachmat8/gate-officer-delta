@@ -37,34 +37,36 @@ const App = {
   },
 
   init: function() {
-    App.loadSettings();
-    SupabaseDB.init();
+    try { App.loadSettings(); } catch(e) { console.error("[INIT] loadSettings:", e); }
+    try { SupabaseDB.init(); } catch(e) { console.error("[INIT] SupabaseDB.init:", e); }
 
-    App.loadRosterFromStorage();
-    App.loadSKCRFromStorage();
-    App.loadNoticesFromStorage();
+    try { App.loadRosterFromStorage(); } catch(e) { console.error("[INIT] loadRoster:", e); }
+    try { App.loadSKCRFromStorage(); } catch(e) { console.error("[INIT] loadSKCR:", e); }
+    try { App.loadNoticesFromStorage(); } catch(e) { console.error("[INIT] loadNotices:", e); }
 
-    App.startClock();
-    App.setupThemeToggle();
-    App.setupTabNavigation();
-    App.setupModalGlobalListeners();
-    App.setupMarqueeBanner();
-    App.setupSettingsModule();
-    App.setupSKCRModule();
-    App.setupExcelRosterModule();
-    App.setupNoticeModule();
-    App.setupLOLOTariffModule();
-    App.setupHandoverModule();
-    App.setupUserGuideModule();
-    App.setupGlobalSearch();
+    try { App.startClock(); } catch(e) { console.error("[INIT] startClock:", e); }
+    try { App.setupThemeToggle(); } catch(e) { console.error("[INIT] setupThemeToggle:", e); }
+    try { App.setupTabNavigation(); } catch(e) { console.error("[INIT] setupTabNavigation:", e); }
+    try { App.setupModalGlobalListeners(); } catch(e) { console.error("[INIT] setupModalGlobalListeners:", e); }
+    try { App.setupMarqueeBanner(); } catch(e) { console.error("[INIT] setupMarqueeBanner:", e); }
+    try { App.setupSettingsModule(); } catch(e) { console.error("[INIT] setupSettingsModule:", e); }
+    try { App.setupSKCRModule(); } catch(e) { console.error("[INIT] setupSKCRModule:", e); }
+    try { App.setupExcelRosterModule(); } catch(e) { console.error("[INIT] setupExcelRosterModule:", e); }
+    try { App.setupNoticeModule(); } catch(e) { console.error("[INIT] setupNoticeModule:", e); }
+    try { App.setupLOLOTariffModule(); } catch(e) { console.error("[INIT] setupLOLOTariffModule:", e); }
+    try { App.setupHandoverModule(); } catch(e) { console.error("[INIT] setupHandoverModule:", e); }
+    try { App.setupUserGuideModule(); } catch(e) { console.error("[INIT] setupUserGuideModule:", e); }
+    try { App.setupGlobalSearch(); } catch(e) { console.error("[INIT] setupGlobalSearch:", e); }
 
     // Render initial local state immediately so UI is 100% active instantly
     App.renderAll();
 
     // Trigger Cloud sync non-blocking in background
-    if (SupabaseDB.isConfigured) {
+    if (typeof SupabaseDB !== 'undefined' && SupabaseDB.isConfigured) {
       SupabaseDB.syncAllFromCloud();
     }
+
+    console.log("[INIT] App.init() completed successfully. All modules loaded.");
   },
 
   openModal: function(modalId) {
@@ -633,10 +635,10 @@ const App = {
           <td><span class="badge badge-shipping-line">${item.consignee || item.shippingLine}</span></td>
           <td>
             <div style="display: flex; gap: 0.35rem;">
-              <button class="btn btn-primary btn-sm btn-print-skcr" data-id="${item.id}">
+              <button class="btn btn-primary btn-sm btn-print-skcr" data-id="${item.id}" onclick="App.openSKCRDetail('${item.id}')">
                 <i class="fa-solid fa-print"></i> Cetak (${cCount})
               </button>
-              <button class="btn btn-secondary btn-sm btn-delete-skcr" data-id="${item.id}" style="color: var(--status-danger);" title="Hapus Dokumen SKCR Ini">
+              <button class="btn btn-secondary btn-sm btn-delete-skcr" data-id="${item.id}" onclick="App.deleteSKCR('${item.id}')" style="color: var(--status-danger);" title="Hapus Dokumen SKCR Ini">
                 <i class="fa-solid fa-trash-can"></i> Hapus
               </button>
             </div>
@@ -1009,16 +1011,16 @@ const App = {
             <div class="news-title">${item.title}</div>
             <div class="news-body">${item.body}</div>
             <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-              <button class="btn btn-secondary btn-sm btn-print-notice" data-id="${item.id}">
+              <button class="btn btn-secondary btn-sm btn-print-notice" data-id="${item.id}" onclick="App.openNoticePrintModal('${item.id}')">
                 <i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i> Cetak PDF
               </button>
-              <button class="btn btn-secondary btn-sm btn-toggle-notice-status" data-id="${item.id}">
+              <button class="btn btn-secondary btn-sm btn-toggle-notice-status" data-id="${item.id}" onclick="App.toggleNoticeStatus('${item.id}')">
                 ${isDisabled 
                   ? `<i class="fa-solid fa-eye" style="color: #10b981;"></i> Aktifkan` 
                   : `<i class="fa-solid fa-eye-slash" style="color: #f59e0b;"></i> Sembunyikan`
                 }
               </button>
-              <button class="btn btn-secondary btn-sm btn-delete-notice" data-id="${item.id}" style="color: var(--status-danger);" title="Hapus Edaran Ini">
+              <button class="btn btn-secondary btn-sm btn-delete-notice" data-id="${item.id}" onclick="App.deleteNotice('${item.id}')" style="color: var(--status-danger);" title="Hapus Edaran Ini">
                 <i class="fa-solid fa-trash-can"></i> Hapus
               </button>
             </div>
