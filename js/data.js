@@ -1,6 +1,6 @@
 /* ==========================================================================
    PortGate Logistics Hub - Initial Mock Data & Constants
-   Includes SKCR Records, Matrix Roster Data (09-Mar to 26-Jul), Peraturan Pelayaran Ekspor/Impor, & Tarif LOLO Presisi
+   Includes SKCR Records, Matrix Roster Data (09-Mar to 26-Jul), Peraturan Pelayaran Ekspor/Impor (10 Notices), & Tarif LOLO Presisi
    ========================================================================== */
 
 const SHIPPING_LINES = [
@@ -132,7 +132,7 @@ let matrixRosterData = [
   { name: "INDRA", shifts: generateFullRosterShifts("INDRA") }
 ];
 
-// Official Operational Rules per Shipping Line tagged with serviceType ("EKSPOR" / "IMPOR")
+// Official Operational Rules per Shipping Line tagged with serviceType ("EKSPOR" / "IMPOR") - Full 10 Notices
 let operationalAnnouncements = [
   {
     id: "NOTE-HAPAG-001",
@@ -228,6 +228,30 @@ let operationalAnnouncements = [
     priority: "Warning",
     author: "Superintendent Gate Operations",
     body: "• Timbangan Digital Gate 2 dialihkan sementara ke Gate 3 untuk sertifikasi kalibrasi tahunan.\n• Seluruh pengemudi truk wajib menggunakan rompi K3 dan helm keselamatan selama berada di jalur gate depo.",
+    status: "Active"
+  },
+  {
+    id: "NOTE-HMM-009",
+    date: "2026-07-25",
+    time: "11:15",
+    title: "Prosedur Pengambilan DO & Release Duty HMM / Hyundai (IMPOR)",
+    category: "HYUNDAI",
+    serviceType: "IMPOR",
+    priority: "Info",
+    author: "HMM Import Ops",
+    body: "• Pengambilan DO Impor HMM wajib membawa SPPB & BL Asli / E-DO yang sudah tervalidasi.\n• Pastikan fisik kontainer kosong dalam keadaan bersih dari sisa dunnage sebelum masuk depo.",
+    status: "Active"
+  },
+  {
+    id: "NOTE-WANHAI-010",
+    date: "2026-07-25",
+    time: "11:45",
+    title: "Petunjuk Pelepasan Segel & Pemeriksaan Fisik Impor Wan-Hai Line (IMPOR)",
+    category: "WAN-HAI",
+    serviceType: "IMPOR",
+    priority: "Warning",
+    author: "Wan-Hai Import Ops",
+    body: "• Pembongkaran kontainer impor Wan-Hai wajib verifikasi nomor segel pelayaran di pos gate in.\n• Segera terbitkan SKCR apabila ditemukan kerusakan struktur lantai atau dinding akibat pembongkaran.",
     status: "Active"
   }
 ];

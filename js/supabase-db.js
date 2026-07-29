@@ -21,7 +21,10 @@ const SupabaseDB = {
         console.log("⚡ Supabase Cloud Database Connected Successfully!");
         SupabaseDB.subscribeToRealtimeChanges();
 
-        // 3-Second Instant Auto-Poll to ensure 100% Identical Multi-PC Real-Time Sync
+        // Initial Cloud Sync immediately on load
+        SupabaseDB.syncAllFromCloud();
+
+        // 3-Second Instant Auto-Poll Fallback to ensure 100% Identical Multi-PC Real-Time Sync
         setInterval(() => {
           if (SupabaseDB.isConfigured) {
             SupabaseDB.syncAllFromCloud();
@@ -50,7 +53,7 @@ const SupabaseDB = {
     }
   },
 
-  // Save Roster Schedule Matrix to Cloud
+  // 1. Save Roster Schedule Matrix to Cloud
   saveRoster: async function(dates, roster) {
     if (!SupabaseDB.isConfigured) return;
     try {
@@ -71,7 +74,6 @@ const SupabaseDB = {
     }
   },
 
-  // Load Roster Schedule Matrix from Cloud
   loadRoster: async function() {
     if (!SupabaseDB.isConfigured) return null;
     try {
@@ -88,89 +90,105 @@ const SupabaseDB = {
     }
   },
 
-  // Sync SKCR Records
-  saveSKCR: async function(skcrRecord) {
+  // 2. Sync Operational Notices / Peraturan (Stored reliably via gate_roster table)
+  saveAllNotices: async function(noticesArray) {
     if (!SupabaseDB.isConfigured) return;
     try {
+      const payload = {
+        id: 'latest_notices',
+        dates: ['2026-07-25'],
+        roster: noticesArray,
+        updated_at: new Date().toISOString()
+      };
       const { data, error } = await SupabaseDB.client
-        .from('gate_skcr')
-        .upsert(skcrRecord, { onConflict: 'id' });
+        .from('gate_roster')
+        .upsert(payload, { onConflict: 'id' });
 
-      if (error) console.error("Error saving SKCR to Supabase:", error);
-      else console.log("☁️ SKCR Record synced to Supabase Cloud!");
-    } catch(e) {
-      console.error("Supabase SKCR Save Exception:", e);
-    }
-  },
-
-  deleteSKCR: async function(skcrId) {
-    if (!SupabaseDB.isConfigured) return;
-    try {
-      const { error } = await SupabaseDB.client
-        .from('gate_skcr')
-        .delete()
-        .eq('id', skcrId);
-
-      if (error) console.error("Error deleting SKCR from Supabase:", error);
-    } catch(e) {
-      console.error("Supabase SKCR Delete Exception:", e);
-    }
-  },
-
-  loadAllSKCR: async function() {
-    if (!SupabaseDB.isConfigured) return null;
-    try {
-      const { data, error } = await SupabaseDB.client
-        .from('gate_skcr')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) return null;
-      return data;
-    } catch(e) {
-      return null;
-    }
-  },
-
-  // Sync Operational Notices / Peraturan
-  saveNotice: async function(noticeRecord) {
-    if (!SupabaseDB.isConfigured) return;
-    try {
-      const { data, error } = await SupabaseDB.client
-        .from('gate_notices')
-        .upsert(noticeRecord, { onConflict: 'id' });
-
-      if (error) console.error("Error saving notice to Supabase:", error);
-      else console.log("☁️ Notice synced to Supabase Cloud!");
+      if (error) console.error("Error saving notices to Supabase:", error);
+      else console.log("☁️ All 10 Notices synced to Supabase Cloud!");
     } catch(e) {
       console.error("Supabase Notice Save Exception:", e);
     }
   },
 
-  deleteNotice: async function(noticeId) {
-    if (!SupabaseDB.isConfigured) return;
-    try {
-      const { error } = await SupabaseDB.client
-        .from('gate_notices')
-        .delete()
-        .eq('id', noticeId);
-
-      if (error) console.error("Error deleting notice from Supabase:", error);
-    } catch(e) {
-      console.error("Supabase Notice Delete Exception:", e);
+  saveNotice: async function(noticeRecord) {
+    let existingIndex = operationalAnnouncements.findIndex(n => n.id === noticeRecord.id);
+    if (existingIndex >= 0) {
+      operationalAnnouncements[existingIndex] = noticeRecord;
+    } else {
+      operationalAnnouncements.unshift(noticeRecord);
     }
+    await SupabaseDB.saveAllNotices(operationalAnnouncements);
+  },
+
+  deleteNotice: async function(noticeId) {
+    operationalAnnouncements = operationalAnnouncements.filter(n => n.id !== noticeId);
+    await SupabaseDB.saveAllNotices(operationalAnnouncements);
   },
 
   loadAllNotices: async function() {
     if (!SupabaseDB.isConfigured) return null;
     try {
       const { data, error } = await SupabaseDB.client
-        .from('gate_notices')
+        .from('gate_roster')
         .select('*')
-        .order('date', { ascending: false });
+        .eq('id', 'latest_notices')
+        .single();
 
-      if (error) return null;
-      return data;
+      if (error || !data || !data.roster) return null;
+      return data.roster;
+    } catch(e) {
+      return null;
+    }
+  },
+
+  // 3. Sync SKCR Records (Stored reliably via gate_roster table)
+  saveAllSKCR: async function(skcrArray) {
+    if (!SupabaseDB.isConfigured) return;
+    try {
+      const payload = {
+        id: 'latest_skcr_data',
+        dates: ['2026-07-25'],
+        roster: skcrArray,
+        updated_at: new Date().toISOString()
+      };
+      const { data, error } = await SupabaseDB.client
+        .from('gate_roster')
+        .upsert(payload, { onConflict: 'id' });
+
+      if (error) console.error("Error saving SKCR data to Supabase:", error);
+      else console.log("☁️ SKCR data synced to Supabase Cloud!");
+    } catch(e) {
+      console.error("Supabase SKCR Save Exception:", e);
+    }
+  },
+
+  saveSKCR: async function(skcrRecord) {
+    let existingIndex = skcrData.findIndex(s => s.id === skcrRecord.id);
+    if (existingIndex >= 0) {
+      skcrData[existingIndex] = skcrRecord;
+    } else {
+      skcrData.unshift(skcrRecord);
+    }
+    await SupabaseDB.saveAllSKCR(skcrData);
+  },
+
+  deleteSKCR: async function(skcrId) {
+    skcrData = skcrData.filter(s => s.id !== skcrId);
+    await SupabaseDB.saveAllSKCR(skcrData);
+  },
+
+  loadAllSKCR: async function() {
+    if (!SupabaseDB.isConfigured) return null;
+    try {
+      const { data, error } = await SupabaseDB.client
+        .from('gate_roster')
+        .select('*')
+        .eq('id', 'latest_skcr_data')
+        .single();
+
+      if (error || !data || !data.roster) return null;
+      return data.roster;
     } catch(e) {
       return null;
     }
@@ -180,89 +198,57 @@ const SupabaseDB = {
   subscribeToRealtimeChanges: function() {
     if (!SupabaseDB.isConfigured || !SupabaseDB.client) return;
 
-    // Listen to changes in gate_roster
+    // Listen to changes in gate_roster channel
     SupabaseDB.client
       .channel('public:gate_roster')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_roster' }, payload => {
-        console.log('🔄 Live Realtime Roster Update Received:', payload);
-        if (payload.new && payload.new.dates && payload.new.roster) {
-          matrixDatesList = payload.new.dates;
-          matrixRosterData = payload.new.roster;
-          if (window.App) {
-            App.updateStaffFilterOptions();
-            App.renderMatrixScheduleTable();
-            App.updateKPIs();
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_roster' }, async payload => {
+        console.log('🔄 Live Realtime Cloud Update Received:', payload);
+        if (payload.new) {
+          if (payload.new.id === 'latest_roster' && payload.new.dates && payload.new.roster) {
+            matrixDatesList = payload.new.dates;
+            matrixRosterData = payload.new.roster;
+          } else if (payload.new.id === 'latest_notices' && payload.new.roster) {
+            operationalAnnouncements = payload.new.roster;
+          } else if (payload.new.id === 'latest_skcr_data' && payload.new.roster) {
+            skcrData = payload.new.roster;
           }
-        }
-      })
-      .subscribe();
 
-    // Listen to changes in gate_skcr
-    SupabaseDB.client
-      .channel('public:gate_skcr')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_skcr' }, async payload => {
-        console.log('🔄 Live Realtime SKCR Update Received:', payload);
-        const cloudSKCR = await SupabaseDB.loadAllSKCR();
-        if (cloudSKCR && window.App) {
-          skcrData = cloudSKCR;
-          App.renderSKCRTable();
-          App.updateKPIs();
-        }
-      })
-      .subscribe();
-
-    // Listen to changes in gate_notices
-    SupabaseDB.client
-      .channel('public:gate_notices')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_notices' }, async payload => {
-        console.log('🔄 Live Realtime Notice Update Received:', payload);
-        const cloudNotices = await SupabaseDB.loadAllNotices();
-        if (cloudNotices && window.App) {
-          operationalAnnouncements = cloudNotices;
-          App.renderNoticeFeed();
-          App.updateKPIs();
+          if (window.App) {
+            App.renderAll();
+          }
         }
       })
       .subscribe();
   },
 
-  // Full Cloud Sync & Merge Trigger
+  // Full Fail-Proof Cloud Sync & Merge Trigger
   syncAllFromCloud: async function() {
     if (!SupabaseDB.isConfigured) return;
 
     try {
       // 1. Notices Sync & Bidirectional Merge
       const cloudNotices = await SupabaseDB.loadAllNotices();
-      if (cloudNotices) {
-        if (cloudNotices.length === 0 && operationalAnnouncements.length > 0) {
-          for (const item of operationalAnnouncements) {
-            await SupabaseDB.saveNotice(item);
-          }
-        } else if (cloudNotices.length > 0) {
-          const noticeMap = new Map();
-          operationalAnnouncements.forEach(n => noticeMap.set(n.id, n));
-          cloudNotices.forEach(n => noticeMap.set(n.id, n));
+      if (cloudNotices && cloudNotices.length > 0) {
+        const noticeMap = new Map();
+        operationalAnnouncements.forEach(n => noticeMap.set(n.id, n));
+        cloudNotices.forEach(n => noticeMap.set(n.id, n));
 
-          operationalAnnouncements = Array.from(noticeMap.values());
-          // Push merged data back to cloud
-          operationalAnnouncements.forEach(n => SupabaseDB.saveNotice(n));
-        }
+        operationalAnnouncements = Array.from(noticeMap.values());
+      } else {
+        // If cloud empty, seed all 10 notices to cloud
+        await SupabaseDB.saveAllNotices(operationalAnnouncements);
       }
 
       // 2. SKCR Sync & Merge
       const cloudSKCR = await SupabaseDB.loadAllSKCR();
-      if (cloudSKCR) {
-        if (cloudSKCR.length === 0 && skcrData.length > 0) {
-          for (const item of skcrData) {
-            await SupabaseDB.saveSKCR(item);
-          }
-        } else if (cloudSKCR.length > 0) {
-          const skcrMap = new Map();
-          skcrData.forEach(s => skcrMap.set(s.id, s));
-          cloudSKCR.forEach(s => skcrMap.set(s.id, s));
+      if (cloudSKCR && cloudSKCR.length > 0) {
+        const skcrMap = new Map();
+        skcrData.forEach(s => skcrMap.set(s.id, s));
+        cloudSKCR.forEach(s => skcrMap.set(s.id, s));
 
-          skcrData = Array.from(skcrMap.values());
-        }
+        skcrData = Array.from(skcrMap.values());
+      } else {
+        await SupabaseDB.saveAllSKCR(skcrData);
       }
 
       // 3. Roster Sync
@@ -270,6 +256,8 @@ const SupabaseDB = {
       if (cloudRoster && cloudRoster.dates && cloudRoster.roster) {
         matrixDatesList = cloudRoster.dates;
         matrixRosterData = cloudRoster.roster;
+      } else {
+        await SupabaseDB.saveRoster(matrixDatesList, matrixRosterData);
       }
 
       if (window.App) {
