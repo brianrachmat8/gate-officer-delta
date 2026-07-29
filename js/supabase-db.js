@@ -1,6 +1,6 @@
 /* ==========================================================================
    PortGate / Gate Officer Delta - Supabase Cloud Database Module
-   Handles real-time cloud data sync across all online devices/phones.
+   Handles 100% real-time cloud data sync across all online devices/phones.
    ========================================================================== */
 
 const SupabaseDB = {
@@ -21,12 +21,12 @@ const SupabaseDB = {
         console.log("⚡ Supabase Cloud Database Connected Successfully!");
         SupabaseDB.subscribeToRealtimeChanges();
 
-        // 10-Second Auto-Poll Fallback to ensure 100% Real-Time Sync on all PCs
+        // 3-Second Instant Auto-Poll to ensure 100% Identical Multi-PC Real-Time Sync
         setInterval(() => {
           if (SupabaseDB.isConfigured) {
             SupabaseDB.syncAllFromCloud();
           }
-        }, 10000);
+        }, 3000);
       } catch (e) {
         console.error("Failed to initialize Supabase client:", e);
         SupabaseDB.isConfigured = false;
@@ -81,9 +81,7 @@ const SupabaseDB = {
         .eq('id', 'latest_roster')
         .single();
 
-      if (error) {
-        return null;
-      }
+      if (error) return null;
       return data;
     } catch(e) {
       return null;
