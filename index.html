@@ -546,21 +546,21 @@
             <h3 class="card-title"><i class="fa-solid fa-table-cells-large"></i> Tarif LOLO Per-Block Pelayaran (Format Sesuai Excel Asli)</h3>
           </div>
 
-          <!-- Direct Indicator Badges for Both Lift Off & Lift On -->
+          <!-- Sub-Tab Toggle Buttons for LIFT OFF vs LIFT ON -->
           <div style="display: flex; gap: 0.5rem; margin-left: auto; flex-wrap: wrap;">
-            <span class="badge" style="background: #ea580c; color: white; padding: 0.45rem 0.75rem; font-size: 0.8rem;">
-              <i class="fa-solid fa-truck-ramp-box"></i> LIFT OFF (Per 1 Mei 2026)
-            </span>
-            <span class="badge" style="background: #16a34a; color: white; padding: 0.45rem 0.75rem; font-size: 0.8rem;">
-              <i class="fa-solid fa-truck-moving"></i> LIFT ON (Per 20 April 2026)
-            </span>
+            <button class="btn btn-primary lolo-subtab-btn active" id="btnLoloTabLiftOff" data-type="LIFTOFF" style="background: #ea580c; border-color: #c2410c;">
+              <i class="fa-solid fa-truck-ramp-box"></i> INFORMASI HARGA LIFT OFF (Per 1 Mei 2026)
+            </button>
+            <button class="btn btn-secondary lolo-subtab-btn" id="btnLoloTabLiftOn" data-type="LIFTON">
+              <i class="fa-solid fa-truck-moving"></i> INFORMASI HARGA LIFT ON (Per 20 April 2026)
+            </button>
           </div>
         </div>
 
         <!-- Filter & Header Summary Bar -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
-          <div style="font-size: 1.1rem; font-family: 'Outfit', sans-serif; font-weight: 800; color: var(--accent-blue);" id="loloActiveTabTitleHeader">
-            TARIF LOLO DIREKTORI LENGKAP (LIFT OFF & LIFT ON SERENTAK)
+          <div style="font-size: 1.15rem; font-family: 'Outfit', sans-serif; font-weight: 800; color: var(--accent-blue);" id="loloActiveTabTitleHeader">
+            TARIF LOLO PER 1 MEI 2026 - INFORMASI HARGA LIFT OFF
           </div>
 
           <div style="display: flex; gap: 0.75rem; align-items: center;">
@@ -596,10 +596,8 @@
               <tr>
                 <th>Shipping Line</th>
                 <th>Ukuran / Tipe Container</th>
-                <th style="color: #ea580c;">Harga Lift Off (Per 1 Mei 2026)</th>
-                <th style="color: #16a34a;">Harga Lift On (Per 20 April 2026)</th>
-                <th>Total Paket</th>
-                <th>Keterangan</th>
+                <th id="loloPriceTableHeader">Harga Tarif Lift Off (Rp)</th>
+                <th>Tanggal Berlaku / Keterangan</th>
               </tr>
             </thead>
             <tbody id="tbodyLOLOTariffs">
@@ -971,16 +969,16 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v170.0</span></div>
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v180.0</span></div>
       <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
     </div>
   </footer>
 
-  <!-- Main JavaScript App Entry (Cache Busted Version 20260728_v170) -->
-  <script src="js/data.js?v=20260728_v170"></script>
-  <script src="js/supabase-db.js?v=20260728_v170"></script>
-  <script src="js/excel-parser.js?v=20260728_v170"></script>
-  <script src="js/skcr.js?v=20260728_v170"></script>
-  <script src="js/app.js?v=20260728_v170"></script>
+  <!-- Main JavaScript App Entry (Cache Busted Version 20260728_v180) -->
+  <script src="js/data.js?v=20260728_v180"></script>
+  <script src="js/supabase-db.js?v=20260728_v180"></script>
+  <script src="js/excel-parser.js?v=20260728_v180"></script>
+  <script src="js/skcr.js?v=20260728_v180"></script>
+  <script src="js/app.js?v=20260728_v180"></script>
 </body>
 </html>
