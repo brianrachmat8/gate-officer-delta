@@ -500,7 +500,59 @@ const App = {
       `;
     } else {
       sigContainer.innerHTML = `<span style="font-size:0.78rem; color:var(--text-muted);">Belum ada gambar tanda tangan di-upload.</span>`;
-    }
+  getFormattedSKCRText: function(skcrId) {
+    const record = skcrData.find(r => r.id === skcrId);
+    if (!record) return "";
+
+    const formattedDate = (typeof SKCRModule !== 'undefined' && SKCRModule.formatIndonesianDateStr)
+      ? SKCRModule.formatIndonesianDateStr(record.date)
+      : record.date;
+
+    const cList = record.containers && record.containers.length > 0
+      ? record.containers
+      : [record.primaryContainer || record.containerNo || "-"];
+
+    const containersFormatted = cList.map((c, i) => `${i + 1}. ${c}`).join('\n');
+
+    return `📋 *SURAT KETERANGAN CONTAINER RUSAK (SKCR)*
+
+📄 *No. SKCR:* ${record.id}
+📅 *Tanggal:* ${formattedDate} (${record.time || '12:00'} WIB)
+🚢 *Pelayaran:* ${record.shippingLine}
+⚓ *Kapal / Voyage:* ${record.vesselVoyage || '-'}
+📦 *Tipe & Ukuran:* ${record.sizeType}
+🏢 *Consignee:* ${record.consignee || record.shippingLine}
+
+🔢 *Daftar Kontainer (Total: ${cList.length}):*
+${containersFormatted}
+
+⚠️ *Keterangan Kerusakan:*
+_${record.damageDescription || 'Empty reposition damage'}_
+
+👤 *Petugas Gate:* ${record.userNameGate || 'RIDWAN'}
+
+---
+_Sistem Informasi Gate Officer_`;
+  },
+
+  shareSKCRToWA: function(skcrId) {
+    const text = App.getFormattedSKCRText(skcrId);
+    if (!text) return;
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(waUrl, '_blank');
+  },
+
+  copySKCRToClipboard: function(skcrId) {
+    const text = App.getFormattedSKCRText(skcrId);
+    if (!text) return;
+
+    const tempInput = document.createElement("textarea");
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    alert("✅ Format SKCR Container berhasil disalin ke Clipboard!\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
   },
 
   setupSKCRModule: function() {
@@ -510,6 +562,8 @@ const App = {
     document.getElementById('tbodySKCR').addEventListener('click', (e) => {
       const btnPrint = e.target.closest('.btn-print-skcr');
       const btnDelete = e.target.closest('.btn-delete-skcr');
+      const btnWA = e.target.closest('.btn-share-wa-skcr');
+      const btnCopy = e.target.closest('.btn-copy-wa-skcr');
 
       if (btnPrint) {
         const skcrId = btnPrint.getAttribute('data-id');
@@ -519,6 +573,16 @@ const App = {
       if (btnDelete) {
         const skcrId = btnDelete.getAttribute('data-id');
         App.deleteSKCR(skcrId);
+      }
+
+      if (btnWA) {
+        const skcrId = btnWA.getAttribute('data-id');
+        App.shareSKCRToWA(skcrId);
+      }
+
+      if (btnCopy) {
+        const skcrId = btnCopy.getAttribute('data-id');
+        App.copySKCRToClipboard(skcrId);
       }
     });
 
@@ -682,11 +746,17 @@ const App = {
           </td>
           <td style="padding: 0.35rem 0.4rem;"><span style="font-size: 0.7rem; color: var(--text-muted); display: block; word-break: break-word; line-height: 1.2;">${App.escapeHTML(item.vesselVoyage || '-')}</span></td>
           <td style="white-space: nowrap; text-align: center; padding: 0.35rem 0.4rem;">
-            <div style="display: flex; gap: 0.2rem; justify-content: center;">
-              <button class="btn btn-primary btn-sm btn-print-skcr" data-id="${item.id}" style="padding: 0.2rem 0.45rem; font-size: 0.7rem;">
+            <div style="display: flex; gap: 0.2rem; justify-content: center; align-items: center;">
+              <button class="btn btn-primary btn-sm btn-print-skcr" data-id="${item.id}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;" title="Cetak / Pratinjau Dokumen PDF">
                 <i class="fa-solid fa-print"></i> Cetak (${cCount})
               </button>
-              <button class="btn btn-secondary btn-sm btn-delete-skcr" data-id="${item.id}" style="color: var(--status-danger); padding: 0.2rem 0.4rem; font-size: 0.7rem;" title="Hapus Dokumen SKCR Ini">
+              <button class="btn btn-success btn-sm btn-share-wa-skcr" data-id="${item.id}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem; background-color: #25D366; border-color: #25D366; color: white;" title="Buka Langsung WhatsApp">
+                <i class="fa-brands fa-whatsapp"></i> WA
+              </button>
+              <button class="btn btn-secondary btn-sm btn-copy-wa-skcr" data-id="${item.id}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;" title="Salin Format Teks ke Clipboard">
+                <i class="fa-solid fa-copy"></i> Salin
+              </button>
+              <button class="btn btn-secondary btn-sm btn-delete-skcr" data-id="${item.id}" style="color: var(--status-danger); padding: 0.2rem 0.35rem; font-size: 0.7rem;" title="Hapus Dokumen SKCR Ini">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
@@ -1066,9 +1136,22 @@ const App = {
       const btnToggle = e.target.closest('.btn-toggle-notice-status');
       const btnDelete = e.target.closest('.btn-delete-notice');
 
+      const btnWA = e.target.closest('.btn-share-wa-notice');
+      const btnCopy = e.target.closest('.btn-copy-wa-notice');
+
       if (btnPrint) {
         const noticeId = btnPrint.getAttribute('data-id');
         App.openNoticePrintModal(noticeId);
+      }
+
+      if (btnWA) {
+        const noticeId = btnWA.getAttribute('data-id');
+        App.shareNoticeToWA(noticeId);
+      }
+
+      if (btnCopy) {
+        const noticeId = btnCopy.getAttribute('data-id');
+        App.copyNoticeToClipboard(noticeId);
       }
 
       if (btnToggle) {
@@ -1081,6 +1164,52 @@ const App = {
         App.deleteNotice(noticeId);
       }
     });
+  },
+
+  getFormattedNoticeText: function(noticeId) {
+    const notice = operationalAnnouncements.find(n => n.id === noticeId);
+    if (!notice) return "";
+
+    const formattedDate = (typeof SKCRModule !== 'undefined' && SKCRModule.formatIndonesianDateStr)
+      ? SKCRModule.formatIndonesianDateStr(notice.date)
+      : notice.date;
+
+    return `📢 *EDARAN OPERASIONAL GATE (${notice.serviceType || 'EKSPOR'})*
+
+📌 *Kategori Pelayaran:* ${notice.category}
+📅 *Tanggal Publikasi:* ${formattedDate} (${notice.time} WIB)
+⚠️ *Prioritas:* ${notice.priority}
+
+📝 *Judul Edaran:*
+*${notice.title}*
+
+📄 *Isi Peraturan / Instruksi:*
+_${notice.body}_
+
+👤 *Penerbit:* ${notice.author}
+
+---
+_Sistem Informasi Gate Officer_`;
+  },
+
+  shareNoticeToWA: function(noticeId) {
+    const text = App.getFormattedNoticeText(noticeId);
+    if (!text) return;
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(waUrl, '_blank');
+  },
+
+  copyNoticeToClipboard: function(noticeId) {
+    const text = App.getFormattedNoticeText(noticeId);
+    if (!text) return;
+
+    const tempInput = document.createElement("textarea");
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    alert("✅ Format Peraturan / Edaran Pelayaran berhasil disalin ke Clipboard!\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
   },
 
   deleteNotice: function(noticeId) {
@@ -1177,9 +1306,15 @@ const App = {
             </div>
             <div class="news-title">${item.title}</div>
             <div class="news-body">${item.body}</div>
-            <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-              <button class="btn btn-secondary btn-sm btn-print-notice" data-id="${item.id}">
+            <div style="margin-top: 0.75rem; display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
+              <button class="btn btn-secondary btn-sm btn-print-notice" data-id="${item.id}" title="Cetak Surat Edaran Format PDF">
                 <i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i> Cetak PDF
+              </button>
+              <button class="btn btn-success btn-sm btn-share-wa-notice" data-id="${item.id}" style="background-color: #25D366; border-color: #25D366; color: white;" title="Buka Langsung WhatsApp">
+                <i class="fa-brands fa-whatsapp"></i> Kirim WA
+              </button>
+              <button class="btn btn-secondary btn-sm btn-copy-wa-notice" data-id="${item.id}" title="Salin Format Teks ke Clipboard">
+                <i class="fa-solid fa-copy"></i> Salin
               </button>
               <button class="btn btn-secondary btn-sm btn-toggle-notice-status" data-id="${item.id}">
                 ${isDisabled 
@@ -1316,6 +1451,77 @@ const App = {
       App.activeLOLOFilter = e.target.value;
       App.renderLOLOTariffs();
     });
+
+    const btnShareWA = document.getElementById('btnShareWALOLO');
+    const btnCopyWA = document.getElementById('btnCopyWALOLO');
+
+    if (btnShareWA) {
+      btnShareWA.addEventListener('click', () => App.shareLOLOToWA());
+    }
+
+    if (btnCopyWA) {
+      btnCopyWA.addEventListener('click', () => App.copyLOLOToClipboard());
+    }
+  },
+
+  getFormattedLOLOText: function() {
+    const isLiftOff = (App.activeLOLOTab === "LIFTOFF");
+    const title = isLiftOff ? "LIFT OFF (Per 1 Mei 2026)" : "LIFT ON (Per 20 April 2026)";
+
+    const formatRp = (num) => {
+      if (!num && num !== 0) return "-";
+      return "Rp " + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(num);
+    };
+
+    const shippingLineMap = {};
+    loloTariffData.forEach(item => {
+      if (!shippingLineMap[item.shippingLine]) {
+        shippingLineMap[item.shippingLine] = {};
+      }
+      shippingLineMap[item.shippingLine][item.sizeType] = item;
+    });
+
+    let linesList = Object.keys(shippingLineMap);
+    if (App.activeLOLOFilter) {
+      linesList = linesList.filter(l => l === App.activeLOLOFilter);
+    }
+
+    const linesText = linesList.map(lineName => {
+      const data20 = shippingLineMap[lineName]["20 FT"] || shippingLineMap[lineName]["20GP"] || {};
+      const data40 = shippingLineMap[lineName]["40 FT"] || shippingLineMap[lineName]["40HC"] || {};
+      const price20 = isLiftOff ? data20.liftOff : data20.liftOn;
+      const price40 = isLiftOff ? data40.liftOff : data40.liftOn;
+      return `• *${lineName}*: 20' = ${formatRp(price20)} | 40' = ${formatRp(price40)}`;
+    }).join('\n');
+
+    return `💰 *INFORMASI TARIF LOLO CONTAINER*
+
+📌 *Kategori Tarif:* ${title}
+
+${linesText}
+
+---
+_Sistem Informasi Gate Officer_`;
+  },
+
+  shareLOLOToWA: function() {
+    const text = App.getFormattedLOLOText();
+    if (!text) return;
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(waUrl, '_blank');
+  },
+
+  copyLOLOToClipboard: function() {
+    const text = App.getFormattedLOLOText();
+    if (!text) return;
+
+    const tempInput = document.createElement("textarea");
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    alert("✅ Informasi Tarif LOLO berhasil disalin ke Clipboard!\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
   },
 
   onLOLOExcelParsed: function(newTariffs) {
