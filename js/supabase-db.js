@@ -234,12 +234,13 @@ const SupabaseDB = {
         cloudNotices.forEach(n => noticeMap.set(n.id, n));
 
         operationalAnnouncements = Array.from(noticeMap.values());
+        await SupabaseDB.saveAllNotices(operationalAnnouncements);
       } else {
-        // If cloud empty, seed all 10 notices to cloud
+        // If cloud empty, seed all notices to cloud
         await SupabaseDB.saveAllNotices(operationalAnnouncements);
       }
 
-      // 2. SKCR Sync & Merge
+      // 2. SKCR Sync & Bidirectional Merge
       const cloudSKCR = await SupabaseDB.loadAllSKCR();
       if (cloudSKCR && cloudSKCR.length > 0) {
         const skcrMap = new Map();
@@ -247,6 +248,7 @@ const SupabaseDB = {
         cloudSKCR.forEach(s => skcrMap.set(s.id, s));
 
         skcrData = Array.from(skcrMap.values());
+        await SupabaseDB.saveAllSKCR(skcrData);
       } else {
         await SupabaseDB.saveAllSKCR(skcrData);
       }
