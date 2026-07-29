@@ -48,10 +48,20 @@ const SKCRModule = {
       return null;
     }
 
+    const now = new Date();
+    const localYear = now.getFullYear();
+    const localMonth = String(now.getMonth() + 1).padStart(2, '0');
+    const localDay = String(now.getDate()).padStart(2, '0');
+    const localDateStr = `${localYear}-${localMonth}-${localDay}`;
+
+    const localHours = String(now.getHours()).padStart(2, '0');
+    const localMinutes = String(now.getMinutes()).padStart(2, '0');
+    const localTimeStr = `${localHours}:${localMinutes}`;
+
     const newRecord = {
       id: SKCRModule.generateId(),
-      date: formData.date || new Date().toISOString().split('T')[0],
-      time: formData.time || new Date().toTimeString().slice(0, 5),
+      date: formData.date || localDateStr,
+      time: formData.time || localTimeStr,
       containers: containers, // Array of container numbers (up to 100)
       containerCount: containers.length,
       primaryContainer: containers[0],

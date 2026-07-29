@@ -490,6 +490,30 @@ const App = {
       }
     });
 
+    const consigneeMap = {
+      "HAPAG": "PT HAPAG-LLOYD INDONESIA",
+      "SINOKOR": "PT Sinokor Merchant Marine Co., Ltd.",
+      "ONE": "PT STAR SHIPPING INDONESIA",
+      "HEUNG-A": "PT HEUNG-A INDONESIA",
+      "RCL": "PT RCL INDONESIA",
+      "WAN-HAI": "PT WAN HAI LINES INDONESIA",
+      "SITC": "PT SITC CONTAINER LINES INDONESIA",
+      "ZIMLINE": "PT ZIMLINE INDONESIA",
+      "HMM": "PT HYUNDAI MERCHANT MARINE INDONESIA"
+    };
+
+    const shippingLineSelect = document.getElementById('skcrShippingLine');
+    const consigneeInput = document.getElementById('skcrConsignee');
+
+    if (shippingLineSelect && consigneeInput) {
+      shippingLineSelect.addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (consigneeMap[val]) {
+          consigneeInput.value = consigneeMap[val];
+        }
+      });
+    }
+
     const form = document.getElementById('formCreateSKCR');
     form.addEventListener('submit', (e) => {
       e.preventDefault();
