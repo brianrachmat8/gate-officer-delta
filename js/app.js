@@ -36,18 +36,13 @@ const App = {
     supabaseKey: "sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk"
   },
 
-  init: async function() {
+  init: function() {
     App.loadSettings();
     SupabaseDB.init();
 
     App.loadRosterFromStorage();
     App.loadSKCRFromStorage();
     App.loadNoticesFromStorage();
-    
-    // If Supabase is configured, trigger Cloud sync before initial render so all devices align seamlessly
-    if (SupabaseDB.isConfigured) {
-      await SupabaseDB.syncAllFromCloud();
-    }
 
     App.startClock();
     App.setupThemeToggle();
@@ -62,7 +57,14 @@ const App = {
     App.setupHandoverModule();
     App.setupUserGuideModule();
     App.setupGlobalSearch();
+
+    // Render initial local state immediately so UI is 100% active instantly
     App.renderAll();
+
+    // Trigger Cloud sync non-blocking in background
+    if (SupabaseDB.isConfigured) {
+      SupabaseDB.syncAllFromCloud();
+    }
   },
 
   openModal: function(modalId) {
@@ -181,7 +183,21 @@ const App = {
     const saved = localStorage.getItem('portgate_notices_data');
     if (saved) {
       try {
-        operationalAnnouncements = JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const noticeMap = new Map();
+          if (typeof operationalAnnouncements !== 'undefined' && Array.isArray(operationalAnnouncements)) {
+            operationalAnnouncements.forEach(n => noticeMap.set(n.id, n));
+          }
+          parsed.forEach(n => {
+            if (n && n.id) {
+              n.serviceType = (n.serviceType || n.servicetype || "EKSPOR").toUpperCase();
+              noticeMap.set(n.id, n);
+            }
+          });
+          operationalAnnouncements = Array.from(noticeMap.values());
+          return;
+        }
       } catch(e) {
         console.error("Failed to load notices data:", e);
       }
