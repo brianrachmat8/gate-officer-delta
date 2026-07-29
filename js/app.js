@@ -2038,6 +2038,16 @@ _Sistem Informasi Gate Officer_`;
     App.renderHandoverTable();
     App.updateUserProfileDisplay();
     App.updateKPIs();
+  },
+
+  escapeHTML: function(str) {
+    if (!str && str !== 0) return '';
+    return str.toString()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 };
 
