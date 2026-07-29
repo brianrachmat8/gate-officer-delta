@@ -164,7 +164,10 @@ const SupabaseDB = {
         .upsert(payload, { onConflict: 'id' });
 
       if (error) console.error("Error saving SKCR to Supabase:", error);
-      else console.log("☁️ SKCR Record synced to Supabase Cloud!");
+      else {
+        console.log("☁️ SKCR Record synced to Supabase Cloud!");
+        setTimeout(() => SupabaseDB.syncAllFromCloud(), 400);
+      }
     } catch(e) {
       console.error("Supabase SKCR Save Exception:", e);
     }
@@ -179,6 +182,7 @@ const SupabaseDB = {
         .eq('id', skcrId);
 
       if (error) console.error("Error deleting SKCR from Supabase:", error);
+      else setTimeout(() => SupabaseDB.syncAllFromCloud(), 400);
     } catch(e) {
       console.error("Supabase SKCR Delete Exception:", e);
     }
@@ -237,7 +241,10 @@ const SupabaseDB = {
         .upsert(payload, { onConflict: 'id' });
 
       if (error) console.error("Error saving notice to Supabase:", error);
-      else console.log("☁️ Notice synced to Supabase Cloud!");
+      else {
+        console.log("☁️ Notice synced to Supabase Cloud!");
+        setTimeout(() => SupabaseDB.syncAllFromCloud(), 400);
+      }
     } catch(e) {
       console.error("Supabase Notice Save Exception:", e);
     }
@@ -252,6 +259,7 @@ const SupabaseDB = {
         .eq('id', noticeId);
 
       if (error) console.error("Error deleting notice from Supabase:", error);
+      else setTimeout(() => SupabaseDB.syncAllFromCloud(), 400);
     } catch(e) {
       console.error("Supabase Notice Delete Exception:", e);
     }
@@ -339,7 +347,10 @@ const SupabaseDB = {
         .upsert(payloadObj, { onConflict: 'id' });
 
       if (error) console.error("Error saving handover log to Supabase:", error);
-      else console.log("☁️ Handover Log synced to Supabase Cloud!");
+      else {
+        console.log("☁️ Handover Log synced to Supabase Cloud!");
+        setTimeout(() => SupabaseDB.syncAllFromCloud(), 400);
+      }
     } catch(e) {
       console.error("Supabase Handover Save Exception:", e);
     }
@@ -462,6 +473,15 @@ const SupabaseDB = {
         }
       })
       .subscribe();
+
+    // Background Auto-Poll Heartbeat (Every 5 Seconds) for guaranteed cross-device real-time updates
+    if (!SupabaseDB._autoSyncInterval) {
+      SupabaseDB._autoSyncInterval = setInterval(async () => {
+        try {
+          await SupabaseDB.syncAllFromCloud();
+        } catch(e) {}
+      }, 5000);
+    }
   },
 
   // Full Cloud Sync Trigger
