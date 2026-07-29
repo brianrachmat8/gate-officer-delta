@@ -17,7 +17,7 @@ const ExcelParser = {
     return { class: "shift-pill-yellow", text: clean };
   },
 
-  // Ultra-Resilient Multi-Format Roster Parse Method (Handles all Excel date formats & layouts)
+  // Multi-Block Roster Parse Method
   parseFile: function(file, callback) {
     if (!file) return;
 
@@ -26,84 +26,17 @@ const ExcelParser = {
     reader.onload = function(e) {
       try {
         const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array', cellDates: false, raw: false });
+        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
 
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
 
-        const rawJson = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+        const rawJson = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
         if (!rawJson || rawJson.length === 0) {
-          alert("File Excel kosong atau tidak dapat dibaca.");
+          alert("File Excel kosong!");
           return;
         }
-
-        const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-        // Universal Date Normalizer: converts Date, string, or number to 'DD-MMM' (e.g. '27-Jul')
-        const parseAnyDate = (val) => {
-          if (val === undefined || val === null) return "";
-
-          if (val instanceof Date && !isNaN(val.getTime())) {
-            // Bulletproof WIB (Jakarta UTC+7) vs UTC date extraction
-            let dayNum = val.getDate();
-            let monthIdx = val.getMonth();
-
-            if (val.getHours() >= 17) {
-              dayNum = val.getUTCDate();
-              monthIdx = val.getUTCMonth();
-            }
-
-            const day = String(dayNum).padStart(2, '0');
-            const month = MONTH_NAMES[monthIdx];
-            return `${day}-${month}`;
-          }
-
-          let s = String(val).trim();
-          if (!s || s.length > 25 || s.toLowerCase().includes("jadwal") || s.toLowerCase().includes("halaman")) return "";
-
-          // Match DD-MMM or DD-MMM-YYYY (e.g. 27-Jul, 27-Jul-2026, 27 Jul)
-          let matchMMM = s.match(/(\d{1,2})[-/\s.]([A-Za-z]{3,9})/i);
-          if (matchMMM) {
-            const day = String(matchMMM[1]).padStart(2, '0');
-            const mStr = matchMMM[2].toLowerCase();
-            const mIdx = MONTH_NAMES.findIndex(m => m.toLowerCase() === mStr.slice(0, 3));
-            const month = mIdx >= 0 ? MONTH_NAMES[mIdx] : mStr.charAt(0).toUpperCase() + mStr.slice(1, 3);
-            return `${day}-${month}`;
-          }
-
-          // Match DD/MM or DD-MM or YYYY-MM-DD or DD.MM.YYYY
-          let matchNum = s.match(/(\d{4})[-/. ](\d{1,2})[-/. ](\d{1,2})/) || s.match(/(\d{1,2})[-/. ](\d{1,2})(?:[-/. ]\d{2,4})?/);
-          if (matchNum) {
-            let day = matchNum[1].length === 4 ? String(matchNum[3]).padStart(2, '0') : String(matchNum[1]).padStart(2, '0');
-            let mNum = parseInt(matchNum[1].length === 4 ? matchNum[2] : matchNum[2], 10);
-            if (mNum >= 1 && mNum <= 12) {
-              const month = MONTH_NAMES[mNum - 1];
-              return `${day}-${month}`;
-            }
-          }
-
-          // Handle Excel serial date numbers (e.g. 46230 -> 27-Jul-2026)
-          let num = parseFloat(s);
-          if (!isNaN(num) && num > 40000 && num < 60000) {
-            if (typeof XLSX !== 'undefined' && XLSX.SSF && XLSX.SSF.parse_date_code) {
-              const parsedCode = XLSX.SSF.parse_date_code(num);
-              if (parsedCode && parsedCode.y && parsedCode.m && parsedCode.d) {
-                const day = String(parsedCode.d).padStart(2, '0');
-                const month = MONTH_NAMES[parsedCode.m - 1];
-                return `${day}-${month}`;
-              }
-            }
-            let jsDate = new Date((num - 25569) * 86400 * 1000);
-            if (!isNaN(jsDate.getTime())) {
-              const day = String(jsDate.getUTCDate()).padStart(2, '0');
-              const month = MONTH_NAMES[jsDate.getUTCMonth()];
-              return `${day}-${month}`;
-            }
-          }
-
-          return "";
-        };
 
         const allDatesList = [];
         const staffShiftMap = {};
@@ -112,61 +45,60 @@ const ExcelParser = {
         let currentBlockDates = [];
         let currentColDateMap = {};
 
-        // Primary Loop: Scan rows for date headers and staff shift rows
         for (let r = 0; r < rawJson.length; r++) {
           const row = rawJson[r];
           if (!row || row.length < 2) continue;
 
-          // Count date candidates in row
-          let dateCandidates = [];
-          for (let c = 0; c < row.length; c++) {
-            const parsedD = parseAnyDate(row[c]);
-            if (parsedD) {
-              dateCandidates.push({ col: c, date: parsedD });
+          let dateMatches = 0;
+          for (let c = 1; c < row.length; c++) {
+            const val = String(row[c] || '').trim();
+            if (val.match(/\d{1,2}-[A-Za-z]{3}/) || val.match(/\d{4}-\d{2}-\d{2}/) || val.match(/\d{1,2}\/\d{1,2}/) || val.match(/\d{1,2}-\d{1,2}/) || val instanceof Date) {
+              dateMatches++;
             }
           }
 
-          // If a row contains 2 or more date-like cells, treat it as a Date Header row
-          if (dateCandidates.length >= 2) {
+          if (dateMatches >= 2) {
             currentBlockDates = [];
             currentColDateMap = {};
 
-            dateCandidates.forEach(item => {
-              if (!allDatesList.includes(item.date)) {
-                allDatesList.push(item.date);
+            for (let c = 1; c < row.length; c++) {
+              const rawVal = row[c];
+              if (rawVal === undefined || rawVal === null || String(rawVal).trim() === '') continue;
+
+              let dateStr = "";
+              if (rawVal instanceof Date) {
+                const day = String(rawVal.getDate()).padStart(2, '0');
+                const month = rawVal.toLocaleString('en-US', { month: 'short' });
+                dateStr = `${day}-${month}`;
+              } else {
+                dateStr = String(rawVal).trim();
               }
-              currentBlockDates.push(item.date);
-              currentColDateMap[item.col] = item.date;
-            });
+
+              if (dateStr && !dateStr.toLowerCase().includes("jadwal")) {
+                if (!allDatesList.includes(dateStr)) {
+                  allDatesList.push(dateStr);
+                }
+                currentBlockDates.push(dateStr);
+                currentColDateMap[c] = dateStr;
+              }
+            }
             continue;
           }
 
-          // Read staff row if we are inside an active date block
           if (currentBlockDates.length > 0) {
-            let staffName = "";
+            let staffName = String(row[0] || row[1] || '').trim().toUpperCase();
+            if (!staffName || staffName === 'UNDEFINED' || staffName.length < 2) continue;
 
-            // Find staff name in first 3 columns
-            for (let c = 0; c < Math.min(3, row.length); c++) {
-              let candidate = String(row[c] || '').trim().toUpperCase();
-              if (candidate && candidate.length >= 2 && candidate !== 'UNDEFINED') {
-                if (!candidate.includes("KET") && !candidate.includes("JADWAL") && !candidate.includes("DIBUAT") && 
-                    !candidate.includes("MENGETAHUI") && !candidate.includes("SHIFT") && !candidate.includes("KORD") && 
-                    !candidate.includes("NAMA") && !candidate.includes("MANAGER") && !candidate.includes("OPS") && 
-                    !candidate.includes("NO") && !candidate.includes("SUBTOTAL") && !candidate.includes("TOTAL")) {
-                  staffName = candidate;
-                  break;
-                }
-              }
+            if (staffName.includes("KET") || staffName.includes("JADWAL") || staffName.includes("DIBUAT") || staffName.includes("MENGETAHUI") || staffName.includes("SHIFT") || staffName.includes("KORD") || staffName.includes("NAMA")) {
+              continue;
             }
-
-            if (!staffName) continue;
 
             if (!staffShiftMap[staffName]) {
               staffShiftMap[staffName] = {};
               staffNameOrder.push(staffName);
             }
 
-            for (let c = 0; c < row.length; c++) {
+            for (let c = 1; c < row.length; c++) {
               const dateLabel = currentColDateMap[c];
               if (dateLabel) {
                 const cellVal = String(row[c] || 'OFF').trim().toUpperCase();
@@ -176,48 +108,13 @@ const ExcelParser = {
           }
         }
 
-        // Secondary Strategy: If no dates were detected via date headers, map staff rows using active matrixDatesList
-        if (staffNameOrder.length === 0 || allDatesList.length === 0) {
-          console.warn("⚠️ Date headers not detected automatically. Activating resilient fallback parser...");
-
-          const fallbackDates = (matrixDatesList && matrixDatesList.length > 0) ? matrixDatesList : [];
-          
-          for (let r = 0; r < rawJson.length; r++) {
-            const row = rawJson[r];
-            if (!row || row.length < 2) continue;
-
-            let staffName = String(row[0] || row[1] || '').trim().toUpperCase();
-            if (!staffName || staffName.length < 2 || staffName.includes("JADWAL") || staffName.includes("SHIFT") || staffName.includes("MENGETAHUI")) continue;
-
-            if (!staffShiftMap[staffName]) {
-              staffShiftMap[staffName] = {};
-              staffNameOrder.push(staffName);
-            }
-
-            let dateColIndex = 0;
-            for (let c = 1; c < row.length; c++) {
-              const cellVal = String(row[c] || '').trim().toUpperCase();
-              if (cellVal && (cellVal.startsWith("P-") || cellVal.startsWith("S-") || cellVal.startsWith("M-") || cellVal === "OFF" || cellVal === "OT")) {
-                const targetDate = fallbackDates[dateColIndex] || `Day-${dateColIndex + 1}`;
-                staffShiftMap[staffName][targetDate] = cellVal;
-                if (!allDatesList.includes(targetDate)) {
-                  allDatesList.push(targetDate);
-                }
-                dateColIndex++;
-              }
-            }
-          }
-        }
-
-        // Build new Matrix Roster
         const newMatrixRoster = staffNameOrder.map(name => ({
           name: name,
-          shifts: staffShiftMap[name] || {}
+          shifts: staffShiftMap[name]
         }));
 
-        if (newMatrixRoster.length > 0) {
-          const finalDates = allDatesList.length > 0 ? allDatesList : matrixDatesList;
-          matrixDatesList = finalDates;
+        if (newMatrixRoster.length > 0 && allDatesList.length > 0) {
+          matrixDatesList = allDatesList;
           matrixRosterData = newMatrixRoster;
 
           if (window.App && typeof window.App.saveRosterToStorage === 'function') {
@@ -225,15 +122,14 @@ const ExcelParser = {
           }
 
           if (typeof callback === 'function') {
-            callback(newMatrixRoster, finalDates);
+            callback(newMatrixRoster, allDatesList);
           }
         } else {
-          alert("Silakan pastikan file Excel berisi tabel nama petugas dan kode shift (P-IN, S-OUT, M-IN, OFF, OT).");
+          alert("Gagal membaca struktur blok jadwal Excel. Pastikan header tanggal berbentuk '09-Mar', '06-Apr', dst.");
         }
-
       } catch (err) {
-        console.error("Excel Multi-Block Read Exception:", err);
-        alert("Terjadi kesalahan membaca file Excel. Pastikan file dalam format .xlsx atau .xls.");
+        console.error("Excel Multi-Block Read Error:", err);
+        alert("Terjadi kesalahan saat membaca file Excel. Pastikan file tidak rusak.");
       }
     };
 
@@ -272,12 +168,7 @@ const ExcelParser = {
           if (rowText.includes("LIFT OFF")) isLiftOffSheet = true;
         }
 
-        // Try Grid Parser matching User Excel Screenshots (HYUNDAI, HAPAG, SINOKOR, HEUNG-A, RCL, WAN-HAI, SITC, ONE)
-
-// ... line skip ...
-      ["WAN-HAI", "", "SITC", "", "ONE", ""],
-      ["20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT"],
-      [577200, 754800, 643800, 821400, 999000, 1343100]
+        // Try Grid Parser matching User Excel Screenshots (HYUNDAI, HAPAG, SINOKOR, HEUNG-A, RCL, WAN-HAI, SITC, STAR SHIPPING, ONE)
         let gridPairsFound = false;
 
         for (let r = 0; r < rawJson.length - 2; r++) {
@@ -421,9 +312,9 @@ const ExcelParser = {
       ["HYUNDAI", "", "HAPAG", "", "SINOKOR", "", "HEUNG-A", "", "RCL", ""],
       ["20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT"],
       [976850, 1265400, 1093350, 1337550, 871350, 1104450, 871350, 1104450, 627150, 849150],
-      ["WAN-HAI", "", "SITC", "", "ONE", ""],
-      ["20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT"],
-      [577200, 754800, 643800, 821400, 999000, 1343100]
+      ["WAN-HAI", "", "SITC", "", "STAR SHIPPING", "", "ONE", ""],
+      ["20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT", "20 FT", "40 FT"],
+      [577200, 754800, 643800, 821400, 904650, 1148850, 999000, 1343100]
     ];
 
     const ws = XLSX.utils.aoa_to_sheet(templateData);

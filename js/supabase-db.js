@@ -20,6 +20,13 @@ const SupabaseDB = {
         SupabaseDB.isConfigured = true;
         console.log("⚡ Supabase Cloud Database Connected Successfully!");
         SupabaseDB.subscribeToRealtimeChanges();
+
+        // 10-Second Auto-Poll Fallback to ensure 100% Real-Time Sync on all PCs
+        setInterval(() => {
+          if (SupabaseDB.isConfigured) {
+            SupabaseDB.syncAllFromCloud();
+          }
+        }, 10000);
       } catch (e) {
         console.error("Failed to initialize Supabase client:", e);
         SupabaseDB.isConfigured = false;
@@ -64,47 +71,6 @@ const SupabaseDB = {
     }
   },
 
-  resetRosterToDefault: async function() {
-    if (!SupabaseDB.isConfigured) return;
-    try {
-      const defaultDates = [
-        "27-Jul","28-Jul","29-Jul","30-Jul","31-Jul","01-Aug","02-Aug","03-Aug","04-Aug","05-Aug",
-        "06-Aug","07-Aug","08-Aug","09-Aug","10-Aug","11-Aug","12-Aug","13-Aug","14-Aug","15-Aug",
-        "16-Aug","17-Aug","18-Aug","19-Aug","20-Aug","21-Aug","22-Aug","23-Aug","24-Aug","25-Aug",
-        "26-Aug","27-Aug","28-Aug","29-Aug","30-Aug","31-Aug","01-Sep","02-Sep","03-Sep","04-Sep",
-        "05-Sep","06-Sep","07-Sep","08-Sep","09-Sep","10-Sep","11-Sep","12-Sep","13-Sep","14-Sep",
-        "15-Sep","16-Sep","17-Sep","18-Sep","19-Sep","20-Sep","21-Sep","22-Sep","23-Sep","24-Sep",
-        "25-Sep","26-Sep","27-Sep","28-Sep","29-Sep","30-Sep","01-Oct","02-Oct","03-Oct","04-Oct",
-        "05-Oct","06-Oct","07-Oct","08-Oct","09-Oct","10-Oct","11-Oct","12-Oct","13-Oct","14-Oct",
-        "15-Oct","16-Oct","17-Oct","18-Oct","19-Oct","20-Oct","21-Oct","22-Oct","23-Oct","24-Oct",
-        "25-Oct","26-Oct","27-Oct","28-Oct","29-Oct","30-Oct","31-Oct","01-Nov","02-Nov","03-Nov",
-        "04-Nov","05-Nov","06-Nov","07-Nov","08-Nov","09-Nov","10-Nov","11-Nov","12-Nov","13-Nov",
-        "14-Nov","15-Nov","16-Nov","17-Nov","18-Nov","19-Nov","20-Nov","21-Nov","22-Nov","23-Nov",
-        "24-Nov","25-Nov","26-Nov","27-Nov","28-Nov","29-Nov","30-Nov","01-Dec","02-Dec","03-Dec",
-        "04-Dec","05-Dec","06-Dec","07-Dec","08-Dec","09-Dec","10-Dec","11-Dec","12-Dec","13-Dec"
-      ];
-
-      const defaultRoster = typeof OFFICIAL_WEEKLY_SHIFTS !== 'undefined'
-        ? Object.keys(OFFICIAL_WEEKLY_SHIFTS).map(name => ({
-            name: name,
-            shifts: generateFullRosterShifts(name)
-          }))
-        : [];
-
-      const payload = {
-        id: 'latest_roster',
-        dates: defaultDates,
-        roster: defaultRoster,
-        updated_at: new Date().toISOString()
-      };
-
-      await SupabaseDB.client.from('gate_roster').upsert(payload, { onConflict: 'id' });
-      console.log("☁️ Supabase Cloud Roster Reset to Default (27-Jul start)!");
-    } catch(e) {
-      console.error("Error resetting Supabase Roster:", e);
-    }
-  },
-
   // Load Roster Schedule Matrix from Cloud
   loadRoster: async function() {
     if (!SupabaseDB.isConfigured) return null;
@@ -116,23 +82,10 @@ const SupabaseDB = {
         .single();
 
       if (error) {
-        console.error("Error fetching roster from Supabase:", error);
         return null;
       }
-
-      if (data && data.dates && data.dates[0] === "26-Jul") {
-        console.warn("🔧 Stripping legacy 26-Jul start date from Supabase Cloud roster data...");
-        data.dates.shift();
-        if (data.roster && Array.isArray(data.roster)) {
-          data.roster.forEach(r => {
-            if (r.shifts && r.shifts["26-Jul"]) delete r.shifts["26-Jul"];
-          });
-        }
-      }
-
       return data;
     } catch(e) {
-      console.error("Supabase Roster Fetch Exception:", e);
       return null;
     }
   },
@@ -141,33 +94,12 @@ const SupabaseDB = {
   saveSKCR: async function(skcrRecord) {
     if (!SupabaseDB.isConfigured) return;
     try {
-      const getLocalDate = () => {
-        const d = new Date();
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      };
-      const payload = {
-        id: skcrRecord.id,
-        date: skcrRecord.date || getLocalDate(),
-        containers: skcrRecord.containers || [skcrRecord.containerNo || 'SNKO8923410'],
-        consignee: skcrRecord.consignee || skcrRecord.shippingLine || 'PT DELTA KONTAINER',
-        shippingline: skcrRecord.shippingLine || 'HAPAG',
-        sizetype: skcrRecord.sizeType || '40ft High Cube (40HC)',
-        vesselvoyage: skcrRecord.vesselVoyage || '-',
-        usernamegate: skcrRecord.userNameGate || 'RIDWAN',
-        companyname: skcrRecord.companyName || 'PT DELTA KONTAINER DEPOT',
-        usertitle: skcrRecord.userTitle || 'Gate Operasional',
-        containercount: skcrRecord.containerCount || (skcrRecord.containers ? skcrRecord.containers.length : 1),
-        primarycontainer: skcrRecord.primaryContainer || (skcrRecord.containers ? skcrRecord.containers[0] : 'SNKO8923410')
-      };
       const { data, error } = await SupabaseDB.client
         .from('gate_skcr')
-        .upsert(payload, { onConflict: 'id' });
+        .upsert(skcrRecord, { onConflict: 'id' });
 
       if (error) console.error("Error saving SKCR to Supabase:", error);
-      else {
-        console.log("☁️ SKCR Record synced to Supabase Cloud!");
-        setTimeout(() => SupabaseDB.syncAllFromCloud(), 400);
-      }
+      else console.log("☁️ SKCR Record synced to Supabase Cloud!");
     } catch(e) {
       console.error("Supabase SKCR Save Exception:", e);
     }
@@ -182,7 +114,6 @@ const SupabaseDB = {
         .eq('id', skcrId);
 
       if (error) console.error("Error deleting SKCR from Supabase:", error);
-      else setTimeout(() => SupabaseDB.syncAllFromCloud(), 400);
     } catch(e) {
       console.error("Supabase SKCR Delete Exception:", e);
     }
@@ -191,31 +122,13 @@ const SupabaseDB = {
   loadAllSKCR: async function() {
     if (!SupabaseDB.isConfigured) return null;
     try {
-      const getLocalDate = () => {
-        const d = new Date();
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      };
       const { data, error } = await SupabaseDB.client
         .from('gate_skcr')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error || !data) return null;
-      return data.map(item => ({
-        id: item.id,
-        date: item.date || getLocalDate(),
-        containers: item.containers || [item.containerno || 'SNKO8923410'],
-        containerNo: item.containerno || (item.containers ? item.containers[0] : 'SNKO8923410'),
-        consignee: item.consignee || 'PT GLOBAL CARGO LOGISTICS',
-        shippingLine: item.shippingline || item.shippingLine || item.consignee || 'HAPAG',
-        sizeType: item.sizetype || item.sizeType || '40ft High Cube (40HC)',
-        vesselVoyage: item.vesselvoyage || item.vesselVoyage || '-',
-        userNameGate: item.usernamegate || item.userNameGate || 'RIDWAN',
-        companyName: item.companyname || item.companyName || 'PT DELTA KONTAINER DEPOT',
-        userTitle: item.usertitle || item.userTitle || 'Gate Operasional',
-        containerCount: item.containercount || item.containerCount || (item.containers ? item.containers.length : 1),
-        primaryContainer: item.primarycontainer || item.primaryContainer || (item.containers ? item.containers[0] : 'SNKO8923410')
-      }));
+      if (error) return null;
+      return data;
     } catch(e) {
       return null;
     }
@@ -225,26 +138,12 @@ const SupabaseDB = {
   saveNotice: async function(noticeRecord) {
     if (!SupabaseDB.isConfigured) return;
     try {
-      const payload = {
-        id: noticeRecord.id,
-        date: noticeRecord.date || new Date().toISOString().split('T')[0],
-        time: noticeRecord.time || "08:00",
-        title: noticeRecord.title || "",
-        category: noticeRecord.category || "UMUM",
-        priority: noticeRecord.priority || "Info",
-        author: noticeRecord.author || "Gate Ops",
-        body: noticeRecord.body || "",
-        status: noticeRecord.status || "Active"
-      };
       const { data, error } = await SupabaseDB.client
         .from('gate_notices')
-        .upsert(payload, { onConflict: 'id' });
+        .upsert(noticeRecord, { onConflict: 'id' });
 
       if (error) console.error("Error saving notice to Supabase:", error);
-      else {
-        console.log("☁️ Notice synced to Supabase Cloud!");
-        setTimeout(() => SupabaseDB.syncAllFromCloud(), 400);
-      }
+      else console.log("☁️ Notice synced to Supabase Cloud!");
     } catch(e) {
       console.error("Supabase Notice Save Exception:", e);
     }
@@ -259,7 +158,6 @@ const SupabaseDB = {
         .eq('id', noticeId);
 
       if (error) console.error("Error deleting notice from Supabase:", error);
-      else setTimeout(() => SupabaseDB.syncAllFromCloud(), 400);
     } catch(e) {
       console.error("Supabase Notice Delete Exception:", e);
     }
@@ -280,97 +178,6 @@ const SupabaseDB = {
     }
   },
 
-  // Sync App Settings (Logo, Stamp, Signature, Profile, Marquee)
-  saveSettings: async function(settingsPayload) {
-    if (!SupabaseDB.isConfigured) return;
-    try {
-      const payload = {
-        id: 'global_settings',
-        user_name_gate: settingsPayload.userNameGate || '',
-        company_name: settingsPayload.companyName || '',
-        user_title: settingsPayload.userTitle || '',
-        logo_url: settingsPayload.logoUrl || '',
-        stamp_url: settingsPayload.stampUrl || '',
-        signature_url: settingsPayload.signatureUrl || '',
-        marquee_text: settingsPayload.marqueeText || '',
-        marquee_active: settingsPayload.marqueeActive !== undefined ? settingsPayload.marqueeActive : true,
-        updated_at: new Date().toISOString()
-      };
-      const { data, error } = await SupabaseDB.client
-        .from('gate_settings')
-        .upsert(payload, { onConflict: 'id' });
-
-      if (error) console.error("Error saving settings to Supabase:", error);
-      else console.log("☁️ Global Settings & Branding synced to Supabase Cloud!");
-    } catch(e) {
-      console.error("Supabase Settings Save Exception:", e);
-    }
-  },
-
-  loadSettings: async function() {
-    if (!SupabaseDB.isConfigured) return null;
-    try {
-      const { data, error } = await SupabaseDB.client
-        .from('gate_settings')
-        .select('*')
-        .eq('id', 'global_settings')
-        .single();
-
-      if (error) return null;
-      return {
-        userNameGate: data.user_name_gate,
-        companyName: data.company_name,
-        userTitle: data.user_title,
-        logoUrl: data.logo_url,
-        stampUrl: data.stamp_url,
-        signatureUrl: data.signature_url,
-        marqueeText: data.marquee_text,
-        marqueeActive: data.marquee_active
-      };
-    } catch(e) {
-      return null;
-    }
-  },
-
-  // Sync Shift Handover Logs
-  saveHandover: async function(logRecord) {
-    if (!SupabaseDB.isConfigured) return;
-    try {
-      const payloadObj = {
-        id: logRecord.id,
-        date: logRecord.date || new Date().toISOString().split('T')[0],
-        payload: logRecord,
-        created_at: new Date().toISOString()
-      };
-      const { error } = await SupabaseDB.client
-        .from('gate_handover')
-        .upsert(payloadObj, { onConflict: 'id' });
-
-      if (error) console.error("Error saving handover log to Supabase:", error);
-      else {
-        console.log("☁️ Handover Log synced to Supabase Cloud!");
-        setTimeout(() => SupabaseDB.syncAllFromCloud(), 400);
-      }
-    } catch(e) {
-      console.error("Supabase Handover Save Exception:", e);
-    }
-  },
-
-  loadAllHandovers: async function() {
-    if (!SupabaseDB.isConfigured) return null;
-    try {
-      const { data, error } = await SupabaseDB.client
-        .from('gate_handover')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error || !data) return null;
-      return data.map(item => item.payload || item);
-    } catch(e) {
-      return null;
-    }
-  },
-
   // Real-time Subscriptions across all online devices/phones
   subscribeToRealtimeChanges: function() {
     if (!SupabaseDB.isConfigured || !SupabaseDB.client) return;
@@ -381,30 +188,10 @@ const SupabaseDB = {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_roster' }, payload => {
         console.log('🔄 Live Realtime Roster Update Received:', payload);
         if (payload.new && payload.new.dates && payload.new.roster) {
-          if (payload.new.dates[0] === "26-Jul") {
-            payload.new.dates.shift();
-            if (payload.new.roster && Array.isArray(payload.new.roster)) {
-              payload.new.roster.forEach(r => {
-                if (r.shifts && r.shifts["26-Jul"]) delete r.shifts["26-Jul"];
-              });
-            }
-          }
           matrixDatesList = payload.new.dates;
           matrixRosterData = payload.new.roster;
-
-          try {
-            localStorage.setItem('portgate_matrix_roster', JSON.stringify({
-              dates: matrixDatesList,
-              roster: matrixRosterData,
-              timestamp: Date.now()
-            }));
-          } catch(e) {
-            console.error("Failed to update local storage on roster realtime event:", e);
-          }
-
           if (window.App) {
             App.updateStaffFilterOptions();
-            App.updateMonthFilterOptions();
             App.renderMatrixScheduleTable();
             App.updateKPIs();
           }
@@ -416,13 +203,10 @@ const SupabaseDB = {
     SupabaseDB.client
       .channel('public:gate_skcr')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_skcr' }, async payload => {
-        console.log('🔄 Live Realtime SKCR Event Received:', payload);
+        console.log('🔄 Live Realtime SKCR Update Received:', payload);
         const cloudSKCR = await SupabaseDB.loadAllSKCR();
-        if (Array.isArray(cloudSKCR) && window.App) {
+        if (cloudSKCR && window.App) {
           skcrData = cloudSKCR;
-          try {
-            localStorage.setItem('portgate_skcr_data', JSON.stringify(skcrData));
-          } catch(e) {}
           App.renderSKCRTable();
           App.updateKPIs();
         }
@@ -433,143 +217,68 @@ const SupabaseDB = {
     SupabaseDB.client
       .channel('public:gate_notices')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_notices' }, async payload => {
-        console.log('🔄 Live Realtime Notice Event Received:', payload);
+        console.log('🔄 Live Realtime Notice Update Received:', payload);
         const cloudNotices = await SupabaseDB.loadAllNotices();
-        if (Array.isArray(cloudNotices) && window.App) {
+        if (cloudNotices && window.App) {
           operationalAnnouncements = cloudNotices;
-          try {
-            localStorage.setItem('portgate_notices_data', JSON.stringify(operationalAnnouncements));
-          } catch(e) {}
           App.renderNoticeFeed();
           App.updateKPIs();
         }
       })
       .subscribe();
-
-    // Listen to changes in gate_handover (Serah Terima Shift)
-    SupabaseDB.client
-      .channel('public:gate_handover')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_handover' }, async payload => {
-        console.log('🔄 Live Realtime Handover Log Event Received:', payload);
-        const cloudHandovers = await SupabaseDB.loadAllHandovers();
-        if (Array.isArray(cloudHandovers) && window.App) {
-          shiftHandoverLogs = cloudHandovers;
-          try {
-            localStorage.setItem('portgate_handover_data', JSON.stringify(shiftHandoverLogs));
-          } catch(e) {}
-          App.renderHandoverTable();
-        }
-      })
-      .subscribe();
-
-    // Listen to changes in gate_settings (Logo, TTD, Stamp, Profile)
-    SupabaseDB.client
-      .channel('public:gate_settings')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_settings' }, async payload => {
-        console.log('🔄 Live Realtime Settings/Branding Event Received:', payload);
-        const cloudSettings = await SupabaseDB.loadSettings();
-        if (cloudSettings && window.App) {
-          App.applyCloudSettings(cloudSettings);
-        }
-      })
-      .subscribe();
-
-    // Background Auto-Poll Heartbeat (Every 5 Seconds) for guaranteed cross-device real-time updates
-    if (!SupabaseDB._autoSyncInterval) {
-      SupabaseDB._autoSyncInterval = setInterval(async () => {
-        try {
-          await SupabaseDB.syncAllFromCloud();
-        } catch(e) {}
-      }, 5000);
-    }
   },
 
-  // Full Cloud Sync Trigger
+  // Full Cloud Sync & Merge Trigger
   syncAllFromCloud: async function() {
     if (!SupabaseDB.isConfigured) return;
 
-    // Settings (Logo, Stamp, TTD, Profile, Marquee)
-    const cloudSettings = await SupabaseDB.loadSettings();
-    if (cloudSettings && window.App) {
-      App.applyCloudSettings(cloudSettings);
-    }
+    try {
+      // 1. Notices Sync & Bidirectional Merge
+      const cloudNotices = await SupabaseDB.loadAllNotices();
+      if (cloudNotices) {
+        if (cloudNotices.length === 0 && operationalAnnouncements.length > 0) {
+          for (const item of operationalAnnouncements) {
+            await SupabaseDB.saveNotice(item);
+          }
+        } else if (cloudNotices.length > 0) {
+          const noticeMap = new Map();
+          operationalAnnouncements.forEach(n => noticeMap.set(n.id, n));
+          cloudNotices.forEach(n => noticeMap.set(n.id, n));
 
-    // Roster
-    const cloudRoster = await SupabaseDB.loadRoster();
-    if (cloudRoster && cloudRoster.dates && cloudRoster.roster && cloudRoster.dates.length > 0) {
-      if (cloudRoster.dates[0] === "26-Jul") {
-        cloudRoster.dates.shift();
-        if (cloudRoster.roster && Array.isArray(cloudRoster.roster)) {
-          cloudRoster.roster.forEach(r => {
-            if (r.shifts && r.shifts["26-Jul"]) delete r.shifts["26-Jul"];
-          });
+          operationalAnnouncements = Array.from(noticeMap.values());
+          // Push merged data back to cloud
+          operationalAnnouncements.forEach(n => SupabaseDB.saveNotice(n));
         }
       }
-      matrixDatesList = cloudRoster.dates;
-      matrixRosterData = cloudRoster.roster;
 
-      try {
-        localStorage.setItem('portgate_matrix_roster', JSON.stringify({
-          dates: matrixDatesList,
-          roster: matrixRosterData,
-          timestamp: Date.now()
-        }));
-      } catch(e) {
-        console.error("Failed to update local storage on cloud roster sync:", e);
-      }
-    }
+      // 2. SKCR Sync & Merge
+      const cloudSKCR = await SupabaseDB.loadAllSKCR();
+      if (cloudSKCR) {
+        if (cloudSKCR.length === 0 && skcrData.length > 0) {
+          for (const item of skcrData) {
+            await SupabaseDB.saveSKCR(item);
+          }
+        } else if (cloudSKCR.length > 0) {
+          const skcrMap = new Map();
+          skcrData.forEach(s => skcrMap.set(s.id, s));
+          cloudSKCR.forEach(s => skcrMap.set(s.id, s));
 
-    // SKCR
-    const cloudSKCR = await SupabaseDB.loadAllSKCR();
-    if (Array.isArray(cloudSKCR) && cloudSKCR.length > 0) {
-      skcrData = cloudSKCR;
-      try {
-        localStorage.setItem('portgate_skcr_data', JSON.stringify(skcrData));
-      } catch(e) {}
-    }
-
-    // Notices / Peraturan
-    const cloudNotices = await SupabaseDB.loadAllNotices();
-    if (Array.isArray(cloudNotices) && cloudNotices.length > 0) {
-      const existingNoticeIds = new Set(cloudNotices.map(n => n.id));
-      const seedNotices = [
-        { id: "NOTE-HAPAG-001", date: "2026-07-25", time: "08:30", title: "Peraturan Operasional & Ketentuan Release HAPAG LLOYD (EKSPOR)", category: "HAPAG", serviceType: "EKSPOR", priority: "Danger", author: "Pak Dady (HAPAG Ops)", body: "• SCHENKER: Wajib menggunakan Container Murni HAPAG.\n• TUJUAN PREFIX GT (GUATEMALA): Wajib Leasing Container.\n• MATTEL & IKEA: Free LOLO (Selama DO untuk ke DKD).\n• ADIDAS BUFFERSTOCK: Free LOLO (Cek Email / Info Pak Dady).\n• SEAL HAPAG FREE: Apabila sudah ada email konfirmasi dari HAPAG. WAJIB DI-INPUT DI DMS & INFO DI GROUP (Pak Dady).", status: "Active" },
-        { id: "NOTE-SNKO-002", date: "2026-07-25", time: "09:00", title: "Ketentuan Release & Foto SINOKOR & HASPUL (EKSPOR)", category: "SINOKOR", serviceType: "EKSPOR", priority: "Warning", author: "Pak Firman & Pak Agung (Ops)", body: "• TUJUAN PREFIX RU (VLADIVOSTOK): JANGAN RELEASE ALL CONTAINER UP 2022 & Prefix SEKU, SEGU, GESU, CRXU, CRSU.\n• SEAL SINOKOR & HASPUL BAYAR: Wajib di-input di DMS & info di Group (SKR: Pak Firman & HASPUL: Pak Agung).\n• TUJUAN HOCHIMINH (SINOKOR): Wajib remake foto floor atas dan bawah.", status: "Active" },
-        { id: "NOTE-RCL-003", date: "2026-07-25", time: "09:45", title: "Peraturan Release & Seal Pelayaran RCL (EKSPOR)", category: "RCL", serviceType: "EKSPOR", priority: "Warning", author: "Pak Agung (RCL Ops)", body: "• TUJUAN PREFIX TZ (TANZANIA): JANGAN RELEASE ALL REGU.\n• SEAL RCL FREE: Apabila sudah ada email konfirmasi resmi dari RCL. WAJIB DI-INPUT DI DMS & INFO DI GROUP (Pak Agung).", status: "Active" },
-        { id: "NOTE-ONE-004", date: "2026-07-25", time: "10:15", title: "Prosedur Early Pick-Up & Seal Pelayaran ONE (EKSPOR)", category: "ONE", serviceType: "EKSPOR", priority: "Info", author: "Pak Firman (ONE Ops)", body: "• UNTUK EARLY PICK UP: Mohon selalu di-cek di Exception List resmi.\n• SEAL ONE FREE: Customer / EMKL harus mengisi Google Sheet dan menunggu info dari Pelayaran by email. WAJIB DI-INPUT DI DMS & INFO DI GROUP (Pak Firman).", status: "Active" },
-        { id: "NOTE-ZIM-005", date: "2026-07-25", time: "10:50", title: "Ketentuan Prefix & Seal Pelayaran ZIM / ZIMLINE (EKSPOR)", category: "ZIMLINE", serviceType: "EKSPOR", priority: "Info", author: "Pak Pandu (ZIM Ops)", body: "• PREFIX CONTAINER MURNI ZIM: Harus dipastikan keluar untuk negara tujuan Non-Muslim.\n• SEAL ZIM FREE: Customer / EMKL harus info ke Pelayaran dan menunggu konfirmasi by email. WAJIB DI-INPUT DI DMS & INFO DI GROUP (Pak Pandu).", status: "Active" },
-        { id: "NOTE-SITC-006", date: "2026-07-24", time: "14:00", title: "Batas Closing Time & Cut-Off Gate-In SITC Line (EKSPOR)", category: "SITC", serviceType: "EKSPOR", priority: "Info", author: "SITC Line Ops", body: "• Batas Waktu Closing Time / Cut-off Gate-In Ekspor SITC armada kapal SITC SHANGHAI V.2612E jam 18:00 WIB.\n• Truk yang terlambat wajib konfirmasi late-gate ke pos inspek.", status: "Active" },
-        { id: "NOTE-HEUNG-007", date: "2026-07-24", time: "15:30", title: "Standar Inspeksi Integritas Peti Kemas HEUNG-A (EKSPOR)", category: "HEUNG-A", serviceType: "EKSPOR", priority: "Info", author: "HEUNG-A Ops", body: "• Seluruh peti kemas HEUNG-A tipe 20GP & 40HC wajib dicek kebersihan lantai dan bebas dari bau bahan kimia berbahaya sebelum serah terima.", status: "Active" },
-        { id: "NOTE-WAN-008", date: "2026-07-24", time: "16:00", title: "Peraturan Release & Ketentuan Kontainer WAN-HAI (EKSPOR)", category: "WAN-HAI", serviceType: "EKSPOR", priority: "Info", author: "Wan Hai Ops", body: "• Wajib pastikan nomor peti kemas murni WAN-HAI sesuai spesifikasi dokumen DO.\n• Pengeluaran armada peti kemas murni WAN-HAI tanpa biaya tambahan.", status: "Active" }
-      ];
-
-      seedNotices.forEach(sn => {
-        if (!existingNoticeIds.has(sn.id)) {
-          cloudNotices.push(sn);
-          SupabaseDB.saveNotice(sn);
+          skcrData = Array.from(skcrMap.values());
         }
-      });
+      }
 
-      operationalAnnouncements = cloudNotices;
-      try {
-        localStorage.setItem('portgate_notices_data', JSON.stringify(operationalAnnouncements));
-      } catch(e) {}
-    } else if (operationalAnnouncements && operationalAnnouncements.length > 0) {
-      console.log("🌱 Auto-seeding 8 operational notices to Supabase Cloud...");
-      operationalAnnouncements.forEach(n => SupabaseDB.saveNotice(n));
-    }
+      // 3. Roster Sync
+      const cloudRoster = await SupabaseDB.loadRoster();
+      if (cloudRoster && cloudRoster.dates && cloudRoster.roster) {
+        matrixDatesList = cloudRoster.dates;
+        matrixRosterData = cloudRoster.roster;
+      }
 
-    // Handover Logs
-    const cloudHandovers = await SupabaseDB.loadAllHandovers();
-    if (Array.isArray(cloudHandovers) && cloudHandovers.length > 0) {
-      shiftHandoverLogs = cloudHandovers;
-      try {
-        localStorage.setItem('portgate_handover_data', JSON.stringify(shiftHandoverLogs));
-      } catch(e) {}
-    }
-
-    if (window.App) {
-      App.renderAll();
+      if (window.App) {
+        App.renderAll();
+      }
+    } catch(e) {
+      console.error("Cloud Sync Exception:", e);
     }
   }
 };

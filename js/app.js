@@ -24,8 +24,8 @@ const App = {
 
   // Settings State with LocalStorage & Supabase Credentials
   settings: {
-    userNameGate: "RIDWAN",
-    companyName: "Delta",
+    userNameGate: "RIDWAN ALAMSYAH",
+    companyName: "PT DELTA KONTAINER DEPOT",
     userTitle: "Gate Operasional",
     logoUrl: "",
     stampUrl: "",
@@ -43,7 +43,6 @@ const App = {
     App.loadRosterFromStorage();
     App.loadSKCRFromStorage();
     App.loadNoticesFromStorage();
-    App.loadHandoverFromStorage();
     
     // If Supabase is configured, trigger Cloud sync
     if (SupabaseDB.isConfigured) {
@@ -71,16 +70,6 @@ const App = {
     if (modal) {
       modal.classList.add('active');
     }
-  },
-
-  escapeHTML: function(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
   },
 
   closeModal: function(modalId) {
@@ -134,60 +123,6 @@ const App = {
     App.settings = { ...App.settings, ...newSettings };
     localStorage.setItem('portgate_settings', JSON.stringify(App.settings));
     App.updateMarqueeUI();
-    if (typeof SupabaseDB !== 'undefined' && SupabaseDB.isConfigured) {
-      SupabaseDB.saveSettings(App.settings);
-    }
-  },
-
-  applyCloudSettings: function(cloudSettings) {
-    if (!cloudSettings) return;
-    const activeLogo = cloudSettings.logoUrl || App.settings.logoUrl;
-    const activeStamp = cloudSettings.stampUrl || App.settings.stampUrl;
-    const activeSig = cloudSettings.signatureUrl || App.settings.signatureUrl;
-    const localUser = localStorage.getItem('portgate_active_user') || App.settings.userNameGate;
-
-    App.settings = { 
-      ...App.settings, 
-      ...cloudSettings,
-      userNameGate: localUser,
-      logoUrl: activeLogo,
-      stampUrl: activeStamp,
-      signatureUrl: activeSig
-    };
-    localStorage.setItem('portgate_settings', JSON.stringify(App.settings));
-    App.updateMarqueeUI();
-    App.renderStampPreviews();
-    App.updateUserProfileDisplay();
-  },
-
-  compressImageFile: function(file, maxWidth, maxHeight, callback) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
-        }
-        if (height > maxHeight) {
-          width = Math.round((width * maxHeight) / height);
-          height = maxHeight;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL('image/png', 0.85);
-        callback(dataUrl);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
   },
 
   getSettings: function() {
@@ -213,36 +148,12 @@ const App = {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // Invalidate stale cache if it contains outdated date headers (e.g. 09-Mar, 06-Apr, 26-Jul, or 12-Dec offset)
-        const isStaleCache = parsed.dates && (
-          parsed.dates.some(d => d.includes("Mar") || d.includes("Apr") || d.includes("May") || d.includes("Jun")) ||
-          parsed.dates[0] === "26-Jul" ||
-          parsed.dates[parsed.dates.length - 1] === "12-Dec"
-        );
-
-        if (isStaleCache) {
-          console.warn("🧹 Purging outdated roster cache (26-Jul/12-Dec era) from localStorage...");
-          localStorage.removeItem('portgate_matrix_roster');
-          return;
-        }
-
         if (parsed.dates && parsed.dates.length > 0 && parsed.roster && parsed.roster.length > 0) {
           matrixDatesList = parsed.dates;
           matrixRosterData = parsed.roster;
         }
       } catch(e) {
         console.error("Failed to load roster from storage:", e);
-      }
-    }
-
-    // Safety guard: Ensure matrixDatesList ALWAYS starts on 27-Jul (Senin)
-    if (matrixDatesList && matrixDatesList[0] === "26-Jul") {
-      console.warn("🧹 Stripping legacy 26-Jul start date from active matrixDatesList...");
-      matrixDatesList.shift();
-      if (matrixRosterData) {
-        matrixRosterData.forEach(r => {
-          if (r.shifts && r.shifts["26-Jul"]) delete r.shifts["26-Jul"];
-        });
       }
     }
   },
@@ -267,54 +178,12 @@ const App = {
   },
 
   loadNoticesFromStorage: function() {
-    const masterNotices = [
-      { id: "NOTE-HAPAG-001", date: "2026-07-25", time: "08:30", title: "Peraturan Operasional & Ketentuan Release HAPAG LLOYD (EKSPOR)", category: "HAPAG", serviceType: "EKSPOR", priority: "Danger", author: "Pak Dady (HAPAG Ops)", body: "• SCHENKER: Wajib menggunakan Container Murni HAPAG.\n• TUJUAN PREFIX GT (GUATEMALA): Wajib Leasing Container.\n• MATTEL & IKEA: Free LOLO (Selama DO untuk ke DKD).\n• ADIDAS BUFFERSTOCK: Free LOLO (Cek Email / Info Pak Dady).\n• SEAL HAPAG FREE: Apabila sudah ada email konfirmasi dari HAPAG. WAJIB DI-INPUT DI DMS & INFO DI GROUP (Pak Dady).", status: "Active" },
-      { id: "NOTE-SNKO-002", date: "2026-07-25", time: "09:00", title: "Ketentuan Release & Foto SINOKOR & HASPUL (EKSPOR)", category: "SINOKOR", serviceType: "EKSPOR", priority: "Warning", author: "Pak Firman & Pak Agung (Ops)", body: "• TUJUAN PREFIX RU (VLADIVOSTOK): JANGAN RELEASE ALL CONTAINER UP 2022 & Prefix SEKU, SEGU, GESU, CRXU, CRSU.\n• SEAL SINOKOR & HASPUL BAYAR: Wajib di-input di DMS & info di Group (SKR: Pak Firman & HASPUL: Pak Agung).\n• TUJUAN HOCHIMINH (SINOKOR): Wajib remake foto floor atas dan bawah.", status: "Active" },
-      { id: "NOTE-RCL-003", date: "2026-07-25", time: "09:45", title: "Peraturan Release & Seal Pelayaran RCL (EKSPOR)", category: "RCL", serviceType: "EKSPOR", priority: "Warning", author: "Pak Agung (RCL Ops)", body: "• TUJUAN PREFIX TZ (TANZANIA): JANGAN RELEASE ALL REGU.\n• SEAL RCL FREE: Apabila sudah ada email konfirmasi resmi dari RCL. WAJIB DI-INPUT DI DMS & INFO DI GROUP (Pak Agung).", status: "Active" },
-      { id: "NOTE-ONE-004", date: "2026-07-25", time: "10:15", title: "Prosedur Early Pick-Up & Seal Pelayaran ONE (EKSPOR)", category: "ONE", serviceType: "EKSPOR", priority: "Info", author: "Pak Firman (ONE Ops)", body: "• UNTUK EARLY PICK UP: Mohon selalu di-cek di Exception List resmi.\n• SEAL ONE FREE: Customer / EMKL harus mengisi Google Sheet dan menunggu info dari Pelayaran by email. WAJIB DI-INPUT DI DMS & INFO DI GROUP (Pak Firman).", status: "Active" },
-      { id: "NOTE-ZIM-005", date: "2026-07-25", time: "10:50", title: "Ketentuan Prefix & Seal Pelayaran ZIM / ZIMLINE (EKSPOR)", category: "ZIMLINE", serviceType: "EKSPOR", priority: "Info", author: "Pak Pandu (ZIM Ops)", body: "• PREFIX CONTAINER MURNI ZIM: Harus dipastikan keluar untuk negara tujuan Non-Muslim.\n• SEAL ZIM FREE: Customer / EMKL harus info ke Pelayaran dan menunggu konfirmasi by email. WAJIB DI-INPUT DI DMS & INFO DI GROUP (Pak Pandu).", status: "Active" },
-      { id: "NOTE-SITC-006", date: "2026-07-24", time: "14:00", title: "Batas Closing Time & Cut-Off Gate-In SITC Line (EKSPOR)", category: "SITC", serviceType: "EKSPOR", priority: "Info", author: "SITC Line Ops", body: "• Batas Waktu Closing Time / Cut-off Gate-In Ekspor SITC armada kapal SITC SHANGHAI V.2612E jam 18:00 WIB.\n• Truk yang terlambat wajib konfirmasi late-gate ke pos inspek.", status: "Active" },
-      { id: "NOTE-HEUNG-007", date: "2026-07-24", time: "15:30", title: "Standar Inspeksi Integritas Peti Kemas HEUNG-A (EKSPOR)", category: "HEUNG-A", serviceType: "EKSPOR", priority: "Info", author: "HEUNG-A Ops", body: "• Seluruh peti kemas HEUNG-A tipe 20GP & 40HC wajib dicek kebersihan lantai dan bebas dari bau bahan kimia berbahaya sebelum serah terima.", status: "Active" },
-      { id: "NOTE-WAN-008", date: "2026-07-24", time: "16:00", title: "Peraturan Release & Ketentuan Kontainer WAN-HAI (EKSPOR)", category: "WAN-HAI", serviceType: "EKSPOR", priority: "Info", author: "Wan Hai Ops", body: "• Wajib pastikan nomor peti kemas murni WAN-HAI sesuai spesifikasi dokumen DO.\n• Pengeluaran armada peti kemas murni WAN-HAI tanpa biaya tambahan.", status: "Active" }
-    ];
-
     const saved = localStorage.getItem('portgate_notices_data');
     if (saved) {
       try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const existingIds = new Set(parsed.map(n => n.id));
-          masterNotices.forEach(mn => {
-            if (!existingIds.has(mn.id)) {
-              parsed.push(mn);
-            }
-          });
-          operationalAnnouncements = parsed;
-          localStorage.setItem('portgate_notices_data', JSON.stringify(operationalAnnouncements));
-          return;
-        }
+        operationalAnnouncements = JSON.parse(saved);
       } catch(e) {
         console.error("Failed to load notices data:", e);
-      }
-    }
-    operationalAnnouncements = masterNotices;
-    localStorage.setItem('portgate_notices_data', JSON.stringify(operationalAnnouncements));
-  },
-
-  saveHandoverToStorage: function() {
-    localStorage.setItem('portgate_handover_data', JSON.stringify(shiftHandoverLogs));
-  },
-
-  loadHandoverFromStorage: function() {
-    const saved = localStorage.getItem('portgate_handover_data');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          shiftHandoverLogs = parsed;
-        }
-      } catch(e) {
-        console.error("Failed to load handover logs data:", e);
       }
     }
   },
@@ -422,6 +291,12 @@ const App = {
       document.getElementById('settingMarqueeText').value = App.settings.marqueeText;
       document.getElementById('settingMarqueeActive').checked = App.settings.marqueeActive;
 
+      const activeUrl = localStorage.getItem('portgate_supabase_url') || SupabaseDB.url || "https://seiscumgtgjxaimaaegp.supabase.co";
+      const activeKey = localStorage.getItem('portgate_supabase_key') || SupabaseDB.key || "sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk";
+
+      document.getElementById('settingSupabaseUrl').value = activeUrl;
+      document.getElementById('settingSupabaseKey').value = activeKey;
+
       App.renderStampPreviews();
       App.openModal('settingsModal');
     });
@@ -429,33 +304,36 @@ const App = {
     document.getElementById('settingLogoFile').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
-        App.compressImageFile(file, 450, 450, (dataUrl) => {
-          App.settings.logoUrl = dataUrl;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          App.settings.logoUrl = event.target.result;
           App.renderStampPreviews();
-          App.saveSettings({ logoUrl: dataUrl });
-        });
+        };
+        reader.readAsDataURL(file);
       }
     });
 
     document.getElementById('settingStampFile').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
-        App.compressImageFile(file, 450, 450, (dataUrl) => {
-          App.settings.stampUrl = dataUrl;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          App.settings.stampUrl = event.target.result;
           App.renderStampPreviews();
-          App.saveSettings({ stampUrl: dataUrl });
-        });
+        };
+        reader.readAsDataURL(file);
       }
     });
 
     document.getElementById('settingSignatureFile').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
-        App.compressImageFile(file, 450, 450, (dataUrl) => {
-          App.settings.signatureUrl = dataUrl;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          App.settings.signatureUrl = event.target.result;
           App.renderStampPreviews();
-          App.saveSettings({ signatureUrl: dataUrl });
-        });
+        };
+        reader.readAsDataURL(file);
       }
     });
 
@@ -472,13 +350,19 @@ const App = {
 
       App.saveSettings(newSettings);
 
+      const spUrl = document.getElementById('settingSupabaseUrl').value.trim();
+      const spKey = document.getElementById('settingSupabaseKey').value.trim();
+      if (spUrl && spKey) {
+        SupabaseDB.setCredentials(spUrl, spKey);
+      }
+
       document.getElementById('skcrUserNameGate').value = App.settings.userNameGate;
       document.getElementById('skcrCompanyName').value = App.settings.companyName;
       document.getElementById('skcrUserTitle').value = App.settings.userTitle;
 
       App.updateUserProfileDisplay();
       App.closeModal('settingsModal');
-      alert("Pengaturan profil user gate, logo, stempel & teks berjalan berhasil disimpan!");
+      alert("Pengaturan profil user gate, logo, stempel & kredensial Supabase Cloud berhasil disimpan!");
     });
   },
 
@@ -521,53 +405,6 @@ const App = {
     }
   },
 
-  getFormattedSKCRText: function(skcrId) {
-    const record = skcrData.find(r => r.id === skcrId);
-    if (!record) return "";
-
-    const formattedDate = (typeof SKCRModule !== 'undefined' && SKCRModule.formatIndonesianDateStr)
-      ? SKCRModule.formatIndonesianDateStr(record.date)
-      : record.date;
-
-    const cList = record.containers && record.containers.length > 0
-      ? record.containers
-      : [record.primaryContainer || record.containerNo || "-"];
-
-    const containersFormatted = cList.map((c, i) => `${i + 1}. ${c}`).join('\n');
-
-    return `📋 *SURAT KETERANGAN CONTAINER RUSAK (SKCR)*
-
-📄 *No. SKCR:* ${record.id}
-📅 *Tanggal:* ${formattedDate} (${record.time || '12:00'} WIB)
-🚢 *Pelayaran:* ${record.shippingLine}
-⚓ *Kapal / Voyage:* ${record.vesselVoyage || '-'}
-📦 *Tipe & Ukuran:* ${record.sizeType}
-🏢 *Consignee:* ${record.consignee || record.shippingLine}
-
-🔢 *Daftar Kontainer (Total: ${cList.length}):*
-${containersFormatted}
-
-⚠️ *Keterangan Kerusakan:*
-_${record.damageDescription || 'Empty reposition damage'}_
-
-👤 *Petugas Gate:* ${record.userNameGate || 'RIDWAN'}
-
----
-_Sistem Informasi Gate Officer_`;
-  },
-
-  shareSKCRToWA: function(skcrId) {
-    const text = App.getFormattedSKCRText(skcrId);
-    if (!text) return alert("Data SKCR tidak ditemukan.");
-    App.openWALink(text);
-  },
-
-  copySKCRToClipboard: function(skcrId) {
-    const text = App.getFormattedSKCRText(skcrId);
-    if (!text) return alert("Data SKCR tidak ditemukan.");
-    App.copyTextToClipboard(text, "Format SKCR Container berhasil disalin ke Clipboard!");
-  },
-
   setupSKCRModule: function() {
     const rawTextArea = document.getElementById('skcrContainerRawText');
     const countBadge = document.getElementById('containerCountBadge');
@@ -575,8 +412,6 @@ _Sistem Informasi Gate Officer_`;
     document.getElementById('tbodySKCR').addEventListener('click', (e) => {
       const btnPrint = e.target.closest('.btn-print-skcr');
       const btnDelete = e.target.closest('.btn-delete-skcr');
-      const btnWA = e.target.closest('.btn-share-wa-skcr');
-      const btnCopy = e.target.closest('.btn-copy-wa-skcr');
 
       if (btnPrint) {
         const skcrId = btnPrint.getAttribute('data-id');
@@ -587,45 +422,7 @@ _Sistem Informasi Gate Officer_`;
         const skcrId = btnDelete.getAttribute('data-id');
         App.deleteSKCR(skcrId);
       }
-
-      if (btnWA) {
-        const skcrId = btnWA.getAttribute('data-id');
-        App.shareSKCRToWA(skcrId);
-      }
-
-      if (btnCopy) {
-        const skcrId = btnCopy.getAttribute('data-id');
-        App.copySKCRToClipboard(skcrId);
-      }
     });
-
-    const shippingLineSelect = document.getElementById('skcrShippingLine');
-    const consigneeInput = document.getElementById('skcrConsignee');
-
-    if (shippingLineSelect && consigneeInput) {
-      shippingLineSelect.addEventListener('change', (e) => {
-        const selectedLine = e.target.value;
-        if (typeof SHIPPING_CONSIGNEE_MAP !== 'undefined' && SHIPPING_CONSIGNEE_MAP[selectedLine]) {
-          consigneeInput.value = SHIPPING_CONSIGNEE_MAP[selectedLine];
-        }
-      });
-    }
-
-    const skcrUserSelect = document.getElementById('skcrUserNameGate');
-    if (skcrUserSelect) {
-      skcrUserSelect.value = localStorage.getItem('portgate_active_user') || App.settings.userNameGate || "RIDWAN";
-      skcrUserSelect.addEventListener('change', (e) => {
-        const selectedUser = e.target.value;
-        localStorage.setItem('portgate_active_user', selectedUser);
-        App.settings.userNameGate = selectedUser;
-        App.saveSettings({ userNameGate: selectedUser });
-
-        const userDutySelect = document.getElementById('userDutySelect');
-        if (userDutySelect) userDutySelect.value = selectedUser;
-
-        App.updateUserProfileDisplay();
-      });
-    }
 
     rawTextArea.addEventListener('input', () => {
       const parsed = SKCRModule.parseContainerBatch(rawTextArea.value);
@@ -726,58 +523,37 @@ _Sistem Informasi Gate Officer_`;
     const filterLine = document.getElementById('filterSKCRLine').value;
 
     let filtered = skcrData.filter(item => {
-      if (!item) return false;
-      const sLine = (item.shippingLine || item.shippingline || "HAPAG").toString();
-      const vVoy = (item.vesselVoyage || item.vesselvoyage || "-").toString();
-      const sId = (item.id || "").toString();
-
-      const matchLine = !filterLine || sLine.toUpperCase() === filterLine.toUpperCase();
+      const matchLine = !filterLine || item.shippingLine === filterLine;
       const cStr = (item.containers ? item.containers.join(' ') : item.containerNo || '').toLowerCase();
       const matchSearch = !searchTerm || 
         cStr.includes(searchTerm.toLowerCase()) ||
-        sId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        vVoy.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        sLine.toLowerCase().includes(searchTerm.toLowerCase());
+        item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.vesselVoyage.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.shippingLine.toLowerCase().includes(searchTerm.toLowerCase());
       return matchLine && matchSearch;
     });
 
-    tbody.innerHTML = filtered.map((item, idx) => {
+    tbody.innerHTML = filtered.map(item => {
       const cCount = item.containerCount || (item.containers ? item.containers.length : 1);
       const mainContainer = item.primaryContainer || (item.containers && item.containers[0]) || item.containerNo || "SNKO8923410";
-      const sLine = item.shippingLine || item.shippingline || "HAPAG";
-      const consigneeName = item.consignee || "-";
-      const itemId = item.id || `SKCR-${idx+1}`;
-      const dateStr = item.date || "-";
 
       return `
         <tr>
-          <td style="text-align: center; font-size: 0.72rem; font-weight: bold; color: var(--text-muted); padding: 0.35rem 0.2rem;">${idx + 1}</td>
-          <td style="padding: 0.35rem 0.4rem;"><strong style="font-size: 0.74rem; word-break: break-all;">${App.escapeHTML(itemId)}</strong></td>
-          <td style="white-space: nowrap; font-size: 0.74rem; font-weight: 600; color: var(--text-muted); padding: 0.35rem 0.4rem;">${App.escapeHTML(dateStr)}</td>
-          <td style="padding: 0.35rem 0.4rem;">
-            <div style="display: flex; flex-direction: column; gap: 0.15rem; align-items: flex-start;">
-              <span class="badge badge-shipping-line" style="font-weight: 800; font-size: 0.68rem; padding: 0.1rem 0.4rem; text-transform: uppercase;">${App.escapeHTML(sLine)}</span>
-              <span style="font-size: 0.72rem; font-weight: 600; color: var(--text-main); word-break: break-word; line-height: 1.2;">${App.escapeHTML(consigneeName)}</span>
-            </div>
+          <td><strong>${item.id}</strong></td>
+          <td>${item.date}</td>
+          <td>
+            <strong style="color: var(--accent-blue);">${mainContainer}</strong>
+            ${cCount > 1 ? `<span class="badge badge-info" style="margin-left:0.4rem;">+${cCount - 1} container lagi</span>` : ''}
           </td>
-          <td style="padding: 0.35rem 0.4rem;">
-            <strong style="color: var(--accent-blue); font-size: 0.76rem;">${App.escapeHTML(mainContainer)}</strong>
-            ${cCount > 1 ? `<span class="badge badge-info" style="margin-left:0.15rem; font-size: 0.65rem; padding: 0.1rem 0.3rem;">+${cCount - 1} cont</span>` : ''}
-          </td>
-          <td style="padding: 0.35rem 0.4rem;"><span style="font-size: 0.7rem; color: var(--text-muted); display: block; word-break: break-word; line-height: 1.2;">${App.escapeHTML(item.vesselVoyage || item.vesselvoyage || '-')}</span></td>
-          <td style="white-space: nowrap; text-align: center; padding: 0.35rem 0.4rem;">
-            <div style="display: flex; gap: 0.2rem; justify-content: center; align-items: center;">
-              <button class="btn btn-primary btn-sm btn-print-skcr" data-id="${App.escapeHTML(itemId)}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;" title="Cetak / Pratinjau Dokumen PDF">
+          <td>${item.vesselVoyage}</td>
+          <td><span class="badge badge-shipping-line">${item.consignee || item.shippingLine}</span></td>
+          <td>
+            <div style="display: flex; gap: 0.35rem;">
+              <button class="btn btn-primary btn-sm btn-print-skcr" data-id="${item.id}">
                 <i class="fa-solid fa-print"></i> Cetak (${cCount})
               </button>
-              <button class="btn btn-success btn-sm btn-share-wa-skcr" data-id="${App.escapeHTML(itemId)}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem; background-color: #25D366; border-color: #25D366; color: white;" title="Buka Langsung WhatsApp">
-                <i class="fa-brands fa-whatsapp"></i> WA
-              </button>
-              <button class="btn btn-secondary btn-sm btn-copy-wa-skcr" data-id="${App.escapeHTML(itemId)}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;" title="Salin Format Teks ke Clipboard">
-                <i class="fa-solid fa-copy"></i> Salin
-              </button>
-              <button class="btn btn-secondary btn-sm btn-delete-skcr" data-id="${App.escapeHTML(itemId)}" style="color: var(--status-danger); padding: 0.2rem 0.35rem; font-size: 0.7rem;" title="Hapus Dokumen SKCR Ini">
-                <i class="fa-solid fa-trash-can"></i>
+              <button class="btn btn-secondary btn-sm btn-delete-skcr" data-id="${item.id}" style="color: var(--status-danger);" title="Hapus Dokumen SKCR Ini">
+                <i class="fa-solid fa-trash-can"></i> Hapus
               </button>
             </div>
           </td>
@@ -800,34 +576,6 @@ _Sistem Informasi Gate Officer_`;
   setupExcelRosterModule: function() {
     const dropZone = document.getElementById('dropZoneExcel');
     const fileInput = document.getElementById('fileInputExcel');
-    const btnToggleUpload = document.getElementById('btnToggleExcelUpload');
-    const iconToggle = document.getElementById('iconToggleUpload');
-    const textToggle = document.getElementById('textToggleUpload');
-
-    const updateUploadPanelState = (isMinimized) => {
-      if (isMinimized) {
-        dropZone.style.display = 'none';
-        if (iconToggle) iconToggle.className = 'fa-solid fa-chevron-down';
-        if (textToggle) textToggle.textContent = 'Expand Panel Upload';
-        btnToggleUpload.className = 'btn btn-primary btn-sm';
-      } else {
-        dropZone.style.display = 'block';
-        if (iconToggle) iconToggle.className = 'fa-solid fa-chevron-up';
-        if (textToggle) textToggle.textContent = 'Minimize Panel';
-        btnToggleUpload.className = 'btn btn-secondary btn-sm';
-      }
-    };
-
-    // Restore saved state
-    const isSavedMinimized = localStorage.getItem('portgate_excel_upload_minimized') === 'true';
-    updateUploadPanelState(isSavedMinimized);
-
-    btnToggleUpload.addEventListener('click', () => {
-      const isCurrentlyHidden = dropZone.style.display === 'none';
-      const newState = !isCurrentlyHidden;
-      localStorage.setItem('portgate_excel_upload_minimized', newState ? 'true' : 'false');
-      updateUploadPanelState(newState);
-    });
 
     dropZone.addEventListener('click', () => fileInput.click());
 
@@ -857,11 +605,9 @@ _Sistem Informasi Gate Officer_`;
       ExcelParser.downloadTemplate();
     });
 
-    document.getElementById('btnResetSavedRoster').addEventListener('click', async () => {
-      if (confirm("Apakah Anda yakin ingin RESET ULANG data jadwal ke default (mulai Senin 27-Jul s/d 13-Dec 2026)?")) {
+    document.getElementById('btnResetSavedRoster').addEventListener('click', () => {
+      if (confirm("Apakah Anda yakin ingin MENGHAPUS file Excel yang tersimpan dan mengembalikan jadwal ke default?")) {
         localStorage.removeItem('portgate_matrix_roster');
-        await SupabaseDB.resetRosterToDefault();
-        alert("✅ Master data jadwal berhasil di-reset total ke default (Senin 27-Jul 2026)!");
         location.reload();
       }
     });
@@ -892,7 +638,6 @@ _Sistem Informasi Gate Officer_`;
     });
 
     App.updateStaffFilterOptions();
-    App.updateMonthFilterOptions();
   },
 
   updateStaffFilterOptions: function() {
@@ -907,87 +652,12 @@ _Sistem Informasi Gate Officer_`;
     `;
   },
 
-  updateMonthFilterOptions: function() {
-    const select = document.getElementById('filterRosterMonth');
-    const headerTitle = document.getElementById('rosterTitleHeader');
-    if (!select || !matrixDatesList || matrixDatesList.length === 0) return;
-
-    const monthNamesMap = {
-      "Jan": "Januari 2026",
-      "Feb": "Februari 2026",
-      "Mar": "Maret 2026",
-      "Apr": "April 2026",
-      "May": "Mei 2026",
-      "Jun": "Juni 2026",
-      "Jul": "Juli 2026",
-      "Aug": "Agustus 2026",
-      "Sep": "September 2026",
-      "Oct": "Oktober 2026",
-      "Nov": "November 2026",
-      "Dec": "Desember 2026"
-    };
-
-    const startDate = matrixDatesList[0];
-    const endDate = matrixDatesList[matrixDatesList.length - 1];
-
-    if (headerTitle) {
-      headerTitle.innerHTML = `<i class="fa-solid fa-table-cells"></i> Matriks Shift Gate Utuh (${startDate} s/d ${endDate} 2026)`;
-    }
-
-    const uniqueMonths = [];
-    matrixDatesList.forEach(d => {
-      const parts = d.split('-');
-      if (parts.length >= 2) {
-        const m = parts[1].trim();
-        if (!uniqueMonths.includes(m)) {
-          uniqueMonths.push(m);
-        }
-      }
-    });
-
-    let optionsHtml = `<option value="">🗓️ Semua Tanggal (${startDate} s/d ${endDate})</option>`;
-    uniqueMonths.forEach(m => {
-      const label = monthNamesMap[m] || m;
-      optionsHtml += `<option value="${m}">${label}</option>`;
-    });
-
-    select.innerHTML = optionsHtml;
-  },
-
   onExcelRosterParsed: function(newRoster, newDates) {
-    if (newDates && newDates.length > 0 && newRoster && newRoster.length > 0) {
-      matrixDatesList = newDates;
-      matrixRosterData = newRoster;
-    }
-
     App.saveRosterToStorage();
     App.updateStaffFilterOptions();
-    App.updateMonthFilterOptions();
     App.renderMatrixScheduleTable();
     App.updateKPIs();
-    alert(`🎉 File Excel Matriks Berhasil Di-Upload!\nJadwal ${newRoster.length} petugas gate across ${newDates.length} tanggal (${newDates[0]} s/d ${newDates[newDates.length - 1]}) tersimpan & ter-sync realtime!`);
-  },
-
-  getDayNameIndonesian: function(dateStr) {
-    if (!dateStr) return '';
-    const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-    const monthMap = {
-      "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5,
-      "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11
-    };
-
-    const parts = String(dateStr).split('-');
-    if (parts.length >= 2) {
-      const day = parseInt(parts[0], 10);
-      const monthStr = parts[1];
-      const monthIdx = monthMap[monthStr] !== undefined ? monthMap[monthStr] : 6;
-      const year = parts[2] ? parseInt(parts[2], 10) : 2026;
-
-      const d = new Date(Date.UTC(year, monthIdx, day));
-      const dayIdx = d.getUTCDay();
-      return dayNames[dayIdx] || '';
-    }
-    return '';
+    alert(`🎉 File Excel Matriks Berhasil Di-Upload!\nJadwal ${newRoster.length} petugas gate across ${newDates.length} tanggal tersimpan & ter-sync realtime!`);
   },
 
   renderMatrixScheduleTable: function(searchTerm = "") {
@@ -1004,20 +674,7 @@ _Sistem Informasi Gate Officer_`;
     thead.innerHTML = `
       <tr>
         <th class="matrix-staff-col"><i class="fa-solid fa-user"></i> NAMA PETUGAS</th>
-        ${displayDates.map(d => {
-          const dayName = App.getDayNameIndonesian(d);
-          const isWeekend = (dayName === "Sabtu" || dayName === "Minggu");
-          const isFriday = (dayName === "Jumat");
-          const styleAttr = isWeekend 
-            ? 'style="background: rgba(239, 68, 68, 0.12); color: #ef4444;"' 
-            : (isFriday ? 'style="background: rgba(245, 158, 11, 0.12);"' : '');
-          return `
-            <th ${styleAttr}>
-              <div style="font-size: 0.65rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; opacity: 0.9;">${dayName}</div>
-              <div style="font-size: 0.8rem; font-weight: 800;">${d}</div>
-            </th>
-          `;
-        }).join('')}
+        ${displayDates.map(d => `<th>${d}</th>`).join('')}
       </tr>
     `;
 
@@ -1156,22 +813,9 @@ _Sistem Informasi Gate Officer_`;
       const btnToggle = e.target.closest('.btn-toggle-notice-status');
       const btnDelete = e.target.closest('.btn-delete-notice');
 
-      const btnWA = e.target.closest('.btn-share-wa-notice');
-      const btnCopy = e.target.closest('.btn-copy-wa-notice');
-
       if (btnPrint) {
         const noticeId = btnPrint.getAttribute('data-id');
         App.openNoticePrintModal(noticeId);
-      }
-
-      if (btnWA) {
-        const noticeId = btnWA.getAttribute('data-id');
-        App.shareNoticeToWA(noticeId);
-      }
-
-      if (btnCopy) {
-        const noticeId = btnCopy.getAttribute('data-id');
-        App.copyNoticeToClipboard(noticeId);
       }
 
       if (btnToggle) {
@@ -1184,44 +828,6 @@ _Sistem Informasi Gate Officer_`;
         App.deleteNotice(noticeId);
       }
     });
-  },
-
-  getFormattedNoticeText: function(noticeId) {
-    const notice = operationalAnnouncements.find(n => n.id === noticeId);
-    if (!notice) return "";
-
-    const formattedDate = (typeof SKCRModule !== 'undefined' && SKCRModule.formatIndonesianDateStr)
-      ? SKCRModule.formatIndonesianDateStr(notice.date)
-      : notice.date;
-
-    return `📢 *EDARAN OPERASIONAL GATE (${notice.serviceType || 'EKSPOR'})*
-
-📌 *Kategori Pelayaran:* ${notice.category}
-📅 *Tanggal Publikasi:* ${formattedDate} (${notice.time} WIB)
-⚠️ *Prioritas:* ${notice.priority}
-
-📝 *Judul Edaran:*
-*${notice.title}*
-
-📄 *Isi Peraturan / Instruksi:*
-_${notice.body}_
-
-👤 *Penerbit:* ${notice.author}
-
----
-_Sistem Informasi Gate Officer_`;
-  },
-
-  shareNoticeToWA: function(noticeId) {
-    const text = App.getFormattedNoticeText(noticeId);
-    if (!text) return alert("Data Edaran tidak ditemukan.");
-    App.openWALink(text);
-  },
-
-  copyNoticeToClipboard: function(noticeId) {
-    const text = App.getFormattedNoticeText(noticeId);
-    if (!text) return alert("Data Edaran tidak ditemukan.");
-    App.copyTextToClipboard(text, "Format Peraturan / Edaran Pelayaran berhasil disalin ke Clipboard!");
   },
 
   deleteNotice: function(noticeId) {
@@ -1257,9 +863,7 @@ _Sistem Informasi Gate Officer_`;
     const displayBadge = document.getElementById('noticeDateDisplayBadge');
 
     let filtered = operationalAnnouncements.filter(n => {
-      const itemType = (n.serviceType || 'EKSPOR').toUpperCase();
-      const activeType = (App.activeNoticeServiceType || 'EKSPOR').toUpperCase();
-      const matchType = (itemType === activeType);
+      const matchType = !n.serviceType || n.serviceType === App.activeNoticeServiceType;
       const matchCategory = !App.activeNoticeCategoryFilter || n.category === App.activeNoticeCategoryFilter;
       const matchDate = !App.activeNoticeDateFilter || n.date === App.activeNoticeDateFilter;
       const matchStatus = App.showDisabledNotices ? true : (n.status !== "Disabled");
@@ -1318,15 +922,9 @@ _Sistem Informasi Gate Officer_`;
             </div>
             <div class="news-title">${item.title}</div>
             <div class="news-body">${item.body}</div>
-            <div style="margin-top: 0.75rem; display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
-              <button class="btn btn-secondary btn-sm btn-print-notice" data-id="${item.id}" title="Cetak Surat Edaran Format PDF">
+            <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button class="btn btn-secondary btn-sm btn-print-notice" data-id="${item.id}">
                 <i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i> Cetak PDF
-              </button>
-              <button class="btn btn-success btn-sm btn-share-wa-notice" data-id="${item.id}" style="background-color: #25D366; border-color: #25D366; color: white;" title="Buka Langsung WhatsApp">
-                <i class="fa-brands fa-whatsapp"></i> Kirim WA
-              </button>
-              <button class="btn btn-secondary btn-sm btn-copy-wa-notice" data-id="${item.id}" title="Salin Format Teks ke Clipboard">
-                <i class="fa-solid fa-copy"></i> Salin
               </button>
               <button class="btn btn-secondary btn-sm btn-toggle-notice-status" data-id="${item.id}">
                 ${isDisabled 
@@ -1418,37 +1016,6 @@ _Sistem Informasi Gate Officer_`;
       }
     });
 
-    const btnToggleUpload = document.getElementById('btnToggleLOLOExcelUpload');
-    const iconToggle = document.getElementById('iconToggleLOLOUpload');
-    const textToggle = document.getElementById('textToggleLOLOUpload');
-
-    const updateUploadPanelState = (isMinimized) => {
-      if (isMinimized) {
-        dropZone.style.display = 'none';
-        if (iconToggle) iconToggle.className = 'fa-solid fa-chevron-down';
-        if (textToggle) textToggle.textContent = 'Expand Panel Upload';
-        if (btnToggleUpload) btnToggleUpload.className = 'btn btn-primary btn-sm';
-      } else {
-        dropZone.style.display = 'block';
-        if (iconToggle) iconToggle.className = 'fa-solid fa-chevron-up';
-        if (textToggle) textToggle.textContent = 'Minimize Panel';
-        if (btnToggleUpload) btnToggleUpload.className = 'btn btn-secondary btn-sm';
-      }
-    };
-
-    // Restore saved state (default true / minimized)
-    const isSavedMinimized = localStorage.getItem('portgate_lolo_excel_upload_minimized') !== 'false';
-    updateUploadPanelState(isSavedMinimized);
-
-    if (btnToggleUpload) {
-      btnToggleUpload.addEventListener('click', () => {
-        const isCurrentlyHidden = dropZone.style.display === 'none';
-        const newState = !isCurrentlyHidden;
-        localStorage.setItem('portgate_lolo_excel_upload_minimized', newState ? 'true' : 'false');
-        updateUploadPanelState(newState);
-      });
-    }
-
     fileInput.addEventListener('change', (e) => {
       if (e.target.files.length > 0) {
         ExcelParser.parseLOLOTariffFile(e.target.files[0], App.onLOLOExcelParsed);
@@ -1463,77 +1030,6 @@ _Sistem Informasi Gate Officer_`;
       App.activeLOLOFilter = e.target.value;
       App.renderLOLOTariffs();
     });
-
-    const btnShareWA = document.getElementById('btnShareWALOLO');
-    const btnCopyWA = document.getElementById('btnCopyWALOLO');
-
-    if (btnShareWA) {
-      btnShareWA.addEventListener('click', () => App.shareLOLOToWA());
-    }
-
-    if (btnCopyWA) {
-      btnCopyWA.addEventListener('click', () => App.copyLOLOToClipboard());
-    }
-  },
-
-  getFormattedLOLOText: function() {
-    const isLiftOff = (App.activeLOLOTab === "LIFTOFF");
-    const title = isLiftOff ? "LIFT OFF (Per 1 Mei 2026)" : "LIFT ON (Per 20 April 2026)";
-
-    const formatRp = (num) => {
-      if (!num && num !== 0) return "-";
-      return "Rp " + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(num);
-    };
-
-    const shippingLineMap = {};
-    loloTariffData.forEach(item => {
-      if (!shippingLineMap[item.shippingLine]) {
-        shippingLineMap[item.shippingLine] = {};
-      }
-      shippingLineMap[item.shippingLine][item.sizeType] = item;
-    });
-
-    let linesList = Object.keys(shippingLineMap);
-    if (App.activeLOLOFilter) {
-      linesList = linesList.filter(l => l === App.activeLOLOFilter);
-    }
-
-    const linesText = linesList.map(lineName => {
-      const data20 = shippingLineMap[lineName]["20 FT"] || shippingLineMap[lineName]["20GP"] || {};
-      const data40 = shippingLineMap[lineName]["40 FT"] || shippingLineMap[lineName]["40HC"] || {};
-      const price20 = isLiftOff ? data20.liftOff : data20.liftOn;
-      const price40 = isLiftOff ? data40.liftOff : data40.liftOn;
-      return `• *${lineName}*: 20' = ${formatRp(price20)} | 40' = ${formatRp(price40)}`;
-    }).join('\n');
-
-    return `💰 *INFORMASI TARIF LOLO CONTAINER*
-
-📌 *Kategori Tarif:* ${title}
-
-${linesText}
-
----
-_Sistem Informasi Gate Officer_`;
-  },
-
-  shareLOLOToWA: function() {
-    const text = App.getFormattedLOLOText();
-    if (!text) return;
-    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-    window.open(waUrl, '_blank');
-  },
-
-  copyLOLOToClipboard: function() {
-    const text = App.getFormattedLOLOText();
-    if (!text) return;
-
-    const tempInput = document.createElement("textarea");
-    tempInput.value = text;
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    document.execCommand("copy");
-    document.body.removeChild(tempInput);
-    alert("✅ Informasi Tarif LOLO berhasil disalin ke Clipboard!\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
   },
 
   onLOLOExcelParsed: function(newTariffs) {
@@ -1682,16 +1178,18 @@ _Sistem Informasi Gate Officer_`;
     App.currentActiveNoticeId = noticeId;
 
     const settings = App.getSettings();
-    const companyName = settings.companyName || "DELTA";
-    const userName = settings.userNameGate || "RIDWAN";
+    const companyName = settings.companyName || "PT DELTA KONTAINER DEPOT";
+    const userName = settings.userNameGate || "RIDWAN ALAMSYAH";
     const userTitle = settings.userTitle || "Gate Operasional";
     const logoUrl = settings.logoUrl || "";
     const stampUrl = settings.stampUrl || "";
     const signatureUrl = settings.signatureUrl || "";
 
-    const dateFormatted = (typeof SKCRModule !== 'undefined' && SKCRModule.formatIndonesianDateStr)
-      ? SKCRModule.formatIndonesianDateStr(notice.date)
-      : notice.date;
+    const dateFormatted = new Date(notice.date).toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
 
     const modalContent = `
       <div class="notice-official-document">
@@ -1699,8 +1197,8 @@ _Sistem Informasi Gate Officer_`;
           <div class="skcr-letterhead-left">
             ${logoUrl ? `<img src="${logoUrl}" class="skcr-company-logo" alt="Logo Perusahaan">` : ''}
             <div>
-              <div class="skcr-company-title">Delta</div>
-              <div class="skcr-company-sub">Kontainer Depot</div>
+              <div class="skcr-company-title">${companyName}</div>
+              <div class="skcr-company-sub">CONTAINER DEPOT & GATE LOGISTICS TERMINAL SERVICES</div>
               <div class="skcr-company-address">Jl. Madya Kebantenan No. 8, Semper Timur, Cilincing Jakarta</div>
               <div class="skcr-company-contact">Phone : +62 21 21485050 &nbsp;|&nbsp; Fax : +62 21 21485532</div>
             </div>
@@ -1789,119 +1287,17 @@ _Sistem Informasi Gate Officer_`;
     }, 1200);
   },
 
-  getFormattedHandoverText: function(handoverId) {
-    const log = shiftHandoverLogs.find(l => l.id === handoverId);
-    if (!log) return "";
-
-    const formattedDate = (typeof SKCRModule !== 'undefined' && SKCRModule.formatIndonesianDateStr)
-      ? SKCRModule.formatIndonesianDateStr(log.date)
-      : log.date;
-
-    return `📋 *LAPORAN SERAH TERIMA SHIFT GATE*
-
-📅 *Tanggal:* ${formattedDate}
-
-🔄 *Pergantian Shift:*
-${log.shiftFrom} ➔ ${log.shiftTo}
-
-👤 *Supervisor / Petugas:*
-${log.supervisor}
-
-🚦 *Keterangan Kondisi & Alat:* ${log.gateCondition}
-📦 *Container Hold / Pending:* ${log.pendingContainers}
-
-📝 *Catatan Khusus Operasional:*
-_${log.generalNotes}_
-${log.responseText ? `
-💬 *Tanggapan / Respon Shift:*
-_"${log.responseText}"_
-— Direspon oleh ${log.respondedBy} pada ${log.respondedAtDate || log.date} pukul ${log.respondedAtTime || log.respondedAt}
-` : ''}
----
-_Sistem Informasi Gate Officer_`;
-  },
-
-  shareHandoverToWA: function(handoverId) {
-    const text = App.getFormattedHandoverText(handoverId);
-    if (!text) return alert("Data Serah Terima Shift tidak ditemukan.");
-    App.openWALink(text);
-  },
-
-  copyHandoverToClipboard: function(handoverId) {
-    const text = App.getFormattedHandoverText(handoverId);
-    if (!text) return alert("Data Serah Terima Shift tidak ditemukan.");
-    App.copyTextToClipboard(text, "Format Laporan Serah Terima Shift berhasil disalin ke Clipboard!");
-  },
-
   setupHandoverModule: function() {
     document.getElementById('btnOpenHandoverModal').addEventListener('click', () => {
       App.openModal('handoverModal');
     });
 
-    document.getElementById('tbodyHandover').addEventListener('click', (e) => {
-      const btnWA = e.target.closest('.btn-share-wa-handover');
-      const btnCopy = e.target.closest('.btn-copy-wa-handover');
-      const btnRespond = e.target.closest('.btn-respond-handover');
-
-      if (btnWA) {
-        const hId = btnWA.getAttribute('data-id');
-        App.shareHandoverToWA(hId);
-      }
-
-      if (btnCopy) {
-        const hId = btnCopy.getAttribute('data-id');
-        App.copyHandoverToClipboard(hId);
-      }
-
-      if (btnRespond) {
-        const hId = btnRespond.getAttribute('data-id');
-        const logIndex = shiftHandoverLogs.findIndex(l => l.id === hId);
-        if (logIndex >= 0) {
-          const log = shiftHandoverLogs[logIndex];
-          
-          // Prompt 1: Get Officer's Name
-          const defaultName = log.respondedBy || App.getSettings().userNameGate || "RIDWAN";
-          const officerName = prompt("Masukkan NAMA PETUGAS yang merespon serah terima ini:", defaultName);
-          if (officerName !== null && officerName.trim() !== "") {
-            
-            // Prompt 2: Get Response/Acknowledge text
-            const defaultVal = log.responseText || "Diterima & Sesuai";
-            const userResp = prompt(`Masukkan tanggapan/konfirmasi dari ${officerName.trim().toUpperCase()} (misal: 'Diterima & Sesuai' atau 'Diterima, printer sudah IT perbaiki'):`, defaultVal);
-            
-            if (userResp !== null) {
-              log.respondedBy = officerName.trim().toUpperCase();
-              log.responseText = userResp.trim();
-              
-              // Generate Current local Date and Time in WIB / Jakarta
-              const now = new Date();
-              const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-              const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
-              
-              log.respondedAtDate = dateStr;
-              log.respondedAtTime = timeStr;
-              log.respondedAt = timeStr; // Legacy fallback
-
-              App.saveHandoverToStorage();
-              SupabaseDB.saveHandover(log);
-              App.renderHandoverTable();
-              alert("✅ Tanggapan serah terima berhasil disimpan & ter-sync realtime!");
-            }
-          }
-        }
-      }
-    });
-
     document.getElementById('formAddHandover').addEventListener('submit', (e) => {
       e.preventDefault();
 
-      const getLocalDate = () => {
-        const d = new Date();
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      };
-
       const newLog = {
         id: `LOG-${Date.now()}`,
-        date: getLocalDate(),
+        date: new Date().toISOString().split('T')[0],
         shiftFrom: document.getElementById('hoShiftFrom').value,
         shiftTo: document.getElementById('hoShiftTo').value,
         supervisor: document.getElementById('hoSupervisor').value,
@@ -1911,51 +1307,23 @@ _Sistem Informasi Gate Officer_`;
       };
 
       shiftHandoverLogs.unshift(newLog);
-      App.saveHandoverToStorage();
-      SupabaseDB.saveHandover(newLog);
-
       document.getElementById('formAddHandover').reset();
       App.closeModal('handoverModal');
 
       App.renderHandoverTable();
-      alert(`Catatan Serah Terima Shift (${newLog.shiftFrom} -> ${newLog.shiftTo}) berhasil disimpan & ter-sync realtime!`);
     });
   },
 
   renderHandoverTable: function() {
     const tbody = document.getElementById('tbodyHandover');
-    if (!tbody) return;
     tbody.innerHTML = shiftHandoverLogs.map(log => `
       <tr>
-        <td style="white-space: nowrap;"><strong>${App.escapeHTML(log.date)}</strong></td>
-        <td style="white-space: nowrap;"><span class="badge badge-info">${App.escapeHTML(log.shiftFrom)}</span> &rarr; <span class="badge badge-success">${App.escapeHTML(log.shiftTo)}</span></td>
-        <td style="white-space: nowrap;"><strong>${App.escapeHTML(log.supervisor)}</strong></td>
-        <td>${App.escapeHTML(log.gateCondition)}</td>
-        <td style="white-space: nowrap;"><strong style="color: var(--status-danger);">${App.escapeHTML(log.pendingContainers)}</strong></td>
-        <td>
-          <div>${App.escapeHTML(log.generalNotes)}</div>
-          ${log.responseText ? `
-            <div style="margin-top: 0.5rem; padding: 0.4rem 0.6rem; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; border-radius: 6px; font-size: 0.76rem; color: var(--text-main);">
-              <div style="font-weight: 700; color: #059669; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.15rem;">
-                <i class="fa-solid fa-reply"></i> Respon oleh ${App.escapeHTML(log.respondedBy)} (${App.escapeHTML(log.respondedAtDate || log.date)} pukul ${App.escapeHTML(log.respondedAtTime || log.respondedAt)}):
-              </div>
-              <div style="font-style: italic;">"${App.escapeHTML(log.responseText)}"</div>
-            </div>
-          ` : ''}
-        </td>
-        <td style="white-space: nowrap; text-align: center;">
-          <div style="display: flex; gap: 0.3rem; justify-content: center; align-items: center;">
-            <button class="btn btn-primary btn-sm btn-respond-handover" data-id="${log.id}" style="padding: 0.25rem 0.5rem; font-size: 0.73rem; background: var(--accent-blue);" title="Tulis Tanggapan / Konfirmasi Serah Terima">
-              <i class="fa-solid fa-comment-dots"></i> ${log.responseText ? 'Edit' : 'Respon'}
-            </button>
-            <button class="btn btn-success btn-sm btn-share-wa-handover" data-id="${log.id}" style="padding: 0.25rem 0.5rem; font-size: 0.73rem; background-color: #25D366; border-color: #25D366; color: white;" title="Buka Langsung WhatsApp">
-              <i class="fa-brands fa-whatsapp"></i> Kirim WA
-            </button>
-            <button class="btn btn-secondary btn-sm btn-copy-wa-handover" data-id="${log.id}" style="padding: 0.25rem 0.5rem; font-size: 0.73rem;" title="Salin Teks Format WA ke Clipboard">
-              <i class="fa-solid fa-copy"></i> Salin
-            </button>
-          </div>
-        </td>
+        <td><strong>${log.date}</strong></td>
+        <td><span class="badge badge-info">${log.shiftFrom}</span> &rarr; <span class="badge badge-success">${log.shiftTo}</span></td>
+        <td><strong>${log.supervisor}</strong></td>
+        <td>${log.gateCondition}</td>
+        <td><strong style="color: var(--status-danger);">${log.pendingContainers}</strong></td>
+        <td>${log.generalNotes}</td>
       </tr>
     `).join('');
   },
@@ -1964,11 +1332,10 @@ _Sistem Informasi Gate Officer_`;
     const userSelect = document.getElementById('userDutySelect');
     if (!userSelect) return;
 
-    userSelect.value = localStorage.getItem('portgate_active_user') || App.settings.userNameGate || "RIDWAN";
+    userSelect.value = App.settings.userNameGate || "RIDWAN ALAMSYAH";
 
     userSelect.addEventListener('change', (e) => {
       const selectedUser = e.target.value;
-      localStorage.setItem('portgate_active_user', selectedUser);
       App.settings.userNameGate = selectedUser;
       App.saveSettings({ userNameGate: selectedUser });
 
@@ -2006,83 +1373,18 @@ _Sistem Informasi Gate Officer_`;
     document.getElementById('kpiGateDuty').textContent = matrixRosterData.length;
     const activeNotices = operationalAnnouncements.filter(n => n.status !== "Disabled").length;
     document.getElementById('kpiActiveNotices').textContent = activeNotices;
-
-    const infoBadge = document.getElementById('infoCountBadge');
-    if (infoBadge) infoBadge.textContent = activeNotices;
-
     document.getElementById('kpiTotalLOLORates').textContent = loloTariffData.length;
   },
 
   renderAll: function() {
     App.renderSKCRTable();
     App.updateStaffFilterOptions();
-    App.updateMonthFilterOptions();
     App.renderMatrixScheduleTable();
     App.renderNoticeFeed();
     App.renderLOLOTariffs();
     App.renderHandoverTable();
     App.updateUserProfileDisplay();
     App.updateKPIs();
-  },
-
-  escapeHTML: function(str) {
-    if (!str && str !== 0) return '';
-    return str.toString()
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  },
-
-  openWALink: function(text) {
-    if (!text) return;
-    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-    try {
-      const win = window.open(waUrl, '_blank');
-      if (!win || win.closed || typeof win.closed === 'undefined') {
-        window.location.href = waUrl;
-      }
-    } catch(e) {
-      window.location.href = waUrl;
-    }
-  },
-
-  copyTextToClipboard: function(text, successMsg = "Teks berhasil disalin ke Clipboard!") {
-    if (!text) return;
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(() => {
-        alert("✅ " + successMsg + "\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
-      }).catch(() => {
-        App.fallbackCopyText(text, successMsg);
-      });
-    } else {
-      App.fallbackCopyText(text, successMsg);
-    }
-  },
-
-  fallbackCopyText: function(text, successMsg = "Teks berhasil disalin ke Clipboard!") {
-    try {
-      const tempInput = document.createElement("textarea");
-      tempInput.value = text;
-      tempInput.style.position = "fixed";
-      tempInput.style.left = "-9999px";
-      tempInput.style.top = "0";
-      document.body.appendChild(tempInput);
-      tempInput.focus();
-      tempInput.select();
-      const successful = document.execCommand("copy");
-      document.body.removeChild(tempInput);
-
-      if (successful) {
-        alert("✅ " + successMsg + "\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
-      } else {
-        prompt("Salin teks di bawah ini secara manual (Tekan Lama / Ctrl+C):", text);
-      }
-    } catch (err) {
-      prompt("Salin teks di bawah ini secara manual (Tekan Lama / Ctrl+C):", text);
-    }
   }
 };
 

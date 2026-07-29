@@ -182,21 +182,19 @@ body {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .clock-badge {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  height: 36px;
-  padding: 0 0.85rem;
+  padding: 0.4rem 0.85rem;
   background: var(--bg-input);
   border: 1px solid var(--border-color);
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 600;
-  white-space: nowrap;
 }
 
 .pulse-indicator {
@@ -215,8 +213,7 @@ body {
 }
 
 .theme-toggle-btn {
-  height: 36px;
-  padding: 0 0.85rem;
+  padding: 0.4rem 0.85rem;
   border-radius: 20px;
   background: var(--bg-input);
   border: 1px solid var(--border-color);
@@ -226,7 +223,6 @@ body {
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.4rem;
   transition: all 0.2s ease;
 }
@@ -234,13 +230,6 @@ body {
 .theme-toggle-btn:hover {
   background: var(--border-color);
   transform: scale(1.03);
-}
-
-.header-actions .btn-sm {
-  height: 36px !important;
-  border-radius: 20px !important;
-  padding: 0 1rem !important;
-  font-size: 0.8rem !important;
 }
 
 /* Custom Running Text Marquee Banner */
@@ -418,11 +407,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem 1rem;
   margin-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.75rem;
 }
 
 .card-title {
@@ -432,28 +417,6 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.card-header select,
-.card-header input {
-  height: 34px !important;
-  font-size: 0.8rem !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  padding: 0.35rem 0.75rem !important;
-  border-radius: 6px !important;
-  margin: 0 !important;
-  width: auto !important;
-}
-
-.card-header button,
-.card-header .btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  vertical-align: middle !important;
 }
 
 /* Grid Layouts */
@@ -586,26 +549,19 @@ textarea.form-control {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.55rem 1.2rem;
+  padding: 0.6rem 1.25rem;
   border-radius: 8px;
-  font-size: 0.84rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   border: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   text-decoration: none;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-.btn:active {
-  transform: translateY(1px);
-  box-shadow: none;
 }
 
 .btn-sm {
-  padding: 0.35rem 0.8rem;
-  font-size: 0.76rem;
-  border-radius: 6px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.78rem;
 }
 
 .btn-primary {
@@ -1051,131 +1007,4 @@ textarea.form-control {
   align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem;
-}
-
-/* ==========================================================================
-   Mobile & Smartphone Responsive Refinements (Polished)
-   ========================================================================== */
-@media (max-width: 768px) {
-  /* Header adjustments */
-  .header-container {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-    padding: 0.5rem 0;
-  }
-
-  .brand-logo {
-    justify-content: center;
-  }
-
-  .global-search-container {
-    max-width: 100%;
-    margin: 0.25rem 0;
-  }
-
-  .header-actions {
-    justify-content: space-between;
-    width: 100%;
-    gap: 0.5rem;
-  }
-
-  .clock-badge,
-  .theme-toggle-btn,
-  .header-actions .btn-sm {
-    flex: 1;
-    justify-content: center;
-    font-size: 0.75rem !important;
-    height: 34px !important;
-  }
-
-  /* Nav tabs horizontal scrolling indicators */
-  .app-nav {
-    padding: 0;
-  }
-
-  .nav-container {
-    gap: 0.15rem;
-    padding: 0 0.5rem;
-  }
-
-  .nav-tab {
-    padding: 0.65rem 0.75rem;
-    font-size: 0.78rem;
-  }
-
-  /* Grid Layout Normalizations */
-  .grid-skcr-layout {
-    grid-template-columns: 1fr !important;
-    gap: 1rem;
-  }
-
-  /* Compact padding for cards and main body */
-  .app-main {
-    padding: 1rem 0.5rem !important;
-  }
-
-  .glass-card {
-    padding: 1rem 0.75rem !important;
-    border-radius: 12px;
-  }
-}
-
-@media (max-width: 640px) {
-  /* KPI 2x2 layout on phones */
-  .grid-4 {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.75rem !important;
-  }
-
-  .kpi-card {
-    padding: 0.6rem 0.85rem !important;
-    gap: 0.6rem !important;
-  }
-
-  .kpi-value {
-    font-size: 1.15rem !important;
-    line-height: 1.1;
-  }
-
-  .kpi-label {
-    font-size: 0.68rem !important;
-  }
-
-  .kpi-icon {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 0.85rem !important;
-  }
-
-  /* Grid-3 and Grid-2 wrap naturally to 1 column */
-  .grid-2, .grid-3 {
-    grid-template-columns: 1fr !important;
-    gap: 1rem !important;
-  }
-
-  /* Modal responsiveness */
-  .modal-backdrop {
-    padding: 0.5rem;
-  }
-
-  .modal-container {
-    border-radius: 12px;
-    max-height: 95vh;
-  }
-
-  .modal-body {
-    padding: 1rem;
-  }
-
-  .modal-header, .modal-footer {
-    padding: 0.75rem 1rem;
-  }
-
-  /* Table actions spacing */
-  .data-table td .btn,
-  .data-table td button {
-    padding: 0.25rem 0.4rem !important;
-    font-size: 0.7rem !important;
-  }
 }

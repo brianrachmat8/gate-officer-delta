@@ -126,17 +126,18 @@
 .skcr-company-title {
   font-size: 1.2rem;
   font-weight: bold;
-  text-transform: none;
+  text-transform: uppercase;
   color: #000;
   line-height: 1.1;
   letter-spacing: 0.5px;
 }
 
 .skcr-company-sub {
-  font-size: 0.85rem;
+  font-size: 0.7rem;
+  font-family: Arial, sans-serif;
   font-weight: bold;
-  color: #000;
-  margin-top: 2px;
+  color: #1f2937;
+  margin-top: 1px;
 }
 
 .skcr-company-address, .skcr-company-contact {

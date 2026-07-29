@@ -20,8 +20,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=20260728_v90">
-  <link rel="stylesheet" href="css/print.css?v=20260728_v90">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/print.css">
 </head>
 <body>
 
@@ -87,7 +87,7 @@
       </button>
       <button class="nav-tab" data-tab="info">
         <i class="fa-solid fa-calendar-days"></i> Peraturan
-        <span class="tab-badge" id="infoCountBadge">7</span>
+        <span class="tab-badge" id="infoCountBadge">8</span>
       </button>
       <button class="nav-tab" data-tab="lolo">
         <i class="fa-solid fa-truck-ramp-box"></i> Tarif LOLO
@@ -125,7 +125,7 @@
       <div class="kpi-card">
         <div class="kpi-icon warning"><i class="fa-solid fa-bullhorn"></i></div>
         <div>
-          <div class="kpi-value" id="kpiActiveNotices">7</div>
+          <div class="kpi-value" id="kpiActiveNotices">8</div>
           <div class="kpi-label">Edaran Operasional Active</div>
         </div>
       </div>
@@ -165,12 +165,14 @@
                 <label class="form-label">Shipping Line / Pelayaran *</label>
                 <select class="form-select" id="skcrShippingLine" required>
                   <option value="">-- Pilih Shipping Line --</option>
+                  <option value="HYUNDAI">HYUNDAI</option>
                   <option value="HAPAG">HAPAG</option>
                   <option value="SINOKOR">SINOKOR</option>
                   <option value="HEUNG-A">HEUNG-A</option>
                   <option value="RCL">RCL</option>
                   <option value="WAN-HAI">WAN-HAI</option>
                   <option value="SITC">SITC</option>
+                  <option value="STAR SHIPPING">STAR SHIPPING</option>
                   <option value="ONE">ONE</option>
                   <option value="ZIMLINE">ZIMLINE</option>
                   <option value="HMM">HMM</option>
@@ -196,25 +198,14 @@
 
               <div class="form-group">
                 <label class="form-label">Consignee / Pemilik *</label>
-                <input type="text" class="form-control" id="skcrConsignee" placeholder="Contoh: PT GLOBAL CARGO LOGISTICS" required>
+                <input type="text" class="form-control" id="skcrConsignee" placeholder="Contoh: PT STAR SHIPPING INDONESIA" required>
               </div>
             </div>
 
             <div class="grid-2" style="gap: 0.75rem;">
               <div class="form-group">
                 <label class="form-label">Nama User Gate *</label>
-                <select class="form-select" id="skcrUserNameGate" required>
-                  <option value="RIDWAN">RIDWAN</option>
-                  <option value="BAYU">BAYU</option>
-                  <option value="ARIP">ARIP</option>
-                  <option value="BRIAN">BRIAN</option>
-                  <option value="AGUS">AGUS</option>
-                  <option value="IRFAN">IRFAN</option>
-                  <option value="SYAHRUL">SYAHRUL</option>
-                  <option value="AGUM">AGUM</option>
-                  <option value="NURHIKMAH">NURHIKMAH</option>
-                  <option value="INDRA">INDRA</option>
-                </select>
+                <input type="text" class="form-control" id="skcrUserNameGate" value="RIDWAN ALAMSYAH" required>
               </div>
 
               <div class="form-group">
@@ -241,15 +232,15 @@
             <div style="display: flex; gap: 0.5rem;">
               <select class="form-select" id="filterSKCRLine" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.8rem;">
                 <option value="">Semua Shipping Line</option>
+                <option value="HYUNDAI">HYUNDAI</option>
                 <option value="HAPAG">HAPAG</option>
                 <option value="SINOKOR">SINOKOR</option>
                 <option value="HEUNG-A">HEUNG-A</option>
                 <option value="RCL">RCL</option>
                 <option value="WAN-HAI">WAN-HAI</option>
                 <option value="SITC">SITC</option>
+                <option value="STAR SHIPPING">STAR SHIPPING</option>
                 <option value="ONE">ONE</option>
-                <option value="ZIMLINE">ZIMLINE</option>
-                <option value="HMM">HMM</option>
               </select>
               <button class="btn btn-secondary btn-sm" id="btnExportSKCRExcel" title="Export Excel">
                 <i class="fa-solid fa-file-excel"></i> Export
@@ -258,16 +249,15 @@
           </div>
 
           <div class="table-responsive">
-            <table class="data-table" id="tableSKCR" style="width: 100%; font-size: 0.76rem;">
+            <table class="data-table" id="tableSKCR">
               <thead>
                 <tr>
-                  <th style="white-space: nowrap; width: 25px; padding: 0.4rem 0.2rem; text-align: center;">No.</th>
-                  <th style="white-space: nowrap; padding: 0.4rem;">No. SKCR</th>
-                  <th style="white-space: nowrap; padding: 0.4rem;">Tanggal</th>
-                  <th style="padding: 0.4rem;">Pelayaran & Consignee</th>
-                  <th style="padding: 0.4rem;">Container Utama</th>
-                  <th style="padding: 0.4rem;">Nama Kapal</th>
-                  <th style="white-space: nowrap; text-align: center; padding: 0.4rem;">Aksi</th>
+                  <th>No. SKCR</th>
+                  <th>Tanggal</th>
+                  <th>Jumlah / Container Utama</th>
+                  <th>Nama Kapal</th>
+                  <th>Consignee</th>
+                  <th>Aksi</th>
                 </tr>
               </thead>
               <tbody id="tbodySKCR">
@@ -282,35 +272,32 @@
 
     <!-- TAB 2: JADWAL ANGGOTA GATE & UPLOAD EXCEL (ALL 5 BLOCKS UP TO 26 JULY) -->
     <section id="tab-roster" class="tab-content">
-      <div class="glass-card" style="margin-bottom: 1.5rem;" id="excelUploadCard">
+      <div class="glass-card" style="margin-bottom: 1.5rem;">
         <div class="card-header">
           <h3 class="card-title"><i class="fa-solid fa-file-excel"></i> Upload File Excel Shift Matriks (.xlsx / .csv)</h3>
-          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-            <button class="btn btn-secondary btn-sm" id="btnToggleExcelUpload" title="Minimize / Expand Panel Upload Excel">
-              <i class="fa-solid fa-chevron-up" id="iconToggleUpload"></i> <span id="textToggleUpload">Minimize Panel</span>
-            </button>
+          <div style="display: flex; gap: 0.5rem;">
             <button class="btn btn-success btn-sm" id="btnDownloadExcelTemplate">
-              <i class="fa-solid fa-download"></i> Template Excel
+              <i class="fa-solid fa-download"></i> Download Template Excel Matriks
             </button>
             <button class="btn btn-secondary btn-sm" id="btnResetSavedRoster" style="color: var(--status-danger);" title="Reset File Excel Upload Ke Default">
-              <i class="fa-solid fa-rotate-left"></i> Reset
+              <i class="fa-solid fa-rotate-left"></i> Reset Ke Default
             </button>
           </div>
         </div>
 
         <!-- Excel Drag & Drop Upload Zone -->
-        <div class="excel-upload-zone" id="dropZoneExcel" style="transition: all 0.3s ease;">
+        <div class="excel-upload-zone" id="dropZoneExcel">
           <input type="file" id="fileInputExcel" accept=".xlsx, .xls, .csv" style="display: none;">
           <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
           <div class="upload-title">Tarik & Lepas File Excel Jadwal (Format Multi-Blok Vertikal) di sini</div>
-          <div class="upload-subtitle">💾 Tersambung dengan Supabase Cloud: File di-upload akan <strong>LANGSUNG TER-SYNC REALTIME</strong> di seluruh HP/Laptop petugas gate!</div>
+          <div class="upload-subtitle">💾 Tersambung dengan Supabase Cloud: File di-upload akan <strong>LANGSUNG TER-SYNC REALTME</strong> di seluruh HP/Laptop petugas gate!</div>
         </div>
       </div>
 
       <!-- Live Roster Excel Matrix Schedule Table View -->
       <div class="glass-card">
         <div class="card-header">
-          <h3 class="card-title" id="rosterTitleHeader"><i class="fa-solid fa-table-cells"></i> Matriks Shift Gate Utuh (27 Juli s/d 13 Desember 2026)</h3>
+          <h3 class="card-title"><i class="fa-solid fa-table-cells"></i> Matriks Shift Gate Utuh (09 Maret s/d 26 Juli 2026)</h3>
           <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
             <!-- Filter Blok Bulan -->
             <select class="form-select" id="filterRosterMonth" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.8rem; font-weight: bold; color: var(--accent-blue);">
@@ -425,15 +412,16 @@
             <label class="form-label">Kategori / Shipping Line</label>
             <select class="form-select" id="filterNoticeCategory">
               <option value="">Semua Pelayaran & Kategori</option>
+              <option value="HYUNDAI">HYUNDAI</option>
               <option value="HAPAG">HAPAG</option>
               <option value="SINOKOR">SINOKOR</option>
               <option value="HEUNG-A">HEUNG-A</option>
               <option value="RCL">RCL</option>
               <option value="WAN-HAI">WAN-HAI</option>
               <option value="SITC">SITC</option>
+              <option value="STAR SHIPPING">STAR SHIPPING</option>
               <option value="ONE">ONE</option>
               <option value="ZIMLINE">ZIMLINE</option>
-              <option value="HMM">HMM</option>
               <option value="Umum / Gate">Umum / Gate Terminal</option>
             </select>
           </div>
@@ -475,15 +463,16 @@
                 <div class="form-group">
                   <label class="form-label">Kategori Pelayaran *</label>
                   <select class="form-select" id="noticeCategory" required>
+                    <option value="HYUNDAI">HYUNDAI</option>
                     <option value="HAPAG">HAPAG</option>
                     <option value="SINOKOR">SINOKOR</option>
                     <option value="HEUNG-A">HEUNG-A</option>
                     <option value="RCL">RCL</option>
                     <option value="WAN-HAI">WAN-HAI</option>
                     <option value="SITC">SITC</option>
+                    <option value="STAR SHIPPING">STAR SHIPPING</option>
                     <option value="ONE">ONE</option>
                     <option value="ZIMLINE">ZIMLINE</option>
-                    <option value="HMM">HMM</option>
                     <option value="Umum / Gate">Umum / Gate</option>
                   </select>
                 </div>
@@ -537,17 +526,12 @@
       <div class="glass-card" style="margin-bottom: 1.5rem;">
         <div class="card-header">
           <h3 class="card-title"><i class="fa-solid fa-file-excel"></i> Upload Master Tarif LOLO (.xlsx / .csv)</h3>
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <button class="btn btn-success btn-sm" id="btnDownloadLOLOExcelTemplate">
-              <i class="fa-solid fa-download"></i> Download Template Format Excel
-            </button>
-            <button class="btn btn-primary btn-sm" id="btnToggleLOLOExcelUpload">
-              <i class="fa-solid fa-chevron-down" id="iconToggleLOLOUpload"></i> <span id="textToggleLOLOUpload">Expand Panel Upload</span>
-            </button>
-          </div>
+          <button class="btn btn-success btn-sm" id="btnDownloadLOLOExcelTemplate">
+            <i class="fa-solid fa-download"></i> Download Template Format Excel
+          </button>
         </div>
 
-        <div class="excel-upload-zone" id="dropZoneLOLOExcel" style="display: none;">
+        <div class="excel-upload-zone" id="dropZoneLOLOExcel">
           <input type="file" id="fileInputLOLOExcel" accept=".xlsx, .xls, .csv" style="display: none;">
           <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up" style="color: var(--status-warning);"></i></div>
           <div class="upload-title">Tarik & Lepas File Excel Tarif LIFT OFF / LIFT ON di sini</div>
@@ -557,8 +541,10 @@
 
       <!-- Main Tariff Container Card with Sub-Tabs & Block View -->
       <div class="glass-card">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fa-solid fa-table-cells-large"></i> Tarif LOLO Per-Block Pelayaran (Format Sesuai Excel Asli)</h3>
+        <div class="card-header" style="flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 class="card-title"><i class="fa-solid fa-table-cells-large"></i> Tarif LOLO Per-Block Pelayaran (Format Sesuai Excel Asli)</h3>
+          </div>
 
           <!-- Sub-Tab Toggle Buttons for LIFT OFF vs LIFT ON -->
           <div style="display: flex; gap: 0.5rem; margin-left: auto; flex-wrap: wrap;">
@@ -577,13 +563,7 @@
             TARIF LOLO PER 1 MEI 2026 - INFORMASI HARGA LIFT OFF
           </div>
 
-          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-            <button class="btn btn-success btn-sm" id="btnShareWALOLO" style="background-color: #25D366; border-color: #25D366; color: white;" title="Buka Langsung WhatsApp">
-              <i class="fa-brands fa-whatsapp"></i> Kirim WA
-            </button>
-            <button class="btn btn-secondary btn-sm" id="btnCopyWALOLO" title="Salin Format Teks ke Clipboard">
-              <i class="fa-solid fa-copy"></i> Salin
-            </button>
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
             <!-- View Mode Switch (Block Grid vs Table) -->
             <button class="btn btn-secondary btn-sm" id="btnToggleLoloViewMode" style="border-radius: 20px;">
               <i class="fa-solid fa-list-check"></i> Switch Ke Tampilan Tabel List
@@ -672,13 +652,12 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th style="white-space: nowrap;">Tanggal</th>
-                <th style="white-space: nowrap;">Pergantian Shift</th>
-                <th style="white-space: nowrap;">Supervisor / Petugas</th>
-                <th>Keterangan Kondisi</th>
-                <th style="white-space: nowrap;">Pending</th>
+                <th>Tanggal</th>
+                <th>Dari Shift -> Ke Shift</th>
+                <th>Supervisor Gate</th>
+                <th>Kondisi Pos & Peralatan</th>
+                <th>Peti Kemas Hold / Pending</th>
                 <th>Catatan Khusus</th>
-                <th style="white-space: nowrap; text-align: center;">Aksi WA</th>
               </tr>
             </thead>
             <tbody id="tbodyHandover">
@@ -703,7 +682,7 @@
             <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; margin: 0 auto 0.85rem; font-size: 2rem; color: white; box-shadow: 0 4px 14px rgba(0, 210, 255, 0.3);">
               <i class="fa-solid fa-user-gear"></i>
             </div>
-            <h4 style="font-size: 1.1rem; font-weight: 800;" id="userProfileNameDisplay">RIDWAN</h4>
+            <h4 style="font-size: 1.1rem; font-weight: 800;" id="userProfileNameDisplay">RIDWAN ALAMSYAH</h4>
             <div style="font-size: 0.82rem; color: var(--accent-blue); font-weight: 600;" id="userProfileTitleDisplay">Gate Operasional</div>
             <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;" id="userProfileCompanyDisplay">PT DELTA KONTAINER DEPOT</div>
           </div>
@@ -711,7 +690,7 @@
           <div class="form-group">
             <label class="form-label">Pilih Identitas Petugas Aktif</label>
             <select class="form-select" id="userDutySelect">
-              <option value="RIDWAN">RIDWAN (Gate Duty)</option>
+              <option value="RIDWAN ALAMSYAH">RIDWAN ALAMSYAH (Gate Duty)</option>
               <option value="BAYU">BAYU (Gate Duty)</option>
               <option value="ARIP">ARIP (Gate Duty)</option>
               <option value="BRIAN">BRIAN (Gate Duty)</option>
@@ -731,7 +710,7 @@
             </div>
             <div style="display: flex; justify-content: space-between;">
               <span>Versi Modul:</span>
-              <strong>v3.0.0 (Build v76)</strong>
+              <strong>v2.6 Enterprise Gate</strong>
             </div>
           </div>
         </div>
@@ -794,19 +773,6 @@
               </ol>
             </div>
 
-            <!-- Module 5 -->
-            <div style="background: var(--bg-card-solid); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.1rem;">
-              <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--accent-blue); margin-bottom: 0.5rem;">
-                <i class="fa-solid fa-clipboard-check"></i> Modul 5: Serah Terima Shift & Respon Konfirmasi Real-Time
-              </h4>
-              <ol style="font-size: 0.85rem; line-height: 1.6; padding-left: 1.2rem; color: var(--text-muted);">
-                <li>Buka Tab <strong>Serah Terima</strong> lalu klik <strong>Tulis Laporan Serah Terima</strong>.</li>
-                <li>Isi detail shift asal & tujuan, kondisi pos/alat, daftar container hold, dan catatan operasional.</li>
-                <li>Petugas shift berikutnya dapat mengeklik tombol <strong>💬 Respon</strong> untuk mengonfirmasi status serah terima.</li>
-                <li>Gunakan tombol <strong>Kirim WA</strong> atau <strong>Salin</strong> untuk membagikan laporan secara subtil dan rapi ke grup WhatsApp.</li>
-              </ol>
-            </div>
-
           </div>
         </div>
 
@@ -858,6 +824,21 @@
       </div>
       <div class="modal-body">
         <form id="formSettings">
+          <!-- Supabase Cloud Database Realtime Credentials Box -->
+          <div style="background: rgba(16, 185, 129, 0.06); border: 1px solid var(--status-success); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+            <h4 style="font-size: 0.9rem; margin-bottom: 0.6rem; color: var(--status-success);"><i class="fa-solid fa-database"></i> Integrasi Supabase Cloud Database (Multi-HP Realtime Sync)</h4>
+            
+            <div class="form-group">
+              <label class="form-label">Supabase Project URL</label>
+              <input type="text" class="form-control" id="settingSupabaseUrl" placeholder="https://seiscumgtgjxaimaaegp.supabase.co">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Supabase Anon Key</label>
+              <input type="text" class="form-control" id="settingSupabaseKey" placeholder="sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk">
+            </div>
+          </div>
+
           <!-- Teks Berjalan Running Text Settings -->
           <div style="background: rgba(0, 210, 255, 0.05); border: 1px solid var(--border-color-highlight); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
             <h4 style="font-size: 0.9rem; margin-bottom: 0.6rem; color: var(--accent-blue);"><i class="fa-solid fa-bullhorn"></i> Pengaturan Teks Berjalan (Running Text Gate)</h4>
@@ -877,7 +858,7 @@
 
           <div class="form-group">
             <label class="form-label">Nama User Gate *</label>
-            <input type="text" class="form-control" id="settingUserNameGate" value="RIDWAN" required>
+            <input type="text" class="form-control" id="settingUserNameGate" value="RIDWAN ALAMSYAH" required>
           </div>
 
           <div class="form-group">
@@ -962,7 +943,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Keterangan Kondisi & Alat *</label>
+            <label class="form-label">Kondisi Pos & Alat *</label>
             <textarea class="form-control" id="hoGateCondition" placeholder="Status timbangan, barrier gate, printer nota..." required></textarea>
           </div>
 
@@ -988,16 +969,16 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v115.0</span></div>
-      <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | ONE | ZIMLINE | HMM</strong></div>
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved.</div>
+      <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
     </div>
   </footer>
 
-  <!-- Main JavaScript App Entry (Cache Busted Version 20260728_v115) -->
-  <script src="js/data.js?v=20260728_v115"></script>
-  <script src="js/supabase-db.js?v=20260728_v115"></script>
-  <script src="js/excel-parser.js?v=20260728_v115"></script>
-  <script src="js/skcr.js?v=20260728_v115"></script>
-  <script src="js/app.js?v=20260728_v115"></script>
+  <!-- Main JavaScript App Entry -->
+  <script src="js/data.js"></script>
+  <script src="js/supabase-db.js"></script>
+  <script src="js/excel-parser.js"></script>
+  <script src="js/skcr.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
