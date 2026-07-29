@@ -181,21 +181,16 @@ const App = {
 
   loadNoticesFromStorage: function() {
     const saved = localStorage.getItem('portgate_notices_data');
-    if (saved) {
+    if (saved !== null) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const noticeMap = new Map();
-          if (typeof operationalAnnouncements !== 'undefined' && Array.isArray(operationalAnnouncements)) {
-            operationalAnnouncements.forEach(n => noticeMap.set(n.id, n));
-          }
+        if (Array.isArray(parsed)) {
           parsed.forEach(n => {
             if (n && n.id) {
               n.serviceType = (n.serviceType || n.servicetype || "EKSPOR").toUpperCase();
-              noticeMap.set(n.id, n);
             }
           });
-          operationalAnnouncements = Array.from(noticeMap.values());
+          operationalAnnouncements = parsed;
           return;
         }
       } catch(e) {
@@ -1129,21 +1124,29 @@ const App = {
       const data20 = shippingLineMap[lineName]["20 FT"] || shippingLineMap[lineName]["20GP"] || {};
       const data40 = shippingLineMap[lineName]["40 FT"] || shippingLineMap[lineName]["40HC"] || {};
 
-      const price20 = isLiftOff ? data20.liftOff : data20.liftOn;
-      const price40 = isLiftOff ? data40.liftOff : data40.liftOn;
-
-      const valColor = isLiftOff ? "#f97316" : "#10b981";
-
       return `
         <div class="shipping-block-card">
           <div class="block-header ${headerClass}">
             ${lineName}
           </div>
-          <div class="block-body-grid">
-            <div class="block-subhead">20 FT</div>
-            <div class="block-subhead">40 FT</div>
-            <div class="block-price-val" style="color: ${valColor};">${formatRp(price20)}</div>
-            <div class="block-price-val" style="color: ${valColor};">${formatRp(price40)}</div>
+          <div style="padding: 0.75rem; display: flex; flex-direction: column; gap: 0.6rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.35rem; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+              <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted);">TIPE</div>
+              <div style="font-size: 0.75rem; font-weight: 800; color: #ea580c; text-align: right;">LIFT OFF</div>
+              <div style="font-size: 0.75rem; font-weight: 800; color: #16a34a; text-align: right;">LIFT ON</div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.35rem; align-items: center;">
+              <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">20 FT</div>
+              <div style="font-size: 0.85rem; font-weight: 800; color: #ea580c; text-align: right;">${formatRp(data20.liftOff)}</div>
+              <div style="font-size: 0.85rem; font-weight: 800; color: #16a34a; text-align: right;">${formatRp(data20.liftOn)}</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.35rem; align-items: center;">
+              <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">40 FT</div>
+              <div style="font-size: 0.85rem; font-weight: 800; color: #ea580c; text-align: right;">${formatRp(data40.liftOff)}</div>
+              <div style="font-size: 0.85rem; font-weight: 800; color: #16a34a; text-align: right;">${formatRp(data40.liftOn)}</div>
+            </div>
           </div>
         </div>
       `;
@@ -1168,22 +1171,15 @@ const App = {
       return "Rp " + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(num);
     };
 
-    const isLiftOff = (App.activeLOLOTab === "LIFTOFF");
-
     tbody.innerHTML = filtered.map(item => {
-      const displayPrice = isLiftOff ? item.liftOff : item.liftOn;
-      const priceColor = isLiftOff ? "#ea580c" : "#16a34a";
-      const dateTag = isLiftOff ? "Per 1 Mei 2026" : "Per 20 April 2026";
-
       return `
         <tr>
           <td><span class="badge badge-shipping-line">${item.shippingLine}</span></td>
-          <td><strong style="font-size: 0.9rem;">${item.sizeType}</strong></td>
-          <td><strong style="color: ${priceColor}; font-size: 1rem;">${formatRp(displayPrice)}</strong></td>
-          <td>
-            <span class="badge badge-info" style="margin-right: 0.35rem;">${dateTag}</span>
-            <small style="color: var(--text-muted);">${item.notes}</small>
-          </td>
+          <td><strong>${item.sizeType}</strong></td>
+          <td><strong style="color: #ea580c;">${formatRp(item.liftOff)}</strong></td>
+          <td><strong style="color: #16a34a;">${formatRp(item.liftOn)}</strong></td>
+          <td><strong style="color: var(--accent-blue);">${formatRp(item.total)}</strong></td>
+          <td><span style="font-size: 0.8rem; color: var(--text-muted);">${item.notes || '-'}</span></td>
         </tr>
       `;
     }).join('');
