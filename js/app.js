@@ -36,7 +36,7 @@ const App = {
     supabaseKey: "sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk"
   },
 
-  init: function() {
+  init: async function() {
     App.loadSettings();
     SupabaseDB.init();
 
@@ -44,9 +44,9 @@ const App = {
     App.loadSKCRFromStorage();
     App.loadNoticesFromStorage();
     
-    // If Supabase is configured, trigger Cloud sync
+    // If Supabase is configured, trigger Cloud sync before initial render so all devices align seamlessly
     if (SupabaseDB.isConfigured) {
-      SupabaseDB.syncAllFromCloud();
+      await SupabaseDB.syncAllFromCloud();
     }
 
     App.startClock();
