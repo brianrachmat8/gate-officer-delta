@@ -955,7 +955,8 @@ const App = {
     }).join('');
 
     const activeCount = operationalAnnouncements.filter(n => n.status !== "Disabled").length;
-    document.getElementById('infoCountBadge').textContent = activeCount;
+    const badgeEl = document.getElementById('noticeCountBadge') || document.getElementById('infoCountBadge');
+    if (badgeEl) badgeEl.textContent = activeCount;
   },
 
   // Tariff Lift On / Lift Off Module with Per-Block Shipping Line Grid Cards
@@ -1410,14 +1411,14 @@ const App = {
   },
 
   renderAll: function() {
-    App.renderSKCRTable();
-    App.updateStaffFilterOptions();
-    App.renderMatrixScheduleTable();
-    App.renderNoticeFeed();
-    App.renderLOLOTariffs();
-    App.renderHandoverTable();
-    App.updateUserProfileDisplay();
-    App.updateKPIs();
+    try { App.renderSKCRTable(); } catch(e) { console.error("SKCR Render error:", e); }
+    try { App.updateStaffFilterOptions(); } catch(e) { console.error("Staff Filter error:", e); }
+    try { App.renderMatrixScheduleTable(); } catch(e) { console.error("Roster Render error:", e); }
+    try { App.renderNoticeFeed(); } catch(e) { console.error("Notice Render error:", e); }
+    try { App.renderLOLOTariffs(); } catch(e) { console.error("LOLO Render error:", e); }
+    try { App.renderHandoverTable(); } catch(e) { console.error("Handover Render error:", e); }
+    try { App.updateUserProfileDisplay(); } catch(e) { console.error("User Profile error:", e); }
+    try { App.updateKPIs(); } catch(e) { console.error("KPIs error:", e); }
   }
 };
 
