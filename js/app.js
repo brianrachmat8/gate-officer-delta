@@ -697,8 +697,9 @@ const App = {
     }
 
     tbody.innerHTML = filteredStaff.map(item => {
+      const shiftsObj = item.shifts || (typeof generateFullRosterShifts !== 'undefined' ? generateFullRosterShifts(item.name) : {});
       const cellsHtml = displayDates.map(dateKey => {
-        let code = item.shifts[dateKey] || 'OFF';
+        let code = shiftsObj[dateKey] || 'OFF';
 
         if (App.activeRosterShiftFilter && !code.includes(App.activeRosterShiftFilter)) {
           return `<td><span class="shift-pill shift-pill-grey" style="opacity: 0.25;">-</span></td>`;
@@ -863,7 +864,8 @@ const App = {
     const displayBadge = document.getElementById('noticeDateDisplayBadge');
 
     let filtered = operationalAnnouncements.filter(n => {
-      const matchType = !n.serviceType || n.serviceType === App.activeNoticeServiceType;
+      const nType = (n.serviceType || n.servicetype || "EKSPOR").toUpperCase();
+      const matchType = (nType === App.activeNoticeServiceType.toUpperCase());
       const matchCategory = !App.activeNoticeCategoryFilter || n.category === App.activeNoticeCategoryFilter;
       const matchDate = !App.activeNoticeDateFilter || n.date === App.activeNoticeDateFilter;
       const matchStatus = App.showDisabledNotices ? true : (n.status !== "Disabled");
