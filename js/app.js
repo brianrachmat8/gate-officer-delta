@@ -108,6 +108,44 @@ const App = {
         App.closeModal(targetId);
       });
     });
+
+    // Global Event Delegation for Dynamic Table & Notice Action Buttons
+    document.body.addEventListener('click', (e) => {
+      const btnPrintSKCR = e.target.closest('.btn-print-skcr');
+      if (btnPrintSKCR) {
+        const id = btnPrintSKCR.getAttribute('data-id');
+        if (id) App.openSKCRDetail(id);
+        return;
+      }
+
+      const btnDeleteSKCR = e.target.closest('.btn-delete-skcr');
+      if (btnDeleteSKCR) {
+        const id = btnDeleteSKCR.getAttribute('data-id');
+        if (id) App.deleteSKCR(id);
+        return;
+      }
+
+      const btnPrintNotice = e.target.closest('.btn-print-notice');
+      if (btnPrintNotice) {
+        const id = btnPrintNotice.getAttribute('data-id');
+        if (id) App.openNoticePrintModal(id);
+        return;
+      }
+
+      const btnToggleNotice = e.target.closest('.btn-toggle-notice-status');
+      if (btnToggleNotice) {
+        const id = btnToggleNotice.getAttribute('data-id');
+        if (id) App.toggleNoticeStatus(id);
+        return;
+      }
+
+      const btnDeleteNotice = e.target.closest('.btn-delete-notice');
+      if (btnDeleteNotice) {
+        const id = btnDeleteNotice.getAttribute('data-id');
+        if (id) App.deleteNotice(id);
+        return;
+      }
+    });
   },
 
   loadSettings: function() {
@@ -549,7 +587,13 @@ const App = {
       return matchLine && matchSearch;
     });
 
-    tbody.innerHTML = filtered.map(item => {
+    let sorted = [...filtered].sort((a, b) => {
+      const timeA = (a.date || '2026-01-01') + 'T' + (a.time || '00:00');
+      const timeB = (b.date || '2026-01-01') + 'T' + (b.time || '00:00');
+      return new Date(timeB) - new Date(timeA);
+    });
+
+    tbody.innerHTML = sorted.map(item => {
       const cCount = item.containerCount || (item.containers ? item.containers.length : 1);
       const mainContainer = item.primaryContainer || (item.containers && item.containers[0]) || item.containerNo || "SNKO8923410";
 
