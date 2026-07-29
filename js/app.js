@@ -181,16 +181,21 @@ const App = {
 
   loadNoticesFromStorage: function() {
     const saved = localStorage.getItem('portgate_notices_data');
-    if (saved !== null) {
+    if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const map = new Map();
+          if (typeof operationalAnnouncements !== 'undefined' && Array.isArray(operationalAnnouncements)) {
+            operationalAnnouncements.forEach(n => map.set(n.id, n));
+          }
           parsed.forEach(n => {
             if (n && n.id) {
               n.serviceType = (n.serviceType || n.servicetype || "EKSPOR").toUpperCase();
+              map.set(n.id, n);
             }
           });
-          operationalAnnouncements = parsed;
+          operationalAnnouncements = Array.from(map.values());
           return;
         }
       } catch(e) {
