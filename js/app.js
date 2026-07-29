@@ -500,6 +500,9 @@ const App = {
       `;
     } else {
       sigContainer.innerHTML = `<span style="font-size:0.78rem; color:var(--text-muted);">Belum ada gambar tanda tangan di-upload.</span>`;
+    }
+  },
+
   getFormattedSKCRText: function(skcrId) {
     const record = skcrData.find(r => r.id === skcrId);
     if (!record) return "";
@@ -537,22 +540,14 @@ _Sistem Informasi Gate Officer_`;
 
   shareSKCRToWA: function(skcrId) {
     const text = App.getFormattedSKCRText(skcrId);
-    if (!text) return;
-    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-    window.open(waUrl, '_blank');
+    if (!text) return alert("Data SKCR tidak ditemukan.");
+    App.openWALink(text);
   },
 
   copySKCRToClipboard: function(skcrId) {
     const text = App.getFormattedSKCRText(skcrId);
-    if (!text) return;
-
-    const tempInput = document.createElement("textarea");
-    tempInput.value = text;
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    document.execCommand("copy");
-    document.body.removeChild(tempInput);
-    alert("✅ Format SKCR Container berhasil disalin ke Clipboard!\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
+    if (!text) return alert("Data SKCR tidak ditemukan.");
+    App.copyTextToClipboard(text, "Format SKCR Container berhasil disalin ke Clipboard!");
   },
 
   setupSKCRModule: function() {
@@ -1201,22 +1196,14 @@ _Sistem Informasi Gate Officer_`;
 
   shareNoticeToWA: function(noticeId) {
     const text = App.getFormattedNoticeText(noticeId);
-    if (!text) return;
-    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-    window.open(waUrl, '_blank');
+    if (!text) return alert("Data Edaran tidak ditemukan.");
+    App.openWALink(text);
   },
 
   copyNoticeToClipboard: function(noticeId) {
     const text = App.getFormattedNoticeText(noticeId);
-    if (!text) return;
-
-    const tempInput = document.createElement("textarea");
-    tempInput.value = text;
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    document.execCommand("copy");
-    document.body.removeChild(tempInput);
-    alert("✅ Format Peraturan / Edaran Pelayaran berhasil disalin ke Clipboard!\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
+    if (!text) return alert("Data Edaran tidak ditemukan.");
+    App.copyTextToClipboard(text, "Format Peraturan / Edaran Pelayaran berhasil disalin ke Clipboard!");
   },
 
   deleteNotice: function(noticeId) {
@@ -1817,35 +1804,15 @@ _Sistem Informasi Gate Officer_`;
   },
 
   shareHandoverToWA: function(handoverId) {
-    const messageText = App.getFormattedHandoverText(handoverId);
-    if (!messageText) return;
-    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(messageText)}`;
-    window.open(waUrl, '_blank');
+    const text = App.getFormattedHandoverText(handoverId);
+    if (!text) return alert("Data Serah Terima Shift tidak ditemukan.");
+    App.openWALink(text);
   },
 
   copyHandoverToClipboard: function(handoverId) {
-    const messageText = App.getFormattedHandoverText(handoverId);
-    if (!messageText) return;
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(messageText).then(() => {
-        alert("✅ Format Laporan Serah Terima Shift berhasil disalin ke Clipboard!\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
-      }).catch(() => {
-        App.fallbackCopyText(messageText);
-      });
-    } else {
-      App.fallbackCopyText(messageText);
-    }
-  },
-
-  fallbackCopyText: function(text) {
-    const tempInput = document.createElement("textarea");
-    tempInput.value = text;
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    document.execCommand("copy");
-    document.body.removeChild(tempInput);
-    alert("✅ Format Laporan Serah Terima Shift berhasil disalin ke Clipboard!\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
+    const text = App.getFormattedHandoverText(handoverId);
+    if (!text) return alert("Data Serah Terima Shift tidak ditemukan.");
+    App.copyTextToClipboard(text, "Format Laporan Serah Terima Shift berhasil disalin ke Clipboard!");
   },
 
   setupHandoverModule: function() {
@@ -2048,6 +2015,56 @@ _Sistem Informasi Gate Officer_`;
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  },
+
+  openWALink: function(text) {
+    if (!text) return;
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    try {
+      const win = window.open(waUrl, '_blank');
+      if (!win || win.closed || typeof win.closed === 'undefined') {
+        window.location.href = waUrl;
+      }
+    } catch(e) {
+      window.location.href = waUrl;
+    }
+  },
+
+  copyTextToClipboard: function(text, successMsg = "Teks berhasil disalin ke Clipboard!") {
+    if (!text) return;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert("✅ " + successMsg + "\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
+      }).catch(() => {
+        App.fallbackCopyText(text, successMsg);
+      });
+    } else {
+      App.fallbackCopyText(text, successMsg);
+    }
+  },
+
+  fallbackCopyText: function(text, successMsg = "Teks berhasil disalin ke Clipboard!") {
+    try {
+      const tempInput = document.createElement("textarea");
+      tempInput.value = text;
+      tempInput.style.position = "fixed";
+      tempInput.style.left = "-9999px";
+      tempInput.style.top = "0";
+      document.body.appendChild(tempInput);
+      tempInput.focus();
+      tempInput.select();
+      const successful = document.execCommand("copy");
+      document.body.removeChild(tempInput);
+
+      if (successful) {
+        alert("✅ " + successMsg + "\n\nAnda dapat langsung meletakkan (Paste / Ctrl+V) di grup WhatsApp.");
+      } else {
+        prompt("Salin teks di bawah ini secara manual (Tekan Lama / Ctrl+C):", text);
+      }
+    } catch (err) {
+      prompt("Salin teks di bawah ini secara manual (Tekan Lama / Ctrl+C):", text);
+    }
   }
 };
 
