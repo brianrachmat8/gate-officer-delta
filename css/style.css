@@ -304,8 +304,13 @@ body {
 
 /* App Nav Tabs - Perfect Distribution Across Header Width */
 .app-nav {
+  position: sticky;
+  top: 57px;
+  z-index: 99;
   background: var(--bg-card-solid);
+  backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .nav-container {
