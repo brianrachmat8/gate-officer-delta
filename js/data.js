@@ -252,6 +252,18 @@ let operationalAnnouncements = [
     author: "HEUNG-A Ops",
     body: "• Seluruh peti kemas HEUNG-A tipe 20GP & 40HC wajib dicek kebersihan lantai dan bebas dari bau bahan kimia berbahaya sebelum serah terima.",
     status: "Active"
+  },
+  {
+    id: "NOTE-WAN-008",
+    date: "2026-07-24",
+    time: "16:00",
+    title: "Peraturan Release & Ketentuan Kontainer WAN-HAI (EKSPOR)",
+    category: "WAN-HAI",
+    serviceType: "EKSPOR",
+    priority: "Info",
+    author: "Wan Hai Ops",
+    body: "• Wajib pastikan nomor peti kemas murni WAN-HAI sesuai spesifikasi dokumen DO.\n• Pengeluaran armada peti kemas murni WAN-HAI tanpa biaya tambahan.",
+    status: "Active"
   }
 ];
 

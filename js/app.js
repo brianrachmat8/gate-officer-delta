@@ -713,27 +713,34 @@ _Sistem Informasi Gate Officer_`;
     const filterLine = document.getElementById('filterSKCRLine').value;
 
     let filtered = skcrData.filter(item => {
-      const matchLine = !filterLine || item.shippingLine === filterLine;
+      if (!item) return false;
+      const sLine = (item.shippingLine || item.shippingline || "HAPAG").toString();
+      const vVoy = (item.vesselVoyage || item.vesselvoyage || "-").toString();
+      const sId = (item.id || "").toString();
+
+      const matchLine = !filterLine || sLine.toUpperCase() === filterLine.toUpperCase();
       const cStr = (item.containers ? item.containers.join(' ') : item.containerNo || '').toLowerCase();
       const matchSearch = !searchTerm || 
         cStr.includes(searchTerm.toLowerCase()) ||
-        item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.vesselVoyage.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.shippingLine.toLowerCase().includes(searchTerm.toLowerCase());
+        sId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        vVoy.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sLine.toLowerCase().includes(searchTerm.toLowerCase());
       return matchLine && matchSearch;
     });
 
     tbody.innerHTML = filtered.map((item, idx) => {
       const cCount = item.containerCount || (item.containers ? item.containers.length : 1);
       const mainContainer = item.primaryContainer || (item.containers && item.containers[0]) || item.containerNo || "SNKO8923410";
-      const sLine = item.shippingLine || "HAPAG";
+      const sLine = item.shippingLine || item.shippingline || "HAPAG";
       const consigneeName = item.consignee || "-";
+      const itemId = item.id || `SKCR-${idx+1}`;
+      const dateStr = item.date || "-";
 
       return `
         <tr>
           <td style="text-align: center; font-size: 0.72rem; font-weight: bold; color: var(--text-muted); padding: 0.35rem 0.2rem;">${idx + 1}</td>
-          <td style="padding: 0.35rem 0.4rem;"><strong style="font-size: 0.74rem; word-break: break-all;">${App.escapeHTML(item.id)}</strong></td>
-          <td style="white-space: nowrap; font-size: 0.74rem; font-weight: 600; color: var(--text-muted); padding: 0.35rem 0.4rem;">${App.escapeHTML(item.date)}</td>
+          <td style="padding: 0.35rem 0.4rem;"><strong style="font-size: 0.74rem; word-break: break-all;">${App.escapeHTML(itemId)}</strong></td>
+          <td style="white-space: nowrap; font-size: 0.74rem; font-weight: 600; color: var(--text-muted); padding: 0.35rem 0.4rem;">${App.escapeHTML(dateStr)}</td>
           <td style="padding: 0.35rem 0.4rem;">
             <div style="display: flex; flex-direction: column; gap: 0.15rem; align-items: flex-start;">
               <span class="badge badge-shipping-line" style="font-weight: 800; font-size: 0.68rem; padding: 0.1rem 0.4rem; text-transform: uppercase;">${App.escapeHTML(sLine)}</span>
@@ -744,19 +751,19 @@ _Sistem Informasi Gate Officer_`;
             <strong style="color: var(--accent-blue); font-size: 0.76rem;">${App.escapeHTML(mainContainer)}</strong>
             ${cCount > 1 ? `<span class="badge badge-info" style="margin-left:0.15rem; font-size: 0.65rem; padding: 0.1rem 0.3rem;">+${cCount - 1} cont</span>` : ''}
           </td>
-          <td style="padding: 0.35rem 0.4rem;"><span style="font-size: 0.7rem; color: var(--text-muted); display: block; word-break: break-word; line-height: 1.2;">${App.escapeHTML(item.vesselVoyage || '-')}</span></td>
+          <td style="padding: 0.35rem 0.4rem;"><span style="font-size: 0.7rem; color: var(--text-muted); display: block; word-break: break-word; line-height: 1.2;">${App.escapeHTML(item.vesselVoyage || item.vesselvoyage || '-')}</span></td>
           <td style="white-space: nowrap; text-align: center; padding: 0.35rem 0.4rem;">
             <div style="display: flex; gap: 0.2rem; justify-content: center; align-items: center;">
-              <button class="btn btn-primary btn-sm btn-print-skcr" data-id="${item.id}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;" title="Cetak / Pratinjau Dokumen PDF">
+              <button class="btn btn-primary btn-sm btn-print-skcr" data-id="${App.escapeHTML(itemId)}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;" title="Cetak / Pratinjau Dokumen PDF">
                 <i class="fa-solid fa-print"></i> Cetak (${cCount})
               </button>
-              <button class="btn btn-success btn-sm btn-share-wa-skcr" data-id="${item.id}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem; background-color: #25D366; border-color: #25D366; color: white;" title="Buka Langsung WhatsApp">
+              <button class="btn btn-success btn-sm btn-share-wa-skcr" data-id="${App.escapeHTML(itemId)}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem; background-color: #25D366; border-color: #25D366; color: white;" title="Buka Langsung WhatsApp">
                 <i class="fa-brands fa-whatsapp"></i> WA
               </button>
-              <button class="btn btn-secondary btn-sm btn-copy-wa-skcr" data-id="${item.id}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;" title="Salin Format Teks ke Clipboard">
+              <button class="btn btn-secondary btn-sm btn-copy-wa-skcr" data-id="${App.escapeHTML(itemId)}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;" title="Salin Format Teks ke Clipboard">
                 <i class="fa-solid fa-copy"></i> Salin
               </button>
-              <button class="btn btn-secondary btn-sm btn-delete-skcr" data-id="${item.id}" style="color: var(--status-danger); padding: 0.2rem 0.35rem; font-size: 0.7rem;" title="Hapus Dokumen SKCR Ini">
+              <button class="btn btn-secondary btn-sm btn-delete-skcr" data-id="${App.escapeHTML(itemId)}" style="color: var(--status-danger); padding: 0.2rem 0.35rem; font-size: 0.7rem;" title="Hapus Dokumen SKCR Ini">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>

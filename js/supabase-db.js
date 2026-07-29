@@ -511,13 +511,31 @@ const SupabaseDB = {
     // Notices / Peraturan
     const cloudNotices = await SupabaseDB.loadAllNotices();
     if (Array.isArray(cloudNotices) && cloudNotices.length > 0) {
+      const existingNoticeIds = new Set(cloudNotices.map(n => n.id));
+      const seedNotices = [
+        { id: "NOTE-HAPAG-001", date: "2026-07-25", time: "08:30", title: "Peraturan Operasional & Ketentuan Release HAPAG LLOYD (EKSPOR)", category: "HAPAG", serviceType: "EKSPOR", priority: "Danger", author: "Pak Dady (HAPAG Ops)", body: "• SCHENKER: Wajib menggunakan Container Murni HAPAG.\n• TUJUAN PREFIX GT (GUATEMALA): Wajib Leasing Container.\n• MATTEL & IKEA: Free LOLO (Selama DO untuk ke DKD).\n• ADIDAS BUFFERSTOCK: Free LOLO (Cek Email / Info Pak Dady).\n• SEAL HAPAG FREE: Apabila sudah ada email konfirmasi dari HAPAG. WAJIB DI-INPUT DI DMS & INFO DI GROUP (Pak Dady).", status: "Active" },
+        { id: "NOTE-SNKO-002", date: "2026-07-25", time: "09:00", title: "Ketentuan Release & Foto SINOKOR & HASPUL (EKSPOR)", category: "SINOKOR", serviceType: "EKSPOR", priority: "Warning", author: "Pak Firman & Pak Agung (Ops)", body: "• TUJUAN PREFIX RU (VLADIVOSTOK): JANGAN RELEASE ALL CONTAINER UP 2022 & Prefix SEKU, SEGU, GESU, CRXU, CRSU.\n• SEAL SINOKOR & HASPUL BAYAR: Wajib di-input di DMS & info di Group (SKR: Pak Firman & HASPUL: Pak Agung).\n• TUJUAN HOCHIMINH (SINOKOR): Wajib remake foto floor atas dan bawah.", status: "Active" },
+        { id: "NOTE-RCL-003", date: "2026-07-25", time: "09:45", title: "Peraturan Release & Seal Pelayaran RCL (EKSPOR)", category: "RCL", serviceType: "EKSPOR", priority: "Warning", author: "Pak Agung (RCL Ops)", body: "• TUJUAN PREFIX TZ (TANZANIA): JANGAN RELEASE ALL REGU.\n• SEAL RCL FREE: Apabila sudah ada email konfirmasi resmi dari RCL. WAJIB DI-INPUT DI DMS & INFO DI GROUP (Pak Agung).", status: "Active" },
+        { id: "NOTE-ONE-004", date: "2026-07-25", time: "10:15", title: "Prosedur Early Pick-Up & Seal Pelayaran ONE (EKSPOR)", category: "ONE", serviceType: "EKSPOR", priority: "Info", author: "Pak Firman (ONE Ops)", body: "• UNTUK EARLY PICK UP: Mohon selalu di-cek di Exception List resmi.\n• SEAL ONE FREE: Customer / EMKL harus mengisi Google Sheet dan menunggu info dari Pelayaran by email. WAJIB DI-INPUT DI DMS & INFO DI GROUP (Pak Firman).", status: "Active" },
+        { id: "NOTE-ZIM-005", date: "2026-07-25", time: "10:50", title: "Ketentuan Prefix & Seal Pelayaran ZIM / ZIMLINE (EKSPOR)", category: "ZIMLINE", serviceType: "EKSPOR", priority: "Info", author: "Pak Pandu (ZIM Ops)", body: "• PREFIX CONTAINER MURNI ZIM: Harus dipastikan keluar untuk negara tujuan Non-Muslim.\n• SEAL ZIM FREE: Customer / EMKL harus info ke Pelayaran dan menunggu konfirmasi by email. WAJIB DI-INPUT DI DMS & INFO DI GROUP (Pak Pandu).", status: "Active" },
+        { id: "NOTE-SITC-006", date: "2026-07-24", time: "14:00", title: "Batas Closing Time & Cut-Off Gate-In SITC Line (EKSPOR)", category: "SITC", serviceType: "EKSPOR", priority: "Info", author: "SITC Line Ops", body: "• Batas Waktu Closing Time / Cut-off Gate-In Ekspor SITC armada kapal SITC SHANGHAI V.2612E jam 18:00 WIB.\n• Truk yang terlambat wajib konfirmasi late-gate ke pos inspek.", status: "Active" },
+        { id: "NOTE-HEUNG-007", date: "2026-07-24", time: "15:30", title: "Standar Inspeksi Integritas Peti Kemas HEUNG-A (EKSPOR)", category: "HEUNG-A", serviceType: "EKSPOR", priority: "Info", author: "HEUNG-A Ops", body: "• Seluruh peti kemas HEUNG-A tipe 20GP & 40HC wajib dicek kebersihan lantai dan bebas dari bau bahan kimia berbahaya sebelum serah terima.", status: "Active" },
+        { id: "NOTE-WAN-008", date: "2026-07-24", time: "16:00", title: "Peraturan Release & Ketentuan Kontainer WAN-HAI (EKSPOR)", category: "WAN-HAI", serviceType: "EKSPOR", priority: "Info", author: "Wan Hai Ops", body: "• Wajib pastikan nomor peti kemas murni WAN-HAI sesuai spesifikasi dokumen DO.\n• Pengeluaran armada peti kemas murni WAN-HAI tanpa biaya tambahan.", status: "Active" }
+      ];
+
+      seedNotices.forEach(sn => {
+        if (!existingNoticeIds.has(sn.id)) {
+          cloudNotices.push(sn);
+          SupabaseDB.saveNotice(sn);
+        }
+      });
+
       operationalAnnouncements = cloudNotices;
       try {
         localStorage.setItem('portgate_notices_data', JSON.stringify(operationalAnnouncements));
       } catch(e) {}
     } else if (operationalAnnouncements && operationalAnnouncements.length > 0) {
-      // Auto-seed initial 7 notices to Cloud if table is currently empty
-      console.log("🌱 Auto-seeding initial 7 operational notices to Supabase Cloud...");
+      console.log("🌱 Auto-seeding 8 operational notices to Supabase Cloud...");
       operationalAnnouncements.forEach(n => SupabaseDB.saveNotice(n));
     }
 
