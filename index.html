@@ -275,10 +275,10 @@
                   <td><span class="badge badge-shipping-line">PT STAR SHIPPING INDONESIA</span></td>
                   <td>
                     <div style="display: flex; gap: 0.35rem;">
-                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="App.openSKCRDetail('SKCR-2026-0701')">
+                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="openSKCRModal('SKCR-2026-0701')">
                         <i class="fa-solid fa-print"></i> Cetak (5)
                       </button>
-                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="this.closest('tr').remove()" style="color: var(--status-danger);">
+                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="deleteSKCRRow(this, 'SKCR-2026-0701')" style="color: var(--status-danger);">
                         <i class="fa-solid fa-trash-can"></i> Hapus
                       </button>
                     </div>
@@ -294,10 +294,10 @@
                   <td><span class="badge badge-shipping-line">PT HAPAG-LLOYD INDONESIA</span></td>
                   <td>
                     <div style="display: flex; gap: 0.35rem;">
-                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="App.openSKCRDetail('SKCR-2026-0702')">
+                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="openSKCRModal('SKCR-2026-0702')">
                         <i class="fa-solid fa-print"></i> Cetak (1)
                       </button>
-                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="this.closest('tr').remove()" style="color: var(--status-danger);">
+                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="deleteSKCRRow(this, 'SKCR-2026-0702')" style="color: var(--status-danger);">
                         <i class="fa-solid fa-trash-can"></i> Hapus
                       </button>
                     </div>
@@ -313,10 +313,10 @@
                   <td><span class="badge badge-shipping-line">PT Sinokor Merchant Marine Co., Ltd.</span></td>
                   <td>
                     <div style="display: flex; gap: 0.35rem;">
-                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="App.openSKCRDetail('SKCR-2026-0703')">
+                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="openSKCRModal('SKCR-2026-0703')">
                         <i class="fa-solid fa-print"></i> Cetak (1)
                       </button>
-                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="this.closest('tr').remove()" style="color: var(--status-danger);">
+                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="deleteSKCRRow(this, 'SKCR-2026-0703')" style="color: var(--status-danger);">
                         <i class="fa-solid fa-trash-can"></i> Hapus
                       </button>
                     </div>
@@ -332,10 +332,10 @@
                   <td><span class="badge badge-shipping-line">PT HYUNDAI MERCHANT MARINE INDONESIA</span></td>
                   <td>
                     <div style="display: flex; gap: 0.35rem;">
-                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="App.openSKCRDetail('SKCR-2026-0704')">
+                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="openSKCRModal('SKCR-2026-0704')">
                         <i class="fa-solid fa-print"></i> Cetak (1)
                       </button>
-                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="this.closest('tr').remove()" style="color: var(--status-danger);">
+                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="deleteSKCRRow(this, 'SKCR-2026-0704')" style="color: var(--status-danger);">
                         <i class="fa-solid fa-trash-can"></i> Hapus
                       </button>
                     </div>
@@ -351,10 +351,10 @@
                   <td><span class="badge badge-shipping-line">PT SITC CONTAINER LINES INDONESIA</span></td>
                   <td>
                     <div style="display: flex; gap: 0.35rem;">
-                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="App.openSKCRDetail('SKCR-2026-0705')">
+                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="openSKCRModal('SKCR-2026-0705')">
                         <i class="fa-solid fa-print"></i> Cetak (1)
                       </button>
-                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="this.closest('tr').remove()" style="color: var(--status-danger);">
+                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="deleteSKCRRow(this, 'SKCR-2026-0705')" style="color: var(--status-danger);">
                         <i class="fa-solid fa-trash-can"></i> Hapus
                       </button>
                     </div>
@@ -374,21 +374,28 @@
         <div class="card-header">
           <h3 class="card-title"><i class="fa-solid fa-file-excel"></i> Upload File Excel Shift Matriks (.xlsx / .csv)</h3>
           <div style="display: flex; gap: 0.5rem;">
-            <button class="btn btn-success btn-sm" id="btnDownloadExcelTemplate">
-              <i class="fa-solid fa-download"></i> Download Template Excel Matriks
+            <button type="button" class="btn btn-secondary btn-sm" onclick="toggleUploadBox('dropZoneExcel', this)">
+              <i class="fa-solid fa-chevron-up"></i> Minimize Upload Box
             </button>
-            <button class="btn btn-secondary btn-sm" id="btnResetSavedRoster" style="color: var(--status-danger);" title="Reset File Excel Upload Ke Default">
-              <i class="fa-solid fa-rotate-left"></i> Reset Ke Default
+            <button class="btn btn-success btn-sm" id="btnDownloadExcelTemplate">
+              <i class="fa-solid fa-download"></i> Download Template Excel
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btnResetSavedRoster" style="color: var(--status-danger);">
+              <i class="fa-solid fa-rotate-left"></i> Reset Default
             </button>
           </div>
         </div>
 
-        <!-- Excel Drag & Drop Upload Zone -->
-        <div class="excel-upload-zone" id="dropZoneExcel">
-          <input type="file" id="fileInputExcel" accept=".xlsx, .xls, .csv" style="display: none;">
-          <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-          <div class="upload-title">Tarik & Lepas File Excel Jadwal (Format Multi-Blok Vertikal) di sini</div>
-          <div class="upload-subtitle">💾 Tersambung dengan Supabase Cloud: File di-upload akan <strong>LANGSUNG TER-SYNC REALTME</strong> di seluruh HP/Laptop petugas gate!</div>
+        <div class="excel-upload-zone" id="dropZoneExcel" style="transition: all 0.3s ease;">
+          <input type="file" id="fileInputExcel" accept=".xlsx, .xls, .csv" style="display: none;" onchange="handleExcelUpload(this)">
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <div class="upload-title">Tarik & Lepas File Excel Jadwal (.xlsx) di sini untuk Upload</div>
+            <div class="upload-subtitle" style="margin-bottom: 0.75rem;">💾 Tersambung dengan Supabase Cloud: File di-upload akan <strong>LANGSUNG TER-SYNC REALTIME</strong> di seluruh HP/Laptop petugas gate!</div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('fileInputExcel').click()">
+              <i class="fa-solid fa-folder-open"></i> Pilih File Excel Dari Komputer
+            </button>
+          </div>
         </div>
       </div>
 
@@ -624,16 +631,26 @@
       <div class="glass-card" style="margin-bottom: 1.5rem;">
         <div class="card-header">
           <h3 class="card-title"><i class="fa-solid fa-file-excel"></i> Upload Master Tarif LOLO (.xlsx / .csv)</h3>
-          <button class="btn btn-success btn-sm" id="btnDownloadLOLOExcelTemplate">
-            <i class="fa-solid fa-download"></i> Download Template Format Excel
-          </button>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="toggleUploadBox('dropZoneLOLOExcel', this)">
+              <i class="fa-solid fa-chevron-up"></i> Minimize Upload Box
+            </button>
+            <button class="btn btn-success btn-sm" id="btnDownloadLOLOExcelTemplate">
+              <i class="fa-solid fa-download"></i> Download Template Format Excel
+            </button>
+          </div>
         </div>
 
-        <div class="excel-upload-zone" id="dropZoneLOLOExcel">
-          <input type="file" id="fileInputLOLOExcel" accept=".xlsx, .xls, .csv" style="display: none;">
-          <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up" style="color: var(--status-warning);"></i></div>
-          <div class="upload-title">Tarik & Lepas File Excel Tarif LIFT OFF / LIFT ON di sini</div>
-          <div class="upload-subtitle">Sistem otomatis mengenali file LIFT OFF (Per 1 Mei 2026) dan LIFT ON (Per 20 April 2026)!</div>
+        <div class="excel-upload-zone" id="dropZoneLOLOExcel" style="transition: all 0.3s ease;">
+          <input type="file" id="fileInputLOLOExcel" accept=".xlsx, .xls, .csv" style="display: none;" onchange="handleLoloExcelUpload(this)">
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up" style="color: var(--status-warning);"></i></div>
+            <div class="upload-title">Tarik & Lepas File Excel Tarif LIFT OFF / LIFT ON di sini</div>
+            <div class="upload-subtitle" style="margin-bottom: 0.75rem;">Sistem otomatis mengenali file LIFT OFF (Per 1 Mei 2026) dan LIFT ON (Per 20 April 2026)!</div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('fileInputLOLOExcel').click()">
+              <i class="fa-solid fa-folder-open"></i> Pilih File Tarif LOLO Dari Komputer
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1147,24 +1164,100 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v800.0</span></div>
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v900.0</span></div>
       <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
     </div>
   </footer>
 
-  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v800) -->
-  <script src="js/data.js?v=20260730_v800"></script>
-  <script src="js/supabase-db.js?v=20260730_v800"></script>
-  <script src="js/excel-parser.js?v=20260730_v800"></script>
-  <script src="js/skcr.js?v=20260730_v800"></script>
-  <script src="js/app.js?v=20260730_v800"></script>
+  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v900) -->
+  <script src="js/data.js?v=20260730_v900"></script>
+  <script src="js/supabase-db.js?v=20260730_v900"></script>
+  <script src="js/excel-parser.js?v=20260730_v900"></script>
+  <script src="js/skcr.js?v=20260730_v900"></script>
+  <script src="js/app.js?v=20260730_v900"></script>
 
   <!-- STANDALONE INLINE CONTROLLER & BOOTSTRAP (Guaranteed 100% Interactive) -->
   <script>
   (function() {
     'use strict';
 
-    // ===== REALTIME CLOCK =====
+    // ===== MINIMIZE / COLLAPSE UPLOAD BOX TOGGLE =====
+    window.toggleUploadBox = function(boxId, btn) {
+      var box = document.getElementById(boxId);
+      if (!box) return;
+      if (box.style.display === 'none') {
+        box.style.display = 'block';
+        btn.innerHTML = '<i class="fa-solid fa-chevron-up"></i> Minimize Upload Box';
+      } else {
+        box.style.display = 'none';
+        btn.innerHTML = '<i class="fa-solid fa-chevron-down"></i> Buka Upload Box';
+      }
+    };
+
+    // ===== EXCEL FILE UPLOAD HANDLERS =====
+    window.handleExcelUpload = function(input) {
+      if (input.files && input.files.length > 0) {
+        var file = input.files[0];
+        if (typeof ExcelParser !== 'undefined' && ExcelParser.parseFile) {
+          ExcelParser.parseFile(file, function(parsed) {
+            if (typeof App !== 'undefined' && App.onExcelRosterParsed) App.onExcelRosterParsed(parsed);
+            else alert('🎉 File Excel ' + file.name + ' berhasil di-upload!');
+          });
+        } else {
+          alert('🎉 File Excel ' + file.name + ' berhasil dipilih!');
+        }
+      }
+    };
+
+    window.handleLoloExcelUpload = function(input) {
+      if (input.files && input.files.length > 0) {
+        var file = input.files[0];
+        if (typeof ExcelParser !== 'undefined' && ExcelParser.parseLOLOTariffFile) {
+          ExcelParser.parseLOLOTariffFile(file, function(parsed) {
+            if (typeof App !== 'undefined' && App.onLOLOExcelParsed) App.onLOLOExcelParsed(parsed);
+            else alert('🎉 File Tarif LOLO ' + file.name + ' berhasil di-upload!');
+          });
+        } else {
+          alert('🎉 File Tarif LOLO ' + file.name + ' berhasil dipilih!');
+        }
+      }
+    };
+
+    // ===== OPEN PRINTABLE SKCR CERTIFICATE MODAL =====
+    window.openSKCRModal = function(id) {
+      if (typeof App !== 'undefined' && App.openSKCRDetail) {
+        App.openSKCRDetail(id);
+        return;
+      }
+      alert("📄 Membuka Sertifikat Printable SKCR " + id + ". Gunakan CTRL+P untuk mencetak dokumen A4 resmi.");
+    };
+
+    // ===== DELETE SKCR ROW WITH REALTIME KPI & SUPABASE SYNC =====
+    window.deleteSKCRRow = function(btn, id) {
+      if (confirm("Apakah Anda yakin ingin MENGHAPUS dokumen SKCR No. " + id + "?")) {
+        var row = btn.closest('tr');
+        if (row) row.remove();
+
+        if (typeof skcrData !== 'undefined') {
+          skcrData = skcrData.filter(function(r){ return r.id !== id; });
+        }
+
+        var tbody = document.getElementById('tbodySKCR');
+        var remaining = tbody ? tbody.querySelectorAll('tr').length : 0;
+
+        var kpiEl = document.getElementById('kpiTotalSKCR');
+        if (kpiEl) kpiEl.textContent = remaining;
+
+        var badgeEl = document.querySelector('#tab-skcr .badge-info') || document.querySelector('.badge-info');
+        if (badgeEl && !isNaN(parseInt(badgeEl.textContent))) {
+          badgeEl.textContent = remaining;
+        }
+
+        if (typeof SupabaseDB !== 'undefined' && SupabaseDB.deleteSKCR) {
+          SupabaseDB.deleteSKCR(id);
+        }
+      }
+    };
     function tickClock() {
       var el = document.getElementById('liveClockDisplay');
       if (!el) return;
