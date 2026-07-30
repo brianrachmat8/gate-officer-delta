@@ -54,8 +54,8 @@
           <span id="liveClockDisplay">Kamis, 30 Jul 2026 | 08:10 WIB</span>
         </div>
 
-        <button id="btnOpenSettings" class="btn btn-secondary btn-sm" style="border-radius: 20px;" title="Pengaturan Logo, Supabase Cloud & Running Text" onclick="openSettingsModal()">
-          <i class="fa-solid fa-gear"></i> Setting Logo & Supabase Cloud
+        <button id="btnOpenSettings" class="btn btn-secondary btn-sm" style="border-radius: 20px;" title="Pengaturan Logo, Profil & Running Text Depot" onclick="openSettingsModal()">
+          <i class="fa-solid fa-gear"></i> Setting Logo & Profil Depot
         </button>
 
         <button id="themeToggleBtn" class="theme-toggle-btn" title="Ganti Tema (Soft Cream / Soft Pink / Gelap)" onclick="toggleAppTheme()">
@@ -150,7 +150,6 @@
         <div class="glass-card">
           <div class="card-header">
             <h3 class="card-title"><i class="fa-solid fa-pen-to-square"></i> Input Surat Keterangan Rusak</h3>
-            <span class="badge badge-info" id="containerCountBadge">0 / 100 Container</span>
           </div>
 
           <form id="formCreateSKCR" onsubmit="handleSKCRSubmit(event)">
@@ -1008,15 +1007,15 @@
     </div>
   </div>
 
-  <!-- MODAL 3: MENU SETTING (LOGO, STEMPEL, USER GATE PROFILE, SUPABASE CLOUD & RUNNING TEXT) -->
+  <!-- MODAL 3: APP SETTINGS & LOGO PROFIL -->
   <div class="modal-backdrop" id="settingsModal">
     <div class="modal-container" style="max-width: 650px;">
       <div class="modal-header">
-        <h3 class="modal-title"><i class="fa-solid fa-sliders"></i> Pengaturan Logo, Supabase Cloud & Running Text</h3>
-        <button class="modal-close" data-close-modal="settingsModal">&times;</button>
+        <h3 class="modal-title"><i class="fa-solid fa-gear"></i> Pengaturan Logo, Profil & Running Text Depot</h3>
+        <button type="button" class="modal-close" onclick="closeAppModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <form id="formSettings">
+        <form id="formSettings" onsubmit="saveUserSettings(event)">
           <!-- Supabase Cloud Database Realtime Credentials Box -->
           <div style="background: rgba(16, 185, 129, 0.06); border: 1px solid var(--status-success); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
             <h4 style="font-size: 0.9rem; margin-bottom: 0.6rem; color: var(--status-success);"><i class="fa-solid fa-database"></i> Integrasi Supabase Cloud Database (Multi-HP Realtime Sync)</h4>
@@ -1097,7 +1096,7 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" data-close-modal="settingsModal">Batal / Tutup</button>
+        <button type="button" class="btn btn-secondary" onclick="closeAppModal()">Batal / Tutup</button>
       </div>
     </div>
   </div>
@@ -1107,7 +1106,7 @@
     <div class="modal-container" style="max-width: 600px;">
       <div class="modal-header">
         <h3 class="modal-title"><i class="fa-solid fa-pen-fancy"></i> Tambah Log Serah Terima Shift</h3>
-        <button class="modal-close" data-close-modal="handoverModal">&times;</button>
+        <button type="button" class="modal-close" onclick="closeAppModal()">&times;</button>
       </div>
       <div class="modal-body">
         <form id="formAddHandover">
@@ -1176,17 +1175,17 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v1300.0</span></div>
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v1400.0</span></div>
       <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
     </div>
   </footer>
 
-  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v1300) -->
-  <script src="js/data.js?v=20260730_v1300"></script>
-  <script src="js/supabase-db.js?v=20260730_v1300"></script>
-  <script src="js/excel-parser.js?v=20260730_v1300"></script>
-  <script src="js/skcr.js?v=20260730_v1300"></script>
-  <script src="js/app.js?v=20260730_v1300"></script>
+  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v1400) -->
+  <script src="js/data.js?v=20260730_v1400"></script>
+  <script src="js/supabase-db.js?v=20260730_v1400"></script>
+  <script src="js/excel-parser.js?v=20260730_v1400"></script>
+  <script src="js/skcr.js?v=20260730_v1400"></script>
+  <script src="js/app.js?v=20260730_v1400"></script>
 
   <!-- STANDALONE INLINE CONTROLLER & BOOTSTRAP (Guaranteed 100% Interactive) -->
   <script>
@@ -1513,7 +1512,18 @@
     window.closeSKCRModal = function() {
       ['skcrPrintModal', 'skcrModal', 'noticePrintModal', 'handoverModal', 'settingsModal'].forEach(function(mId) {
         var m = document.getElementById(mId);
-        if (m) m.classList.remove('active');
+        if (m) {
+          m.classList.remove('active');
+          m.style.display = 'none';
+        }
+      });
+    };
+
+    window.closeAppModal = function() {
+      var backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach(function(m) {
+        m.classList.remove('active');
+        m.style.display = 'none';
       });
     };
 

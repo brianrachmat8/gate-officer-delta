@@ -51,9 +51,21 @@ const ExcelParser = {
 
           let dateMatches = 0;
           for (let c = 1; c < row.length; c++) {
-            const val = String(row[c] || '').trim();
-            if (val.match(/\d{1,2}-[A-Za-z]{3}/) || val.match(/\d{4}-\d{2}-\d{2}/) || val.match(/\d{1,2}\/\d{1,2}/) || val.match(/\d{1,2}-\d{1,2}/) || val instanceof Date) {
+            const rawVal = row[c];
+            if (rawVal === undefined || rawVal === null) continue;
+
+            if (rawVal instanceof Date) {
               dateMatches++;
+            } else if (typeof rawVal === 'number' && rawVal > 30000 && rawVal < 60000) {
+              dateMatches++;
+            } else {
+              const val = String(rawVal).trim();
+              if (val.match(/\d{1,2}[-\/\.][A-Za-z]{3,9}/) ||
+                  val.match(/\d{1,4}[-\/\.]\d{1,2}[-\/\.]\d{1,4}/) ||
+                  val.match(/\d{1,2}[-\/\.]\d{1,2}/) ||
+                  (val.length >= 3 && !isNaN(Date.parse(val)))) {
+                dateMatches++;
+              }
             }
           }
 
@@ -70,6 +82,15 @@ const ExcelParser = {
                 const day = String(rawVal.getDate()).padStart(2, '0');
                 const month = rawVal.toLocaleString('en-US', { month: 'short' });
                 dateStr = `${day}-${month}`;
+              } else if (typeof rawVal === 'number' && rawVal > 30000 && rawVal < 60000) {
+                const jsDate = new Date((rawVal - (25567 + 2)) * 86400 * 1000);
+                if (!isNaN(jsDate.getTime())) {
+                  const day = String(jsDate.getDate()).padStart(2, '0');
+                  const month = jsDate.toLocaleString('en-US', { month: 'short' });
+                  dateStr = `${day}-${month}`;
+                } else {
+                  dateStr = String(rawVal).trim();
+                }
               } else {
                 dateStr = String(rawVal).trim();
               }
