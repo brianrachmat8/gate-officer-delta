@@ -247,8 +247,14 @@ const App = {
   startClock: function() {
     const updateClock = () => {
       const now = new Date();
-      const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-      document.getElementById('liveClockDisplay').textContent = now.toLocaleDateString('id-ID', options) + " WIB";
+      const pad = (n) => String(n).padStart(2, '0');
+      const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+      const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+      const dayName = days[now.getDay()];
+      const dateStr = pad(now.getDate()) + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+      const timeStr = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+      const el = document.getElementById('liveClockDisplay');
+      if (el) el.textContent = dayName + ', ' + dateStr + ' | ' + timeStr + ' WIB';
     };
     updateClock();
     setInterval(updateClock, 1000);
@@ -510,9 +516,7 @@ const App = {
     if (shippingLineSelect && consigneeInput) {
       shippingLineSelect.addEventListener('change', (e) => {
         const val = e.target.value;
-        if (consigneeMap[val]) {
-          consigneeInput.value = consigneeMap[val];
-        }
+        consigneeInput.value = consigneeMap[val] || "";
       });
     }
 
@@ -536,10 +540,12 @@ const App = {
 
       form.reset();
       countBadge.textContent = "0 / 100 Container";
+      countBadge.className = "badge badge-info";
 
       document.getElementById('skcrUserNameGate').value = App.settings.userNameGate;
       document.getElementById('skcrCompanyName').value = App.settings.companyName;
       document.getElementById('skcrUserTitle').value = App.settings.userTitle;
+      if (consigneeInput) consigneeInput.value = "";
 
       App.saveSKCRToStorage();
       SupabaseDB.saveSKCR(newRecord);
@@ -866,10 +872,16 @@ const App = {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
+      const _now = new Date();
+      const _pad = (n) => String(n).padStart(2, '0');
+      const _localDate = _now.getFullYear() + '-' + _pad(_now.getMonth() + 1) + '-' + _pad(_now.getDate());
+      const _localTime = _pad(_now.getHours()) + ':' + _pad(_now.getMinutes());
+
+      const noticeDateInput = document.getElementById('noticeDate').value;
       const newNotice = {
         id: `NOTE-${document.getElementById('noticeCategory').value}-${Date.now()}`,
-        date: document.getElementById('noticeDate').value,
-        time: new Date().toTimeString().slice(0, 5),
+        date: noticeDateInput || _localDate,
+        time: _localTime,
         title: document.getElementById('noticeTitle').value,
         category: document.getElementById('noticeCategory').value,
         serviceType: document.getElementById('noticeServiceType').value,
