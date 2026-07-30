@@ -434,6 +434,29 @@
           </div>
         </div>
 
+        <!-- Tab Switcher 5 Blok Matriks Shift (Fast Navigation) -->
+        <div class="block-switcher-bar" style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; padding: 0.5rem 1rem; background: var(--bg-body); border-radius: 8px; border: 1px solid var(--border-color);">
+          <span style="font-size: 0.8rem; font-weight: bold; align-self: center; margin-right: 0.5rem; color: var(--text-muted);"><i class="fa-solid fa-layer-group"></i> PILIH BLOK MATRIKS EXCEL:</span>
+          <button type="button" class="btn btn-primary btn-sm block-tab-btn active" id="btnBlockAll" onclick="switchRosterBlock('ALL')">
+            <i class="fa-solid fa-globe"></i> Semua 140 Tanggal
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm block-tab-btn" id="btnBlock1" onclick="switchRosterBlock(1)">
+            Blok 1 (27 Jul - 23 Aug)
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm block-tab-btn" id="btnBlock2" onclick="switchRosterBlock(2)">
+            Blok 2 (24 Aug - 20 Sep)
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm block-tab-btn" id="btnBlock3" onclick="switchRosterBlock(3)">
+            Blok 3 (21 Sep - 18 Oct)
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm block-tab-btn" id="btnBlock4" onclick="switchRosterBlock(4)">
+            Blok 4 (19 Oct - 15 Nov)
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm block-tab-btn" id="btnBlock5" onclick="switchRosterBlock(5)">
+            Blok 5 (16 Nov - 13 Dec)
+          </button>
+        </div>
+
         <!-- Modern Excel Matrix Grid Table Container -->
         <div class="matrix-table-wrapper" id="rosterMatrixContainer">
           <table class="matrix-schedule-table" id="tableMatrixSchedule">
@@ -1388,17 +1411,17 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v2000.0</span></div>
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v2100.0</span></div>
       <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
     </div>
   </footer>
 
-  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v2000) -->
-  <script src="js/data.js?v=20260730_v2000"></script>
-  <script src="js/supabase-db.js?v=20260730_v2000"></script>
-  <script src="js/excel-parser.js?v=20260730_v2000"></script>
-  <script src="js/skcr.js?v=20260730_v2000"></script>
-  <script src="js/app.js?v=20260730_v2000"></script>
+  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v2100) -->
+  <script src="js/data.js?v=20260730_v2100"></script>
+  <script src="js/supabase-db.js?v=20260730_v2100"></script>
+  <script src="js/excel-parser.js?v=20260730_v2100"></script>
+  <script src="js/skcr.js?v=20260730_v2100"></script>
+  <script src="js/app.js?v=20260730_v2100"></script>
 
   <!-- STANDALONE INLINE CONTROLLER & BOOTSTRAP (Guaranteed 100% Interactive) -->
   <script>
@@ -1448,6 +1471,31 @@
         } else {
           alert('🎉 File Tarif LOLO ' + file.name + ' berhasil dipilih!');
         }
+      }
+    };
+
+    // ===== FAST SWITCH ROSTER BLOCK TABS (Blok 1 s/d 5) =====
+    window.switchRosterBlock = function(blockNum) {
+      var btns = document.querySelectorAll('.block-tab-btn');
+      btns.forEach(function(b) {
+        b.classList.remove('active', 'btn-primary');
+        b.classList.add('btn-secondary');
+      });
+
+      var targetId = (blockNum === 'ALL' ? 'btnBlockAll' : 'btnBlock' + blockNum);
+      var activeBtn = document.getElementById(targetId);
+      if (activeBtn) {
+        activeBtn.classList.remove('btn-secondary');
+        activeBtn.classList.add('active', 'btn-primary');
+      }
+
+      if (typeof App !== 'undefined') {
+        if (blockNum === 'ALL') {
+          App.activeRosterBlockFilter = null;
+        } else {
+          App.activeRosterBlockFilter = parseInt(blockNum, 10);
+        }
+        if (App.renderMatrixScheduleTable) App.renderMatrixScheduleTable();
       }
     };
 

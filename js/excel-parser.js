@@ -107,12 +107,19 @@ const ExcelParser = {
           }
 
           if (currentBlockDates.length > 0) {
-            let staffName = String(row[0] || row[1] || '').trim().toUpperCase();
-            if (!staffName || staffName === 'UNDEFINED' || staffName.length < 2) continue;
-
-            if (staffName.includes("KET") || staffName.includes("JADWAL") || staffName.includes("DIBUAT") || staffName.includes("MENGETAHUI") || staffName.includes("SHIFT") || staffName.includes("KORD") || staffName.includes("NAMA")) {
-              continue;
+            let staffName = "";
+            for (let colIdx = 0; colIdx <= 3; colIdx++) {
+              const candidate = String(row[colIdx] || '').trim().toUpperCase();
+              if (candidate && isNaN(candidate) && candidate.length >= 2) {
+                if (!candidate.includes("KET") && !candidate.includes("JADWAL") && !candidate.includes("DIBUAT") && 
+                    !candidate.includes("MENGETAHUI") && !candidate.includes("SHIFT") && !candidate.includes("KORD") && 
+                    !candidate.includes("NAMA") && !candidate.includes("NO") && !candidate.includes("TANGGAL")) {
+                  staffName = candidate;
+                  break;
+                }
+              }
             }
+            if (!staffName) continue;
 
             if (!staffShiftMap[staffName]) {
               staffShiftMap[staffName] = {};
