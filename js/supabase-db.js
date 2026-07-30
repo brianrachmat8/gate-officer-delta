@@ -5,37 +5,39 @@
 
 const SupabaseDB = {
   // Pre-configured Supabase Credentials
-  url: localStorage.getItem('portgate_supabase_url') || 'https://seiscumgtgjxaimaaegp.supabase.co',
-  key: localStorage.getItem('portgate_supabase_key') || 'sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk',
+  url: (function(){ try { return localStorage.getItem('portgate_supabase_url') || 'https://seiscumgtgjxaimaaegp.supabase.co'; } catch(e) { return 'https://seiscumgtgjxaimaaegp.supabase.co'; } })(),
+  key: (function(){ try { return localStorage.getItem('portgate_supabase_key') || 'sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk'; } catch(e) { return 'sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk'; } })(),
   client: null,
   isConfigured: false,
 
   init: function() {
-    const activeUrl = SupabaseDB.url || localStorage.getItem('portgate_supabase_url') || 'https://seiscumgtgjxaimaaegp.supabase.co';
-    const activeKey = SupabaseDB.key || localStorage.getItem('portgate_supabase_key') || 'sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk';
-
-    if (typeof supabase !== 'undefined' && activeUrl && activeKey) {
+    try {
+      let activeUrl = 'https://seiscumgtgjxaimaaegp.supabase.co';
+      let activeKey = 'sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk';
       try {
-        SupabaseDB.client = supabase.createClient(activeUrl, activeKey);
+        activeUrl = localStorage.getItem('portgate_supabase_url') || SupabaseDB.url || activeUrl;
+        activeKey = localStorage.getItem('portgate_supabase_key') || SupabaseDB.key || activeKey;
+      } catch(e) {}
+
+      if (typeof supabase !== 'undefined' && activeUrl && activeKey) {
+        SupabaseDB.client = supabase.createClient(activeUrl, activeKey, {
+          auth: { persistSession: false, autoRefreshToken: false }
+        });
         SupabaseDB.isConfigured = true;
         console.log("⚡ Supabase Cloud Database Connected Successfully!");
-        SupabaseDB.subscribeToRealtimeChanges();
 
-        // Initial Cloud Sync immediately on load
-        SupabaseDB.syncAllFromCloud();
+        try { SupabaseDB.subscribeToRealtimeChanges(); } catch(re) { console.warn("Realtime N/A:", re); }
 
-        // 3-Second Instant Auto-Poll Fallback to ensure 100% Identical Multi-PC Real-Time Sync
-        setInterval(() => {
-          if (SupabaseDB.isConfigured) {
-            SupabaseDB.syncAllFromCloud();
-          }
-        }, 3000);
-      } catch (e) {
-        console.error("Failed to initialize Supabase client:", e);
-        SupabaseDB.isConfigured = false;
+        // Initial Cloud Sync after 2 seconds (delayed to allow local DOM render first)
+        setTimeout(function() {
+          try { SupabaseDB.syncAllFromCloud(); } catch(se) { console.warn("Sync failed:", se); }
+        }, 2000);
+      } else {
+        console.log("ℹ️ Supabase SDK pending key entry or offline.");
       }
-    } else {
-      console.log("ℹ️ Supabase credentials pending key entry.");
+    } catch (e) {
+      console.error("Failed to initialize Supabase client:", e);
+      SupabaseDB.isConfigured = false;
     }
   },
 

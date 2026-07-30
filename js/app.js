@@ -625,35 +625,82 @@ const App = {
       return new Date(timeB) - new Date(timeA);
     });
 
-    tbody.innerHTML = sorted.map(item => {
-      const cCount = item.containerCount || (item.containers ? item.containers.length : 1);
-      const mainContainer = item.primaryContainer || (item.containers && item.containers[0]) || item.containerNo || "SNKO8923410";
+  renderSKCRTable: function(searchTerm = "") {
+    const tbody = document.getElementById('tbodySKCR');
+    if (!tbody) return;
 
-      return `
+    const filterElem = document.getElementById('filterSKCRLine');
+    const filterLine = filterElem ? filterElem.value : "";
+
+    if (!Array.isArray(skcrData)) {
+      skcrData = [];
+    }
+
+    let filtered = skcrData.filter(item => {
+      if (!item) return false;
+      const itemLine = (item.shippingLine || '').toUpperCase();
+      const matchLine = !filterLine || itemLine === filterLine.toUpperCase();
+      const cStr = (item.containers ? item.containers.join(' ') : item.containerNo || item.primaryContainer || '').toLowerCase();
+      const itemId = (item.id || '').toLowerCase();
+      const vessel = (item.vesselVoyage || '').toLowerCase();
+      const sTerm = (searchTerm || '').toLowerCase();
+      const matchSearch = !sTerm || 
+        cStr.includes(sTerm) ||
+        itemId.includes(sTerm) ||
+        vessel.includes(sTerm) ||
+        itemLine.toLowerCase().includes(sTerm);
+      return matchLine && matchSearch;
+    });
+
+    let sorted = [...filtered].sort((a, b) => {
+      const timeA = (a.date || '2026-01-01') + 'T' + (a.time || '00:00');
+      const timeB = (b.date || '2026-01-01') + 'T' + (b.time || '00:00');
+      return new Date(timeB) - new Date(timeA);
+    });
+
+    if (sorted.length === 0) {
+      tbody.innerHTML = `
         <tr>
-          <td><strong>${item.id}</strong></td>
-          <td>${item.date}</td>
-          <td>
-            <strong style="color: var(--accent-blue);">${mainContainer}</strong>
-            ${cCount > 1 ? `<span class="badge badge-info" style="margin-left:0.4rem;">+${cCount - 1} container lagi</span>` : ''}
-          </td>
-          <td>${item.vesselVoyage}</td>
-          <td><span class="badge badge-shipping-line">${item.consignee || item.shippingLine}</span></td>
-          <td>
-            <div style="display: flex; gap: 0.35rem;">
-              <button class="btn btn-primary btn-sm btn-print-skcr" data-id="${item.id}" onclick="App.openSKCRDetail('${item.id}')">
-                <i class="fa-solid fa-print"></i> Cetak (${cCount})
-              </button>
-              <button class="btn btn-secondary btn-sm btn-delete-skcr" data-id="${item.id}" onclick="App.deleteSKCR('${item.id}')" style="color: var(--status-danger);" title="Hapus Dokumen SKCR Ini">
-                <i class="fa-solid fa-trash-can"></i> Hapus
-              </button>
-            </div>
+          <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+            <i class="fa-solid fa-folder-open" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; opacity: 0.4;"></i>
+            Belum ada data Surat Keterangan Container Rusak (SKCR) terdaftar.
           </td>
         </tr>
       `;
-    }).join('');
+    } else {
+      tbody.innerHTML = sorted.map(item => {
+        const cCount = item.containerCount || (item.containers ? item.containers.length : 1);
+        const mainContainer = item.primaryContainer || (item.containers && item.containers[0]) || item.containerNo || "N/A";
 
-    document.getElementById('skcrCountBadge').textContent = skcrData.length;
+        return `
+          <tr>
+            <td><strong>${item.id || ''}</strong></td>
+            <td>${item.date || ''}</td>
+            <td>
+              <strong style="color: var(--accent-blue);">${mainContainer}</strong>
+              ${cCount > 1 ? `<span class="badge badge-info" style="margin-left:0.4rem;">+${cCount - 1} container lagi</span>` : ''}
+            </td>
+            <td>${item.vesselVoyage || '-'}</td>
+            <td><span class="badge badge-shipping-line">${item.consignee || item.shippingLine || '-'}</span></td>
+            <td>
+              <div style="display: flex; gap: 0.35rem;">
+                <button type="button" class="btn btn-primary btn-sm btn-print-skcr" data-id="${item.id}" onclick="App.openSKCRDetail('${item.id}')">
+                  <i class="fa-solid fa-print"></i> Cetak (${cCount})
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" data-id="${item.id}" onclick="App.deleteSKCR('${item.id}')" style="color: var(--status-danger);" title="Hapus Dokumen SKCR Ini">
+                  <i class="fa-solid fa-trash-can"></i> Hapus
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    const badge = document.getElementById('skcrCountBadge');
+    if (badge) badge.textContent = skcrData.length;
+    const kpi = document.getElementById('kpiTotalSKCR');
+    if (kpi) kpi.textContent = skcrData.length;
   },
 
   openSKCRDetail: function(skcrId) {
