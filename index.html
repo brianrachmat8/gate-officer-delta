@@ -23,8 +23,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Stylesheets (Cache Busted) -->
-  <link rel="stylesheet" href="css/style.css?v=20260730_v700">
-  <link rel="stylesheet" href="css/print.css?v=20260730_v700">
+  <link rel="stylesheet" href="css/style.css?v=20260730_v1200">
+  <link rel="stylesheet" href="css/print.css?v=20260730_v1200">
 </head>
 <body>
 
@@ -1176,17 +1176,17 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v1100.0</span></div>
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v1200.0</span></div>
       <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
     </div>
   </footer>
 
-  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v1100) -->
-  <script src="js/data.js?v=20260730_v1100"></script>
-  <script src="js/supabase-db.js?v=20260730_v1100"></script>
-  <script src="js/excel-parser.js?v=20260730_v1100"></script>
-  <script src="js/skcr.js?v=20260730_v1100"></script>
-  <script src="js/app.js?v=20260730_v1100"></script>
+  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v1200) -->
+  <script src="js/data.js?v=20260730_v1200"></script>
+  <script src="js/supabase-db.js?v=20260730_v1200"></script>
+  <script src="js/excel-parser.js?v=20260730_v1200"></script>
+  <script src="js/skcr.js?v=20260730_v1200"></script>
+  <script src="js/app.js?v=20260730_v1200"></script>
 
   <!-- STANDALONE INLINE CONTROLLER & BOOTSTRAP (Guaranteed 100% Interactive) -->
   <script>
@@ -1238,13 +1238,13 @@
     // ===== SETTING & THEME TOGGLE HANDLERS =====
     window.openSettingsModal = function() {
       var modal = document.getElementById('settingsModal');
-      if (modal) modal.style.display = 'flex';
-      else alert("⚙️ Pengaturan Supabase Cloud & Logo. Status Connection: ONLINE (Active Sync).");
+      if (modal) modal.classList.add('active');
+      else alert("⚙️ Pengaturan Supabase Cloud & Logo.");
     };
 
     window.closeSettingsModal = function() {
       var modal = document.getElementById('settingsModal');
-      if (modal) modal.style.display = 'none';
+      if (modal) modal.classList.remove('active');
     };
 
     window.toggleAppTheme = function() {
@@ -1268,12 +1268,12 @@
     // ===== HANDOVER MODAL HANDLERS =====
     window.openHandoverModal = function() {
       var modal = document.getElementById('handoverModal');
-      if (modal) modal.style.display = 'flex';
+      if (modal) modal.classList.add('active');
     };
 
     window.closeHandoverModal = function() {
       var modal = document.getElementById('handoverModal');
-      if (modal) modal.style.display = 'none';
+      if (modal) modal.classList.remove('active');
     };
 
     // ===== EXPORT & TEMPLATE HANDLERS =====
@@ -1451,12 +1451,12 @@
         `;
       }
 
-      if (modal) modal.style.display = 'flex';
+      if (modal) modal.classList.add('active');
     };
 
     window.closeSKCRModal = function() {
       var modal = document.getElementById('skcrPrintModal');
-      if (modal) modal.style.display = 'none';
+      if (modal) modal.classList.remove('active');
     };
 
     // ===== DELETE SKCR ROW WITH REALTIME KPI & SUPABASE SYNC =====

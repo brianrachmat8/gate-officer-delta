@@ -931,8 +931,8 @@ textarea.form-control {
   height: 100vh;
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
-  z-index: 1000;
-  display: flex;
+  z-index: 99999;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
@@ -942,8 +942,9 @@ textarea.form-control {
 }
 
 .modal-backdrop.active {
-  opacity: 1;
-  pointer-events: auto;
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 .modal-container {
