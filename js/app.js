@@ -188,8 +188,13 @@ const App = {
       try {
         const parsed = JSON.parse(saved);
         if (parsed.dates && parsed.dates.length > 0 && parsed.roster && parsed.roster.length > 0) {
-          matrixDatesList = parsed.dates;
-          matrixRosterData = parsed.roster;
+          if (parsed.dates[0] && (parsed.dates[0].includes("Mar") || parsed.dates[0].includes("09-"))) {
+            console.log("Purging old March roster cache from localStorage");
+            localStorage.removeItem('portgate_matrix_roster');
+          } else {
+            matrixDatesList = parsed.dates;
+            matrixRosterData = parsed.roster;
+          }
         }
       } catch(e) {
         console.error("Failed to load roster from storage:", e);
