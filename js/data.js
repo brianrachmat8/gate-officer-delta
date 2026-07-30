@@ -4,14 +4,12 @@
    ========================================================================== */
 
 const SHIPPING_LINES = [
-  "HYUNDAI",
   "HAPAG",
   "SINOKOR",
   "HEUNG-A",
   "RCL",
   "WAN-HAI",
   "SITC",
-  "STAR SHIPPING",
   "ONE",
   "ZIMLINE",
   "HMM"

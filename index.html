@@ -176,8 +176,8 @@
                   <option value="WAN-HAI">WAN-HAI</option>
                   <option value="SITC">SITC</option>
                   <option value="ONE">ONE</option>
-                  <option value="ZIMLINE">ZIMLINE</option>
-                  <option value="HMM">HMM</option>
+                  <option value="ZIMLINE">ZIMLINE (Star Shipping)</option>
+                  <option value="HMM">HMM (Hyundai)</option>
                 </select>
               </div>
 
@@ -232,7 +232,7 @@
           <div class="card-header">
             <h3 class="card-title"><i class="fa-solid fa-list-check"></i> Log Surat Keterangan Container Rusak</h3>
             <div style="display: flex; gap: 0.5rem;">
-              <select class="form-select" id="filterSKCRLine" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+              <select class="form-select" id="filterSKCRLine" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.8rem;" onchange="filterSkcrTable(this.value)">
                 <option value="">Semua Shipping Line</option>
                 <option value="HAPAG">HAPAG</option>
                 <option value="SINOKOR">SINOKOR</option>
@@ -503,10 +503,10 @@
           <div class="form-group">
             <label class="form-label">Tipe Layanan Operations *</label>
             <div style="display: flex; gap: 0.5rem;">
-              <button class="btn btn-primary btn-sm service-type-btn active" id="btnNoticeTypeEkspor" data-type="EKSPOR" style="flex: 1;">
+              <button type="button" class="btn btn-primary btn-sm service-type-btn active" id="btnNoticeTypeEkspor" onclick="switchNoticeType('EKSPOR')" style="flex: 1;">
                 <i class="fa-solid fa-plane-departure"></i> EKSPOR
               </button>
-              <button class="btn btn-secondary btn-sm service-type-btn" id="btnNoticeTypeImpor" data-type="IMPOR" style="flex: 1;">
+              <button type="button" class="btn btn-secondary btn-sm service-type-btn" id="btnNoticeTypeImpor" onclick="switchNoticeType('IMPOR')" style="flex: 1;">
                 <i class="fa-solid fa-plane-arrival"></i> IMPOR
               </button>
             </div>
@@ -514,18 +514,17 @@
 
           <div class="form-group">
             <label class="form-label">Kategori / Shipping Line</label>
-            <select class="form-select" id="filterNoticeCategory">
+            <select class="form-select" id="filterNoticeCategory" onchange="filterNoticeFeed()">
               <option value="">Semua Pelayaran & Kategori</option>
-              <option value="HYUNDAI">HYUNDAI</option>
               <option value="HAPAG">HAPAG</option>
               <option value="SINOKOR">SINOKOR</option>
               <option value="HEUNG-A">HEUNG-A</option>
               <option value="RCL">RCL</option>
               <option value="WAN-HAI">WAN-HAI</option>
               <option value="SITC">SITC</option>
-              <option value="STAR SHIPPING">STAR SHIPPING</option>
               <option value="ONE">ONE</option>
               <option value="ZIMLINE">ZIMLINE</option>
+              <option value="HMM">HMM</option>
               <option value="Umum / Gate">Umum / Gate Terminal</option>
             </select>
           </div>
@@ -1313,17 +1312,17 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v1500.0</span></div>
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v1600.0</span></div>
       <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
     </div>
   </footer>
 
-  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v1500) -->
-  <script src="js/data.js?v=20260730_v1500"></script>
-  <script src="js/supabase-db.js?v=20260730_v1500"></script>
-  <script src="js/excel-parser.js?v=20260730_v1500"></script>
-  <script src="js/skcr.js?v=20260730_v1500"></script>
-  <script src="js/app.js?v=20260730_v1500"></script>
+  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v1600) -->
+  <script src="js/data.js?v=20260730_v1600"></script>
+  <script src="js/supabase-db.js?v=20260730_v1600"></script>
+  <script src="js/excel-parser.js?v=20260730_v1600"></script>
+  <script src="js/skcr.js?v=20260730_v1600"></script>
+  <script src="js/app.js?v=20260730_v1600"></script>
 
   <!-- STANDALONE INLINE CONTROLLER & BOOTSTRAP (Guaranteed 100% Interactive) -->
   <script>
@@ -1474,6 +1473,36 @@
         var card = btn.closest('.news-card');
         if (card) card.remove();
       }
+    };
+
+    // ===== SWITCH NOTICE SERVICE TYPE (EKSPOR vs IMPOR) =====
+    window.switchNoticeType = function(type) {
+      var btnE = document.getElementById('btnNoticeTypeEkspor');
+      var btnI = document.getElementById('btnNoticeTypeImpor');
+      var title = document.getElementById('noticeTypeTitleHeader');
+
+      if (type === 'IMPOR') {
+        if (btnE) { btnE.classList.remove('active', 'btn-primary'); btnE.classList.add('btn-secondary'); }
+        if (btnI) { btnI.classList.remove('btn-secondary'); btnI.classList.add('active', 'btn-primary'); }
+        if (title) title.textContent = "IMPOR";
+      } else {
+        if (btnE) { btnE.classList.remove('btn-secondary'); btnE.classList.add('active', 'btn-primary'); }
+        if (btnI) { btnI.classList.remove('active', 'btn-primary'); btnI.classList.add('btn-secondary'); }
+        if (title) title.textContent = "EKSPOR";
+      }
+
+      var feed = document.getElementById('newsTimelineContainer');
+      if (!feed) return;
+
+      var cards = feed.querySelectorAll('.news-card');
+      cards.forEach(function(card) {
+        var cService = card.getAttribute('data-service') || 'EKSPOR';
+        if (cService.toUpperCase() === type.toUpperCase()) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
     };
 
     // ===== FILTER NOTICE FEED (PERATURAN TAB) =====
