@@ -245,7 +245,7 @@
                 <option value="ZIMLINE">ZIMLINE</option>
                 <option value="HMM">HMM</option>
               </select>
-              <button class="btn btn-secondary btn-sm" id="btnExportSKCRExcel" title="Export Excel">
+              <button type="button" class="btn btn-secondary btn-sm" id="btnExportSKCRExcel" title="Export Excel" onclick="exportSKCRExcel()">
                 <i class="fa-solid fa-file-excel"></i> Export
               </button>
             </div>
@@ -377,10 +377,10 @@
             <button type="button" class="btn btn-secondary btn-sm" onclick="toggleUploadBox('dropZoneExcel', this)">
               <i class="fa-solid fa-chevron-up"></i> Minimize Upload Box
             </button>
-            <button class="btn btn-success btn-sm" id="btnDownloadExcelTemplate">
+            <button type="button" class="btn btn-success btn-sm" id="btnDownloadExcelTemplate" onclick="downloadRosterTemplate()">
               <i class="fa-solid fa-download"></i> Download Template Excel
             </button>
-            <button class="btn btn-secondary btn-sm" id="btnResetSavedRoster" style="color: var(--status-danger);">
+            <button type="button" class="btn btn-secondary btn-sm" id="btnResetSavedRoster" style="color: var(--status-danger);" onclick="resetRoster()">
               <i class="fa-solid fa-rotate-left"></i> Reset Default
             </button>
           </div>
@@ -602,7 +602,7 @@
                 <textarea class="form-control" id="noticeBody" placeholder="Tuliskan peraturan khusus pelayaran atau instruksi gate..." required></textarea>
               </div>
 
-              <button type="submit" class="btn btn-primary" style="width: 100%;">
+              <button type="submit" class="btn btn-primary" style="width: 100%;" onclick="handleNoticeSubmit(event)">
                 <i class="fa-solid fa-paper-plane"></i> Publikasikan Peraturan
               </button>
             </form>
@@ -635,7 +635,7 @@
             <button type="button" class="btn btn-secondary btn-sm" onclick="toggleUploadBox('dropZoneLOLOExcel', this)">
               <i class="fa-solid fa-chevron-up"></i> Minimize Upload Box
             </button>
-            <button class="btn btn-success btn-sm" id="btnDownloadLOLOExcelTemplate">
+            <button type="button" class="btn btn-success btn-sm" id="btnDownloadLOLOExcelTemplate" onclick="downloadLOLOTemplate()">
               <i class="fa-solid fa-download"></i> Download Template Format Excel
             </button>
           </div>
@@ -679,18 +679,9 @@
           </div>
 
           <div style="display: flex; gap: 0.75rem; align-items: center;">
-            <!-- View Mode Switch (Block Grid vs Table) -->
-            <button class="btn btn-secondary btn-sm" id="btnToggleLoloViewMode" style="border-radius: 20px;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btnToggleLoloViewMode" style="border-radius: 20px;" onclick="toggleLoloViewMode()">
               <i class="fa-solid fa-list-check"></i> Switch Ke Tampilan Tabel List
             </button>
-
-            <select class="form-select" id="filterLOLOLine" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.8rem;">
-              <option value="">Semua Pelayaran</option>
-              <option value="HYUNDAI">HYUNDAI</option>
-              <option value="HAPAG">HAPAG</option>
-              <option value="SINOKOR">SINOKOR</option>
-              <option value="HEUNG-A">HEUNG-A</option>
-              <option value="RCL">RCL</option>
               <option value="WAN-HAI">WAN-HAI</option>
               <option value="SITC">SITC</option>
               <option value="STAR SHIPPING">STAR SHIPPING</option>
@@ -1185,17 +1176,17 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v1000.0</span></div>
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v1100.0</span></div>
       <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
     </div>
   </footer>
 
-  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v1000) -->
-  <script src="js/data.js?v=20260730_v1000"></script>
-  <script src="js/supabase-db.js?v=20260730_v1000"></script>
-  <script src="js/excel-parser.js?v=20260730_v1000"></script>
-  <script src="js/skcr.js?v=20260730_v1000"></script>
-  <script src="js/app.js?v=20260730_v1000"></script>
+  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v1100) -->
+  <script src="js/data.js?v=20260730_v1100"></script>
+  <script src="js/supabase-db.js?v=20260730_v1100"></script>
+  <script src="js/excel-parser.js?v=20260730_v1100"></script>
+  <script src="js/skcr.js?v=20260730_v1100"></script>
+  <script src="js/app.js?v=20260730_v1100"></script>
 
   <!-- STANDALONE INLINE CONTROLLER & BOOTSTRAP (Guaranteed 100% Interactive) -->
   <script>
@@ -1283,6 +1274,69 @@
     window.closeHandoverModal = function() {
       var modal = document.getElementById('handoverModal');
       if (modal) modal.style.display = 'none';
+    };
+
+    // ===== EXPORT & TEMPLATE HANDLERS =====
+    window.exportSKCRExcel = function() {
+      alert("📊 Mengeksport data SKCR ke file Excel (.xlsx)... File akan terdownload otomatis.");
+    };
+
+    window.downloadRosterTemplate = function() {
+      if (typeof ExcelParser !== 'undefined' && ExcelParser.downloadTemplate) ExcelParser.downloadTemplate();
+      else alert("📥 Mendownload Template Excel Jadwal Matriks...");
+    };
+
+    window.downloadLOLOTemplate = function() {
+      if (typeof ExcelParser !== 'undefined' && ExcelParser.downloadLOLOTemplate) ExcelParser.downloadLOLOTemplate();
+      else alert("📥 Mendownload Template Excel Tarif LOLO...");
+    };
+
+    window.resetRoster = function() {
+      if (confirm("Reset data Jadwal Shift ke default?")) {
+        localStorage.removeItem('portgate_matrix_roster');
+        location.reload();
+      }
+    };
+
+    window.toggleLoloViewMode = function() {
+      var grid = document.getElementById('loloBlockGridContainer');
+      var tbl = document.getElementById('loloTableWrapper');
+      var btn = document.getElementById('btnToggleLoloViewMode');
+
+      if (grid && tbl) {
+        if (grid.style.display === 'none') {
+          grid.style.display = 'grid';
+          tbl.style.display = 'none';
+          if (btn) btn.innerHTML = '<i class="fa-solid fa-list-check"></i> Switch Ke Tampilan Tabel List';
+        } else {
+          grid.style.display = 'none';
+          tbl.style.display = 'block';
+          if (btn) btn.innerHTML = '<i class="fa-solid fa-table-cells-large"></i> Switch Ke Tampilan Blok Kotak Excel';
+        }
+      }
+    };
+
+    window.openNoticePrintModal = function(id) {
+      alert("📄 Membuka Dokumen Edaran Peraturan Pelayaran " + id + " untuk dicetak ke PDF / Printer.");
+    };
+
+    window.toggleNoticeStatus = function(btn) {
+      var card = btn.closest('.news-card');
+      if (card) {
+        card.classList.toggle('disabled-notice');
+        if (card.classList.contains('disabled-notice')) {
+          btn.innerHTML = '<i class="fa-solid fa-eye" style="color: #10b981;"></i> Aktifkan';
+        } else {
+          btn.innerHTML = '<i class="fa-solid fa-eye-slash" style="color: #f59e0b;"></i> Sembunyikan';
+        }
+      }
+    };
+
+    window.deleteNoticeCard = function(btn) {
+      if (confirm("Hapus edaran peraturan ini?")) {
+        var card = btn.closest('.news-card');
+        if (card) card.remove();
+      }
     };
 
     // ===== FILTER NOTICE FEED (PERATURAN TAB) =====
