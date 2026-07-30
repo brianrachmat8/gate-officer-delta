@@ -874,6 +874,9 @@ const App = {
     });
 
     select.innerHTML = optionsHtml;
+    if (App.activeRosterMonthFilter) {
+      select.value = App.activeRosterMonthFilter;
+    }
 
     const titleContainer = document.getElementById('rosterMatrixCardTitle');
     if (titleContainer) {

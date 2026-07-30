@@ -404,7 +404,7 @@
           <h3 class="card-title" id="rosterMatrixCardTitle"><i class="fa-solid fa-table-cells"></i> Matriks Shift Gate Utuh (27 Juli s/d 13 Desember 2026)</h3>
           <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
             <!-- Filter Blok Bulan -->
-            <select class="form-select" id="filterRosterMonth" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.8rem; font-weight: bold; color: var(--accent-blue);">
+            <select class="form-select" id="filterRosterMonth" onchange="filterRosterMonthSelect(this.value)" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.8rem; font-weight: bold; color: var(--accent-blue);">
               <option value="">🗓️ Semua Tanggal (27 Jul s/d 13 Dec)</option>
               <option value="Jul">Juli 2026</option>
               <option value="Aug">Agustus 2026</option>
@@ -1404,17 +1404,17 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v2200.0</span></div>
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v2300.0</span></div>
       <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
     </div>
   </footer>
 
-  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v2200) -->
-  <script src="js/data.js?v=20260730_v2200"></script>
-  <script src="js/supabase-db.js?v=20260730_v2200"></script>
-  <script src="js/excel-parser.js?v=20260730_v2200"></script>
-  <script src="js/skcr.js?v=20260730_v2200"></script>
-  <script src="js/app.js?v=20260730_v2200"></script>
+  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v2300) -->
+  <script src="js/data.js?v=20260730_v2300"></script>
+  <script src="js/supabase-db.js?v=20260730_v2300"></script>
+  <script src="js/excel-parser.js?v=20260730_v2300"></script>
+  <script src="js/skcr.js?v=20260730_v2300"></script>
+  <script src="js/app.js?v=20260730_v2300"></script>
 
   <!-- STANDALONE INLINE CONTROLLER & BOOTSTRAP (Guaranteed 100% Interactive) -->
   <script>
@@ -1464,6 +1464,16 @@
         } else {
           alert('🎉 File Tarif LOLO ' + file.name + ' berhasil dipilih!');
         }
+      }
+    };
+
+    // ===== FILTER ROSTER MONTH SELECT HANDLER =====
+    window.filterRosterMonthSelect = function(val) {
+      if (typeof App !== 'undefined') {
+        App.activeRosterMonthFilter = val;
+        App.renderMatrixScheduleTable();
+        var container = document.getElementById('rosterMatrixContainer');
+        if (container) container.scrollLeft = 0;
       }
     };
 
