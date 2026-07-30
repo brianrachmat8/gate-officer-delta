@@ -1,14 +1,3 @@
-/* ==========================================================================
-   PortGate / Gate Officer Delta - Main Application Controller
-   Handles Settings, Copy-Paste SKCR, Delete SKCR/Notices, LocalStorage Roster Persistence,
-   Supabase Cloud DB Sync, EKSPOR vs IMPOR Service Type Filter, Per-Block Shipping Line Cards for LOLO,
-   User Module Profile Duty Hub, & 3-Theme Selector (Soft Cream, Soft Pink & Dark)
-   ========================================================================== */
-
-document.addEventListener('DOMContentLoaded', function() {
-  App.init();
-});
-
 const App = {
   activeNoticeDateFilter: "",
   activeNoticeCategoryFilter: "",
@@ -502,11 +491,13 @@ const App = {
       "HAPAG": "PT HAPAG-LLOYD INDONESIA",
       "SINOKOR": "PT Sinokor Merchant Marine Co., Ltd.",
       "ONE": "PT STAR SHIPPING INDONESIA",
+      "STAR SHIPPING": "PT STAR SHIPPING INDONESIA",
       "HEUNG-A": "PT HEUNG-A INDONESIA",
       "RCL": "PT RCL INDONESIA",
       "WAN-HAI": "PT WAN HAI LINES INDONESIA",
       "SITC": "PT SITC CONTAINER LINES INDONESIA",
       "ZIMLINE": "PT ZIMLINE INDONESIA",
+      "HYUNDAI": "PT HYUNDAI MERCHANT MARINE INDONESIA",
       "HMM": "PT HYUNDAI MERCHANT MARINE INDONESIA"
     };
 
@@ -514,10 +505,14 @@ const App = {
     const consigneeInput = document.getElementById('skcrConsignee');
 
     if (shippingLineSelect && consigneeInput) {
-      shippingLineSelect.addEventListener('change', (e) => {
-        const val = e.target.value;
-        consigneeInput.value = consigneeMap[val] || "";
-      });
+      const updateConsignee = () => {
+        const val = shippingLineSelect.value;
+        if (val && consigneeMap[val]) {
+          consigneeInput.value = consigneeMap[val];
+        }
+      };
+      shippingLineSelect.addEventListener('change', updateConsignee);
+      shippingLineSelect.addEventListener('input', updateConsignee);
     }
 
     const form = document.getElementById('formCreateSKCR');
@@ -1553,7 +1548,21 @@ const App = {
     try { App.renderHandoverTable(); } catch(e) { console.error("Handover Render error:", e); }
     try { App.updateUserProfileDisplay(); } catch(e) { console.error("User Profile error:", e); }
     try { App.updateKPIs(); } catch(e) { console.error("KPIs error:", e); }
-  }
 };
 
 window.App = App;
+
+function bootstrapApp() {
+  try {
+    App.init();
+  } catch(e) {
+    console.error("App.init error during bootstrap:", e);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrapApp);
+} else {
+  bootstrapApp();
+}
+
