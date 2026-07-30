@@ -918,6 +918,10 @@ const App = {
     }).join('');
   },
 
+  renderMatrixRosterSchedule: function(searchTerm = "") {
+    return App.renderMatrixScheduleTable(searchTerm);
+  },
+
   setupNoticeModule: function() {
     const btnEkspor = document.getElementById('btnNoticeTypeEkspor');
     const btnImpor = document.getElementById('btnNoticeTypeImpor');
