@@ -51,7 +51,7 @@
       <div class="header-actions">
         <div class="clock-badge">
           <div class="pulse-indicator"></div>
-          <span id="liveClockDisplay">25 Jul 2026 | 12:00 WIB</span>
+          <span id="liveClockDisplay">Kamis, 30 Jul 2026 | 08:10 WIB</span>
         </div>
 
         <button id="btnOpenSettings" class="btn btn-secondary btn-sm" style="border-radius: 20px;" title="Pengaturan Logo, Supabase Cloud & Running Text">
@@ -262,7 +262,45 @@
                 </tr>
               </thead>
               <tbody id="tbodySKCR">
-                <!-- Dynamically Populated by app.js -->
+                <tr>
+                  <td><strong>SKCR-2026-0701</strong></td>
+                  <td>2026-07-25</td>
+                  <td>
+                    <strong style="color: var(--accent-blue);">SNKO8923410</strong>
+                    <span class="badge badge-info" style="margin-left:0.4rem;">+4 container lagi</span>
+                  </td>
+                  <td>INTERASIA ENGAGE V. N037</td>
+                  <td><span class="badge badge-shipping-line">PT STAR SHIPPING INDONESIA</span></td>
+                  <td>
+                    <div style="display: flex; gap: 0.35rem;">
+                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" data-id="SKCR-2026-0701" onclick="App.openSKCRDetail('SKCR-2026-0701')">
+                        <i class="fa-solid fa-print"></i> Cetak (5)
+                      </button>
+                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" data-id="SKCR-2026-0701" onclick="App.deleteSKCR('SKCR-2026-0701')" style="color: var(--status-danger);" title="Hapus Dokumen SKCR Ini">
+                        <i class="fa-solid fa-trash-can"></i> Hapus
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>SKCR-2026-0702</strong></td>
+                  <td>2026-07-24</td>
+                  <td>
+                    <strong style="color: var(--accent-blue);">HLCU9812304</strong>
+                  </td>
+                  <td>EXPRESS BERLIN V.991W</td>
+                  <td><span class="badge badge-shipping-line">PT HAPAG-LLOYD INDONESIA</span></td>
+                  <td>
+                    <div style="display: flex; gap: 0.35rem;">
+                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" data-id="SKCR-2026-0702" onclick="App.openSKCRDetail('SKCR-2026-0702')">
+                        <i class="fa-solid fa-print"></i> Cetak (1)
+                      </button>
+                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" data-id="SKCR-2026-0702" onclick="App.deleteSKCR('SKCR-2026-0702')" style="color: var(--status-danger);" title="Hapus Dokumen SKCR Ini">
+                        <i class="fa-solid fa-trash-can"></i> Hapus
+                      </button>
+                    </div>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -970,16 +1008,85 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v500.0</span></div>
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v600.0</span></div>
       <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
     </div>
   </footer>
 
-  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v500) -->
-  <script src="js/data.js?v=20260730_v500"></script>
-  <script src="js/supabase-db.js?v=20260730_v500"></script>
-  <script src="js/excel-parser.js?v=20260730_v500"></script>
-  <script src="js/skcr.js?v=20260730_v500"></script>
-  <script src="js/app.js?v=20260730_v500"></script>
+  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v600) -->
+  <script src="js/data.js?v=20260730_v600"></script>
+  <script src="js/supabase-db.js?v=20260730_v600"></script>
+  <script src="js/excel-parser.js?v=20260730_v600"></script>
+  <script src="js/skcr.js?v=20260730_v600"></script>
+  <script src="js/app.js?v=20260730_v600"></script>
+
+  <!-- STANDALONE INLINE BOOTSTRAP (Runs instantly on any browser/device) -->
+  <script>
+  (function() {
+    'use strict';
+    // ===== REALTIME CLOCK =====
+    function tickClock() {
+      var el = document.getElementById('liveClockDisplay');
+      if (!el) return;
+      var now = new Date();
+      var pad = function(n) { return ('0' + n).slice(-2); };
+      var days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+      var months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+      el.textContent = days[now.getDay()] + ', ' + pad(now.getDate()) + ' ' + months[now.getMonth()] + ' ' + now.getFullYear() + ' | ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds()) + ' WIB';
+    }
+    tickClock();
+    setInterval(tickClock, 1000);
+
+    // ===== AUTO CONSIGNEE AUTOFILL =====
+    var cMap = {
+      'HAPAG': 'PT HAPAG-LLOYD INDONESIA',
+      'SINOKOR': 'PT Sinokor Merchant Marine Co., Ltd.',
+      'ONE': 'PT STAR SHIPPING INDONESIA',
+      'STAR SHIPPING': 'PT STAR SHIPPING INDONESIA',
+      'HEUNG-A': 'PT HEUNG-A INDONESIA',
+      'RCL': 'PT RCL INDONESIA',
+      'WAN-HAI': 'PT WAN HAI LINES INDONESIA',
+      'SITC': 'PT SITC CONTAINER LINES INDONESIA',
+      'ZIMLINE': 'PT ZIMLINE INDONESIA',
+      'HYUNDAI': 'PT HYUNDAI MERCHANT MARINE INDONESIA',
+      'HMM': 'PT HYUNDAI MERCHANT MARINE INDONESIA'
+    };
+    function initAutoConsignee() {
+      var sel = document.getElementById('skcrShippingLine');
+      var inp = document.getElementById('skcrConsignee');
+      if (sel && inp) {
+        var act = function() {
+          if (sel.value && cMap[sel.value]) {
+            inp.value = cMap[sel.value];
+          }
+        };
+        sel.addEventListener('change', act);
+        sel.addEventListener('input', act);
+      }
+    }
+
+    // ===== TAB SWITCHING =====
+    function initTabs() {
+      var tabs = document.querySelectorAll('.nav-tab');
+      tabs.forEach(function(tab) {
+        tab.onclick = function() {
+          tabs.forEach(function(t) { t.classList.remove('active'); });
+          document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+          tab.classList.add('active');
+          var targetTab = tab.getAttribute('data-tab');
+          var targetContent = document.getElementById('tab-' + targetTab);
+          if (targetContent) targetContent.classList.add('active');
+        };
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() { initAutoConsignee(); initTabs(); });
+    } else {
+      initAutoConsignee();
+      initTabs();
+    }
+  })();
+  </script>
 </body>
 </html>
