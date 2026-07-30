@@ -5,7 +5,7 @@
    ========================================================================== */
 
 const FirebaseDB = {
-  dbUrl: "https://gate-officer-delta-default-rtdb.firebaseio.com",
+  dbUrl: "https://gate-officer-delta-default-rtdb.asia-southeast1.firebasedatabase.app",
   eventSource: null,
 
   init: function(customUrl) {

@@ -28,6 +28,7 @@ const App = {
   init: function() {
     try { App.loadSettings(); } catch(e) { console.error("[INIT] loadSettings:", e); }
     try { SupabaseDB.init(); } catch(e) { console.error("[INIT] SupabaseDB.init:", e); }
+    try { FirebaseDB.init(); } catch(e) { console.error("[INIT] FirebaseDB.init:", e); }
 
     try { App.loadRosterFromStorage(); } catch(e) { console.error("[INIT] loadRoster:", e); }
     try { App.loadSKCRFromStorage(); } catch(e) { console.error("[INIT] loadSKCR:", e); }
@@ -169,6 +170,7 @@ const App = {
       };
       localStorage.setItem('portgate_matrix_roster', JSON.stringify(rosterPayload));
       SupabaseDB.saveRoster(matrixDatesList, matrixRosterData);
+      if (typeof FirebaseDB !== 'undefined') FirebaseDB.saveRoster(matrixDatesList, matrixRosterData);
     } catch(e) {
       console.error("Failed to save roster to storage:", e);
     }
