@@ -896,12 +896,7 @@ const App = {
     if (!thead || !tbody) return;
 
     let displayDates = matrixDatesList;
-    if (App.activeRosterBlockFilter) {
-      const bIdx = parseInt(App.activeRosterBlockFilter, 10) - 1;
-      const startIdx = Math.max(0, bIdx * 28);
-      const endIdx = Math.min(matrixDatesList.length, startIdx + 28);
-      displayDates = matrixDatesList.slice(startIdx, endIdx);
-    } else if (App.activeRosterMonthFilter) {
+    if (App.activeRosterMonthFilter) {
       displayDates = matrixDatesList.filter(d => String(d).includes(App.activeRosterMonthFilter));
     }
 
