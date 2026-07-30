@@ -3,6 +3,8 @@
    Includes SKCR Records, Matrix Roster Data (09-Mar to 26-Jul), Peraturan Pelayaran Ekspor/Impor (10 Notices), & Tarif LOLO Presisi
    ========================================================================== */
 
+let isRosterUploaded = false;
+
 const SHIPPING_LINES = [
   "HAPAG",
   "SINOKOR",

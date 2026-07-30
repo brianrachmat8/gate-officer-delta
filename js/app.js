@@ -191,14 +191,19 @@ const App = {
           if (parsed.dates[0] && (parsed.dates[0].includes("Mar") || parsed.dates[0].includes("09-"))) {
             console.log("Purging old March roster cache from localStorage");
             localStorage.removeItem('portgate_matrix_roster');
+            isRosterUploaded = false;
           } else {
             matrixDatesList = parsed.dates;
             matrixRosterData = parsed.roster;
+            isRosterUploaded = true;
           }
         }
       } catch(e) {
         console.error("Failed to load roster from storage:", e);
+        isRosterUploaded = false;
       }
+    } else {
+      isRosterUploaded = false;
     }
   },
 
@@ -804,7 +809,8 @@ const App = {
     document.getElementById('btnResetSavedRoster').addEventListener('click', () => {
       if (confirm("Apakah Anda yakin ingin MENGHAPUS file Excel yang tersimpan dan mengembalikan jadwal ke default?")) {
         localStorage.removeItem('portgate_matrix_roster');
-        location.reload();
+        isRosterUploaded = false;
+        App.renderMatrixScheduleTable();
       }
     });
 
@@ -890,6 +896,9 @@ const App = {
   },
 
   onExcelRosterParsed: function(newRoster, newDates) {
+    isRosterUploaded = true;
+    if (newRoster && newRoster.length > 0) matrixRosterData = newRoster;
+    if (newDates && newDates.length > 0) matrixDatesList = newDates;
     App.saveRosterToStorage();
     App.updateStaffFilterOptions();
     App.updateMonthFilterOptions();
@@ -898,6 +907,32 @@ const App = {
   },
 
   renderMatrixScheduleTable: function(searchTerm = "") {
+    const container = document.getElementById('rosterMatrixContainer');
+    if (!container) return;
+
+    if (!isRosterUploaded) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 3.5rem 1.5rem; background: var(--bg-card); border-radius: 12px; border: 2px dashed var(--accent-blue); margin: 0.5rem 0;">
+          <i class="fa-solid fa-file-excel" style="font-size: 3.5rem; color: #10b981; margin-bottom: 1rem;"></i>
+          <h3 style="font-size: 1.25rem; color: var(--text-main); font-weight: 700; margin-bottom: 0.5rem;">Belum Ada File Excel Jadwal Shift yang Di-upload</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); max-width: 520px; margin: 0 auto 1.5rem auto; line-height: 1.5;">
+            Silakan upload file Excel Jadwal Shift Matriks (misal periode 27 Juli s/d 13 Desember 2026) dari komputer Anda. Setelah di-upload, tabel jadwal shift akan otomatis ditampilkan secara lengkap di sini.
+          </p>
+          <button type="button" class="btn btn-primary" onclick="document.getElementById('excelFileInput').click()" style="padding: 0.65rem 1.5rem; font-size: 0.95rem;">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Upload File Excel Jadwal Shift Dari Komputer
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = `
+      <table class="matrix-schedule-table" id="tableMatrixSchedule">
+        <thead id="theadMatrixSchedule"></thead>
+        <tbody id="tbodyMatrixSchedule"></tbody>
+      </table>
+    `;
+
     const thead = document.getElementById('theadMatrixSchedule');
     const tbody = document.getElementById('tbodyMatrixSchedule');
 
@@ -942,7 +977,10 @@ const App = {
           return `<td><span class="shift-pill shift-pill-grey" style="opacity: 0.25;">-</span></td>`;
         }
 
-        const pillInfo = ExcelParser.getShiftPillCategory(code);
+        const pillInfo = (typeof ExcelParser !== 'undefined' && ExcelParser.getShiftPillCategory) ?
+          ExcelParser.getShiftPillCategory(code) :
+          { class: code === 'OFF' ? 'shift-pill-grey' : 'shift-pill-yellow', text: code };
+
         return `
           <td>
             <span class="shift-pill ${pillInfo.class}">${pillInfo.text}</span>
