@@ -395,9 +395,26 @@
           <div style="display: flex; flex-direction: column; align-items: center;">
             <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
             <div class="upload-title">Tarik & Lepas File Excel Jadwal (.xlsx) di sini untuk Upload</div>
-            <div class="upload-subtitle" style="margin-bottom: 0.75rem;">💾 Tersambung dengan Supabase Cloud: File di-upload akan <strong>LANGSUNG TER-SYNC REALTIME</strong> di seluruh HP/Laptop petugas gate!</div>
+            <div class="upload-subtitle" style="margin-bottom: 0.75rem;">💾 Tersambung dengan Supabase Cloud & Firebase Realtime: File di-upload akan <strong>LANGSUNG TER-SYNC REALTIME</strong> di seluruh HP/Laptop petugas gate!</div>
             <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('fileInputExcel').click()">
               <i class="fa-solid fa-folder-open"></i> Pilih File Excel Dari Komputer
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Google Sheets Online Sync Bar -->
+        <div style="margin-top: 0.75rem; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: var(--text-main);">
+            <i class="fa-solid fa-file-csv" style="font-size: 1.3rem; color: #10b981;"></i>
+            <div>
+              <strong>Sync Otomatis Dari Google Sheets Online (Terhubung Realtime ke Seluruh PC/HP)</strong><br>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Masukkan Link / ID Google Sheet Publik untuk tarik data jadwal live tanpa perlu upload file manual lagi!</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.4rem; flex: 1; max-width: 480px;">
+            <input type="text" id="googleSheetUrlInput" class="form-control form-control-sm" placeholder="Paste Link Google Sheet Publik di sini..." style="font-size: 0.8rem;">
+            <button type="button" class="btn btn-success btn-sm" onclick="syncFromGoogleSheets()">
+              <i class="fa-solid fa-rotate"></i> Sync Live
             </button>
           </div>
         </div>
@@ -1318,17 +1335,19 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v2700.0</span></div>
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v2800.0</span></div>
       <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
     </div>
   </footer>
 
-  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v2700) -->
-  <script src="js/data.js?v=20260730_v2700"></script>
-  <script src="js/supabase-db.js?v=20260730_v2700"></script>
-  <script src="js/excel-parser.js?v=20260730_v2700"></script>
-  <script src="js/skcr.js?v=20260730_v2700"></script>
-  <script src="js/app.js?v=20260730_v2700"></script>
+  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v2800) -->
+  <script src="js/data.js?v=20260730_v2800"></script>
+  <script src="js/supabase-db.js?v=20260730_v2800"></script>
+  <script src="js/firebase-db.js?v=20260730_v2800"></script>
+  <script src="js/google-sheets.js?v=20260730_v2800"></script>
+  <script src="js/excel-parser.js?v=20260730_v2800"></script>
+  <script src="js/skcr.js?v=20260730_v2800"></script>
+  <script src="js/app.js?v=20260730_v2800"></script>
 
   <!-- STANDALONE INLINE CONTROLLER & BOOTSTRAP (Guaranteed 100% Interactive) -->
   <script>
@@ -1451,6 +1470,25 @@
       if (confirm("Reset data Jadwal Shift ke default?")) {
         localStorage.removeItem('portgate_matrix_roster');
         location.reload();
+      }
+    };
+
+    // ===== GOOGLE SHEETS LIVE SYNC HANDLER =====
+    window.syncFromGoogleSheets = function() {
+      var urlInput = document.getElementById('googleSheetUrlInput');
+      var url = urlInput ? urlInput.value.trim() : '';
+      if (!url) {
+        alert("Silakan masukkan Link atau ID Google Sheets publik.");
+        return;
+      }
+
+      if (typeof GoogleSheets !== 'undefined' && GoogleSheets.fetchLiveRoster) {
+        GoogleSheets.fetchLiveRoster(url, function(parsedRoster, parsedDates) {
+          if (typeof App !== 'undefined' && App.onExcelRosterParsed) {
+            App.onExcelRosterParsed(parsedRoster, parsedDates);
+          }
+          alert("🎉 BERHASIL SYNC DARI GOOGLE SHEETS!\nJadwal " + parsedRoster.length + " petugas gate (" + parsedDates.length + " tanggal) telah tersambung secara live!");
+        });
       }
     };
 
