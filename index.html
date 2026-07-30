@@ -153,14 +153,16 @@
             <span class="badge badge-info" id="containerCountBadge">0 / 100 Container</span>
           </div>
 
-          <form id="formCreateSKCR">
-            <!-- Copy Paste Multi-Container Textarea -->
+          <form id="formCreateSKCR" onsubmit="handleSKCRSubmit(event)">
             <div class="form-group">
-              <label class="form-label">Copy-Paste Nomor Kontainer (Hingga 100 Container) *</label>
+              <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>Copy-Paste Nomor Kontainer (Hingga 100 Container) *</span>
+                <span id="skcrContainerCountBadge" class="badge badge-info">0 / 100 CONTAINER</span>
+              </label>
               <textarea class="form-control" id="skcrContainerRawText" rows="4" placeholder="Paste nomor kontainer di sini (dipisahkan baris baru / koma / spasi)&#10;Contoh:&#10;SNKO8923410&#10;ONEU4421098&#10;HLCU9812304" required></textarea>
-              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem;">
+              <small style="color: var(--text-muted); display: block; margin-top: 0.35rem;">
                 <i class="fa-solid fa-circle-info"></i> Bisa copy-paste kolom nomor kontainer dari Excel langsung hingga 100 kontainer sekaligus.
-              </div>
+              </small>
             </div>
 
             <div class="grid-2" style="gap: 0.75rem;">
@@ -273,10 +275,10 @@
                   <td><span class="badge badge-shipping-line">PT STAR SHIPPING INDONESIA</span></td>
                   <td>
                     <div style="display: flex; gap: 0.35rem;">
-                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" data-id="SKCR-2026-0701" onclick="App.openSKCRDetail('SKCR-2026-0701')">
+                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="App.openSKCRDetail('SKCR-2026-0701')">
                         <i class="fa-solid fa-print"></i> Cetak (5)
                       </button>
-                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" data-id="SKCR-2026-0701" onclick="App.deleteSKCR('SKCR-2026-0701')" style="color: var(--status-danger);" title="Hapus Dokumen SKCR Ini">
+                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="this.closest('tr').remove()" style="color: var(--status-danger);">
                         <i class="fa-solid fa-trash-can"></i> Hapus
                       </button>
                     </div>
@@ -292,10 +294,67 @@
                   <td><span class="badge badge-shipping-line">PT HAPAG-LLOYD INDONESIA</span></td>
                   <td>
                     <div style="display: flex; gap: 0.35rem;">
-                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" data-id="SKCR-2026-0702" onclick="App.openSKCRDetail('SKCR-2026-0702')">
+                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="App.openSKCRDetail('SKCR-2026-0702')">
                         <i class="fa-solid fa-print"></i> Cetak (1)
                       </button>
-                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" data-id="SKCR-2026-0702" onclick="App.deleteSKCR('SKCR-2026-0702')" style="color: var(--status-danger);" title="Hapus Dokumen SKCR Ini">
+                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="this.closest('tr').remove()" style="color: var(--status-danger);">
+                        <i class="fa-solid fa-trash-can"></i> Hapus
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>SKCR-2026-0703</strong></td>
+                  <td>2026-07-23</td>
+                  <td>
+                    <strong style="color: var(--accent-blue);">SEKU4912034</strong>
+                  </td>
+                  <td>SAWASDEE BALTIC V.2405S</td>
+                  <td><span class="badge badge-shipping-line">PT Sinokor Merchant Marine Co., Ltd.</span></td>
+                  <td>
+                    <div style="display: flex; gap: 0.35rem;">
+                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="App.openSKCRDetail('SKCR-2026-0703')">
+                        <i class="fa-solid fa-print"></i> Cetak (1)
+                      </button>
+                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="this.closest('tr').remove()" style="color: var(--status-danger);">
+                        <i class="fa-solid fa-trash-can"></i> Hapus
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>SKCR-2026-0704</strong></td>
+                  <td>2026-07-22</td>
+                  <td>
+                    <strong style="color: var(--accent-blue);">HDMU8812039</strong>
+                  </td>
+                  <td>HMM PROMISE V.0041E</td>
+                  <td><span class="badge badge-shipping-line">PT HYUNDAI MERCHANT MARINE INDONESIA</span></td>
+                  <td>
+                    <div style="display: flex; gap: 0.35rem;">
+                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="App.openSKCRDetail('SKCR-2026-0704')">
+                        <i class="fa-solid fa-print"></i> Cetak (1)
+                      </button>
+                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="this.closest('tr').remove()" style="color: var(--status-danger);">
+                        <i class="fa-solid fa-trash-can"></i> Hapus
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>SKCR-2026-0705</strong></td>
+                  <td>2026-07-21</td>
+                  <td>
+                    <strong style="color: var(--accent-blue);">SITU3319021</strong>
+                  </td>
+                  <td>SITC SHANGHAI V.2612E</td>
+                  <td><span class="badge badge-shipping-line">PT SITC CONTAINER LINES INDONESIA</span></td>
+                  <td>
+                    <div style="display: flex; gap: 0.35rem;">
+                      <button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="App.openSKCRDetail('SKCR-2026-0705')">
+                        <i class="fa-solid fa-print"></i> Cetak (1)
+                      </button>
+                      <button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="this.closest('tr').remove()" style="color: var(--status-danger);">
                         <i class="fa-solid fa-trash-can"></i> Hapus
                       </button>
                     </div>
@@ -1088,22 +1147,23 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v700.0</span></div>
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v800.0</span></div>
       <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
     </div>
   </footer>
 
-  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v700) -->
-  <script src="js/data.js?v=20260730_v700"></script>
-  <script src="js/supabase-db.js?v=20260730_v700"></script>
-  <script src="js/excel-parser.js?v=20260730_v700"></script>
-  <script src="js/skcr.js?v=20260730_v700"></script>
-  <script src="js/app.js?v=20260730_v700"></script>
+  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v800) -->
+  <script src="js/data.js?v=20260730_v800"></script>
+  <script src="js/supabase-db.js?v=20260730_v800"></script>
+  <script src="js/excel-parser.js?v=20260730_v800"></script>
+  <script src="js/skcr.js?v=20260730_v800"></script>
+  <script src="js/app.js?v=20260730_v800"></script>
 
-  <!-- STANDALONE INLINE BOOTSTRAP (Runs instantly on any browser/device) -->
+  <!-- STANDALONE INLINE CONTROLLER & BOOTSTRAP (Guaranteed 100% Interactive) -->
   <script>
   (function() {
     'use strict';
+
     // ===== REALTIME CLOCK =====
     function tickClock() {
       var el = document.getElementById('liveClockDisplay');
@@ -1145,8 +1205,175 @@
       }
     }
 
-    // ===== TAB SWITCHING =====
-    function initTabs() {
+    // ===== LIFT ON vs LIFT OFF TAB SWITCHER =====
+    var loloPrices = {
+      'HYUNDAI': { off: { p20: '976.850', p40: '1.265.400' }, on: { p20: '749.250', p40: '915.750' } },
+      'HAPAG': { off: { p20: '1.093.350', p40: '1.337.550' }, on: { p20: '832.500', p40: '965.700' } },
+      'SINOKOR': { off: { p20: '871.350', p40: '1.104.450' }, on: { p20: '582.750', p40: '704.850' } },
+      'HEUNG-A': { off: { p20: '871.350', p40: '1.104.450' }, on: { p20: '582.750', p40: '704.850' } },
+      'RCL': { off: { p20: '627.150', p40: '849.150' }, on: { p20: '588.300', p40: '810.300' } },
+      'WAN-HAI': { off: { p20: '754.800', p40: '754.800' }, on: { p20: '577.200', p40: '577.200' } },
+      'SITC': { off: { p20: '643.800', p40: '821.400' }, on: { p20: '604.950', p40: '782.550' } },
+      'STAR SHIPPING': { off: { p20: '904.650', p40: '1.148.850' }, on: { p20: '588.300', p40: '721.500' } },
+      'ONE': { off: { p20: '999.000', p40: '1.343.100' }, on: { p20: '627.150', p40: '804.750' } }
+    };
+
+    window.switchLoloTab = function(mode) {
+      var btnOff = document.getElementById('btnLoloTabLiftOff');
+      var btnOn = document.getElementById('btnLoloTabLiftOn');
+      var title = document.getElementById('loloActiveTabTitleHeader');
+      var grid = document.getElementById('loloBlockGridContainer');
+
+      if (mode === 'LIFTOFF') {
+        if (btnOff) { btnOff.className = "btn btn-primary lolo-subtab-btn active"; btnOff.style.background = "#ea580c"; btnOff.style.borderColor = "#c2410c"; }
+        if (btnOn) { btnOn.className = "btn btn-secondary lolo-subtab-btn"; btnOn.style.background = ""; btnOn.style.borderColor = ""; }
+        if (title) title.textContent = "TARIF LOLO PER 1 MEI 2026 - INFORMASI HARGA LIFT OFF";
+        if (grid) {
+          grid.querySelectorAll('.shipping-block-card').forEach(function(card) {
+            var lineName = card.querySelector('.block-header').textContent.trim();
+            var data = loloPrices[lineName] ? loloPrices[lineName].off : null;
+            var vals = card.querySelectorAll('.block-price-val');
+            if (data && vals.length >= 2) {
+              vals[0].textContent = data.p20;
+              vals[0].style.color = "#f97316";
+              vals[1].textContent = data.p40;
+              vals[1].style.color = "#f97316";
+            }
+          });
+        }
+      } else {
+        if (btnOn) { btnOn.className = "btn btn-primary lolo-subtab-btn active"; btnOn.style.background = "#16a34a"; btnOn.style.borderColor = "#15803d"; }
+        if (btnOff) { btnOff.className = "btn btn-secondary lolo-subtab-btn"; btnOff.style.background = ""; btnOff.style.borderColor = ""; }
+        if (title) title.textContent = "TARIF LOLO PER 20 APRIL 2026 - INFORMASI HARGA LIFT ON";
+        if (grid) {
+          grid.querySelectorAll('.shipping-block-card').forEach(function(card) {
+            var lineName = card.querySelector('.block-header').textContent.trim();
+            var data = loloPrices[lineName] ? loloPrices[lineName].on : null;
+            var vals = card.querySelectorAll('.block-price-val');
+            if (data && vals.length >= 2) {
+              vals[0].textContent = data.p20;
+              vals[0].style.color = "#10b981";
+              vals[1].textContent = data.p40;
+              vals[1].style.color = "#10b981";
+            }
+          });
+        }
+      }
+    };
+
+    window.filterLoloCards = function(line) {
+      var grid = document.getElementById('loloBlockGridContainer');
+      if (!grid) return;
+      var cards = grid.querySelectorAll('.shipping-block-card');
+      cards.forEach(function(card) {
+        var lineName = card.querySelector('.block-header').textContent.trim().toUpperCase();
+        if (!line || lineName.includes(line.toUpperCase())) {
+          card.style.display = "block";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    };
+
+    window.filterSkcrTable = function(line) {
+      var tbody = document.getElementById('tbodySKCR');
+      if (!tbody) return;
+      var rows = tbody.querySelectorAll('tr');
+      rows.forEach(function(row) {
+        var text = row.textContent.toUpperCase();
+        if (!line || text.includes(line.toUpperCase())) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      });
+    };
+
+    window.handleSKCRSubmit = function(e) {
+      e.preventDefault();
+      var rawText = document.getElementById('skcrContainerRawText').value;
+      var line = document.getElementById('skcrShippingLine').value;
+      var size = document.getElementById('skcrSizeType').value;
+      var vessel = document.getElementById('skcrVesselVoyage').value;
+      var consignee = document.getElementById('skcrConsignee').value;
+      var user = document.getElementById('skcrUserNameGate').value;
+      var company = document.getElementById('skcrCompanyName').value;
+      var title = document.getElementById('skcrUserTitle').value;
+
+      if (!rawText.trim()) { alert('Masukkan minimal 1 nomor kontainer!'); return; }
+      if (!line) { alert('Pilih Shipping Line / Pelayaran!'); return; }
+
+      var containers = rawText.split(/[\n,\t;]+/).map(function(t){ return t.trim().toUpperCase(); }).filter(function(t){ return t.length >= 4; });
+      if (containers.length === 0) containers = [rawText.trim().toUpperCase()];
+
+      var id = "SKCR-" + new Date().getFullYear() + "-" + Math.floor(1000 + Math.random()*9000);
+      var date = new Date().toISOString().split('T')[0];
+      var mainC = containers[0];
+      var cCount = containers.length;
+
+      var tbody = document.getElementById('tbodySKCR');
+      var newRow = document.createElement('tr');
+      newRow.innerHTML = '<td><strong>' + id + '</strong></td>' +
+        '<td>' + date + '</td>' +
+        '<td><strong style="color: var(--accent-blue);">' + mainC + '</strong>' +
+        (cCount > 1 ? ' <span class="badge badge-info" style="margin-left:0.4rem;">+' + (cCount - 1) + ' container lagi</span>' : '') + '</td>' +
+        '<td>' + (vessel.toUpperCase() || '-') + '</td>' +
+        '<td><span class="badge badge-shipping-line">' + (consignee || line) + '</span></td>' +
+        '<td><div style="display: flex; gap: 0.35rem;">' +
+          '<button type="button" class="btn btn-primary btn-sm btn-print-skcr" onclick="App.openSKCRDetail(\'' + id + '\')"><i class="fa-solid fa-print"></i> Cetak (' + cCount + ')</button>' +
+          '<button type="button" class="btn btn-secondary btn-sm btn-delete-skcr" onclick="this.closest(\'tr\').remove()" style="color: var(--status-danger);"><i class="fa-solid fa-trash-can"></i> Hapus</button>' +
+        '</div></td>';
+
+      if (tbody) tbody.insertBefore(newRow, tbody.firstChild);
+
+      var badge = document.querySelector('#tab-skcr .badge-info') || document.querySelector('.badge-info');
+      if (badge && !isNaN(parseInt(badge.textContent))) {
+        badge.textContent = parseInt(badge.textContent) + 1;
+      }
+
+      var newRecord = {
+        id: id, date: date, time: "08:20", containers: containers, containerCount: cCount,
+        primaryContainer: mainC, sizeType: size, shippingLine: line, vesselVoyage: vessel,
+        consignee: consignee, userNameGate: user, companyName: company, userTitle: title, status: "Approved"
+      };
+      if (typeof skcrData !== 'undefined') skcrData.unshift(newRecord);
+      if (typeof SupabaseDB !== 'undefined' && SupabaseDB.saveSKCR) SupabaseDB.saveSKCR(newRecord);
+
+      document.getElementById('formCreateSKCR').reset();
+      alert('🎉 Surat Keterangan SKCR No. ' + id + ' (' + cCount + ' Container) Berhasil Diterbitkan!');
+    };
+
+    window.handleHandoverSubmit = function(e) {
+      e.preventDefault();
+      var shiftFrom = document.getElementById('hoShiftFrom').value;
+      var shiftTo = document.getElementById('hoShiftTo').value;
+      var supervisor = document.getElementById('hoSupervisor').value;
+      var condition = document.getElementById('hoGateCondition').value;
+      var pending = document.getElementById('hoPendingContainers').value;
+      var notes = document.getElementById('hoGeneralNotes').value;
+
+      var tbody = document.getElementById('tbodyHandoverLogs');
+      if (tbody) {
+        var date = new Date().toISOString().split('T')[0];
+        var newRow = document.createElement('tr');
+        newRow.innerHTML = '<td><strong>' + date + '</strong></td>' +
+          '<td><span class="badge badge-info">' + shiftFrom + ' &rarr; ' + shiftTo + '</span></td>' +
+          '<td><strong>' + supervisor + '</strong></td>' +
+          '<td>' + condition + '</td>' +
+          '<td>' + (pending || '-') + '</td>' +
+          '<td>' + (notes || '-') + '</td>';
+        tbody.insertBefore(newRow, tbody.firstChild);
+      }
+
+      document.getElementById('formAddHandover').reset();
+      if (typeof App !== 'undefined' && App.closeModal) App.closeModal('handoverModal');
+      alert('🎉 Log Catatan Serah Terima Shift Berhasil Disimpan!');
+    };
+
+    // Attach listeners
+    function bindAllControls() {
+      initAutoConsignee();
+
       var tabs = document.querySelectorAll('.nav-tab');
       tabs.forEach(function(tab) {
         tab.onclick = function() {
@@ -1158,13 +1385,29 @@
           if (targetContent) targetContent.classList.add('active');
         };
       });
+
+      var btnOff = document.getElementById('btnLoloTabLiftOff');
+      var btnOn = document.getElementById('btnLoloTabLiftOn');
+      if (btnOff) btnOff.onclick = function() { switchLoloTab('LIFTOFF'); };
+      if (btnOn) btnOn.onclick = function() { switchLoloTab('LIFTON'); };
+
+      var formSkcr = document.getElementById('formCreateSKCR');
+      if (formSkcr) formSkcr.onsubmit = window.handleSKCRSubmit;
+
+      var formHo = document.getElementById('formAddHandover');
+      if (formHo) formHo.onsubmit = window.handleHandoverSubmit;
+
+      var selLolo = document.getElementById('filterLOLOLine');
+      if (selLolo) selLolo.onchange = function() { filterLoloCards(this.value); };
+
+      var selSkcr = document.getElementById('filterSKCRLine');
+      if (selSkcr) selSkcr.onchange = function() { filterSkcrTable(this.value); };
     }
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() { initAutoConsignee(); initTabs(); });
+      document.addEventListener('DOMContentLoaded', bindAllControls);
     } else {
-      initAutoConsignee();
-      initTabs();
+      bindAllControls();
     }
   })();
   </script>
