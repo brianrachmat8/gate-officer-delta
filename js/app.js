@@ -754,29 +754,35 @@ const App = {
     const dropZone = document.getElementById('dropZoneExcel');
     const fileInput = document.getElementById('fileInputExcel');
 
-    dropZone.addEventListener('click', () => fileInput.click());
+    if (dropZone && fileInput) {
+      dropZone.addEventListener('click', (e) => {
+        if (e.target !== fileInput) {
+          fileInput.click();
+        }
+      });
 
-    dropZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropZone.classList.add('dragover');
-    });
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      });
 
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
 
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        ExcelParser.parseFile(files[0], App.onExcelRosterParsed);
-      }
-    });
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          ExcelParser.parseFile(files[0], App.onExcelRosterParsed);
+        }
+      });
 
-    fileInput.addEventListener('change', (e) => {
-      if (e.target.files.length > 0) {
-        ExcelParser.parseFile(e.target.files[0], App.onExcelRosterParsed);
-      }
-    });
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          ExcelParser.parseFile(e.target.files[0], App.onExcelRosterParsed);
+        }
+      });
+    }
 
     document.getElementById('btnDownloadExcelTemplate').addEventListener('click', () => {
       ExcelParser.downloadTemplate();
@@ -1184,29 +1190,35 @@ const App = {
       App.renderLOLOTariffs();
     });
 
-    dropZone.addEventListener('click', () => fileInput.click());
+    if (dropZone && fileInput) {
+      dropZone.addEventListener('click', (e) => {
+        if (e.target !== fileInput) {
+          fileInput.click();
+        }
+      });
 
-    dropZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropZone.classList.add('dragover');
-    });
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      });
 
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
 
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        ExcelParser.parseLOLOTariffFile(files[0], App.onLOLOExcelParsed);
-      }
-    });
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          ExcelParser.parseLOLOTariffFile(files[0], App.onLOLOExcelParsed);
+        }
+      });
 
-    fileInput.addEventListener('change', (e) => {
-      if (e.target.files.length > 0) {
-        ExcelParser.parseLOLOTariffFile(e.target.files[0], App.onLOLOExcelParsed);
-      }
-    });
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          ExcelParser.parseLOLOTariffFile(e.target.files[0], App.onLOLOExcelParsed);
+        }
+      });
+    }
 
     document.getElementById('btnDownloadLOLOExcelTemplate').addEventListener('click', () => {
       ExcelParser.downloadLOLOTemplate();
