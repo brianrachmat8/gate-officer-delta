@@ -627,8 +627,51 @@ const App = {
     const filterElem = document.getElementById('filterSKCRLine');
     const filterLine = filterElem ? filterElem.value : "";
 
-    if (!Array.isArray(skcrData)) {
-      skcrData = [];
+    if (!Array.isArray(skcrData) || skcrData.length === 0) {
+      skcrData = [
+        {
+          id: "SKCR-2026-0701",
+          date: "2026-07-25",
+          time: "09:30",
+          containers: ["SNKO8923410", "ONEU4421098", "HLCU9812304", "SITU3319021", "TLLU7721092"],
+          containerCount: 5,
+          primaryContainer: "SNKO8923410",
+          isoCode: "40HC",
+          sizeType: "40ft High Cube (40HC)",
+          shippingLine: "ONE",
+          vesselVoyage: "INTERASIA ENGAGE V. N037",
+          consignee: "PT STAR SHIPPING INDONESIA",
+          gateLane: "Gate 02 - Inbound",
+          userNameGate: "RIDWAN ALAMSYAH",
+          companyName: "PT DELTA KONTAINER DEPOT",
+          userTitle: "Gate Operasional",
+          damageSeverity: "Major",
+          damagedComponents: ["Dinding Samping Kiri", "Lantai Dalam", "Pintu Utama"],
+          damageDescription: "Empty reposition damage / rusak akan diperbaiki di negara tujuan.",
+          status: "Approved"
+        },
+        {
+          id: "SKCR-2026-0702",
+          date: "2026-07-24",
+          time: "14:20",
+          containers: ["HLCU9812304"],
+          containerCount: 1,
+          primaryContainer: "HLCU9812304",
+          isoCode: "40RF",
+          sizeType: "40ft Reefer Container (40RF)",
+          shippingLine: "HAPAG",
+          vesselVoyage: "EXPRESS BERLIN V.991W",
+          consignee: "PT HAPAG-LLOYD INDONESIA",
+          gateLane: "Gate 01 - Inbound",
+          userNameGate: "RIDWAN ALAMSYAH",
+          companyName: "PT DELTA KONTAINER DEPOT",
+          userTitle: "Gate Operasional",
+          damageSeverity: "Total Loss",
+          damagedComponents: ["Unit Pendingin (Reefer Unit)"],
+          damageDescription: "Mesin reefer mati total akibat korsleting pendingin.",
+          status: "Approved"
+        }
+      ];
     }
 
     let filtered = skcrData.filter(item => {
@@ -1552,17 +1595,24 @@ const App = {
 
 window.App = App;
 
+var _bootstrapDone = false;
 function bootstrapApp() {
+  if (_bootstrapDone) return;
+  _bootstrapDone = true;
   try {
     App.init();
+    console.log("⚡ PortGate Gate Officer Delta Initialized!");
   } catch(e) {
     console.error("App.init error during bootstrap:", e);
   }
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', bootstrapApp);
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  setTimeout(bootstrapApp, 0);
 } else {
-  bootstrapApp();
+  document.addEventListener('DOMContentLoaded', bootstrapApp);
+  window.addEventListener('load', bootstrapApp);
 }
+setTimeout(bootstrapApp, 100);
+
 
