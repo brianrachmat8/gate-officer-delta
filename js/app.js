@@ -174,6 +174,14 @@ const App = {
     }
   },
 
+  onExcelRosterParsed: function(newRoster, allDates) {
+    if (newRoster && newRoster.length > 0) matrixRosterData = newRoster;
+    if (allDates && allDates.length > 0) matrixDatesList = allDates;
+    App.saveRosterToStorage();
+    App.renderMatrixRosterSchedule();
+    App.populateRosterFilterDropdowns();
+  },
+
   loadRosterFromStorage: function() {
     const saved = localStorage.getItem('portgate_matrix_roster');
     if (saved) {
