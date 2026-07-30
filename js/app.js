@@ -843,12 +843,50 @@ const App = {
     `;
   },
 
+  updateMonthFilterOptions: function() {
+    const select = document.getElementById('filterRosterMonth');
+    if (!select) return;
+
+    const monthNamesMap = {
+      'Jan': 'Januari', 'Feb': 'Februari', 'Mar': 'Maret', 'Apr': 'April',
+      'May': 'Mei', 'Jun': 'Juni', 'Jul': 'Juli', 'Aug': 'Agustus',
+      'Sep': 'September', 'Oct': 'Oktober', 'Nov': 'November', 'Dec': 'Desember'
+    };
+
+    const uniqueMonths = [];
+    matrixDatesList.forEach(dateStr => {
+      const parts = String(dateStr).split('-');
+      if (parts.length >= 2) {
+        const monthCode = parts[1];
+        if (monthCode && !uniqueMonths.includes(monthCode)) {
+          uniqueMonths.push(monthCode);
+        }
+      }
+    });
+
+    const firstDate = matrixDatesList[0] || '27-Jul';
+    const lastDate = matrixDatesList[matrixDatesList.length - 1] || '13-Dec';
+
+    let optionsHtml = `<option value="">🗓️ Semua Tanggal (${firstDate} s/d ${lastDate})</option>`;
+    uniqueMonths.forEach(m => {
+      const fullLabel = monthNamesMap[m] || m;
+      optionsHtml += `<option value="${m}">${fullLabel} 2026</option>`;
+    });
+
+    select.innerHTML = optionsHtml;
+
+    const titleContainer = document.getElementById('rosterMatrixCardTitle');
+    if (titleContainer) {
+      titleContainer.innerHTML = `<i class="fa-solid fa-table-cells"></i> Matriks Shift Gate Utuh (${firstDate} s/d ${lastDate} 2026)`;
+    }
+  },
+
   onExcelRosterParsed: function(newRoster, newDates) {
     App.saveRosterToStorage();
     App.updateStaffFilterOptions();
+    App.updateMonthFilterOptions();
     App.renderMatrixScheduleTable();
     App.updateKPIs();
-    alert(`🎉 File Excel Matriks Berhasil Di-Upload!\nJadwal ${newRoster.length} petugas gate across ${newDates.length} tanggal tersimpan & ter-sync realtime!`);
   },
 
   renderMatrixScheduleTable: function(searchTerm = "") {
