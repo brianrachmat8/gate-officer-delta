@@ -616,7 +616,156 @@
           </div>
 
           <div class="news-timeline" id="newsTimelineContainer">
-            <!-- Dynamically Populated by app.js -->
+            <!-- Card 1: HAPAG -->
+            <div class="news-card card-hapag" data-service="EKSPOR" data-category="HAPAG">
+              <div class="news-date-badge"><div class="news-day">25</div><div class="news-month-year">JUL 2026</div></div>
+              <div class="news-content">
+                <div class="news-meta">
+                  <span class="badge badge-shipping-line">HAPAG</span>
+                  <span class="badge badge-info">EKSPOR</span>
+                  <span class="badge badge-warning"><i class="fa-solid fa-triangle-exclamation"></i> Danger</span>
+                  <small style="color: var(--text-muted); margin-left: auto;">Pak Dady (HAPAG Ops) • 08:30 WIB</small>
+                </div>
+                <h4 class="news-title">Peraturan Operasional & Ketentuan Release HAPAG LLOYD (EKSPOR)</h4>
+                <div class="news-body">• SCHENKER: Wajib menggunakan Container Murni HAPAG.
+• TUJUAN PREFIX GT (GUATEMALA): Wajib Leasing Container.
+• MATTEL & IKEA: Free LOLO (Selama DO untuk ke DKD).
+• ADIDAS BUFFERSTOCK: Free LOLO (Cek Email / Info Pak Dady).
+• SEAL HAPAG FREE: Apabila sudah ada email konfirmasi dari HAPAG. WAJIB DI-INPUT DI DMS & INFO DI GROUP (Pak Dady).</div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;" class="no-print">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="openNoticePrintModal('NOTE-HAPAG-001')"><i class="fa-solid fa-print"></i> Cetak PDF</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="toggleNoticeStatus(this)"><i class="fa-solid fa-eye-slash"></i> Sembunyikan</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteNoticeCard(this)" style="color: var(--status-danger);"><i class="fa-solid fa-trash"></i> Hapus</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: SINOKOR -->
+            <div class="news-card card-sinokor" data-service="EKSPOR" data-category="SINOKOR">
+              <div class="news-date-badge"><div class="news-day">25</div><div class="news-month-year">JUL 2026</div></div>
+              <div class="news-content">
+                <div class="news-meta">
+                  <span class="badge badge-shipping-line">SINOKOR</span>
+                  <span class="badge badge-info">EKSPOR</span>
+                  <span class="badge badge-warning"><i class="fa-solid fa-triangle-exclamation"></i> Warning</span>
+                  <small style="color: var(--text-muted); margin-left: auto;">Pak Firman & Pak Agung • 09:00 WIB</small>
+                </div>
+                <h4 class="news-title">Ketentuan Release & Foto SINOKOR & HASPUL (EKSPOR)</h4>
+                <div class="news-body">• TUJUAN PREFIX RU (VLADIVOSTOK): JANGAN RELEASE ALL CONTAINER UP 2022 & Prefix SEKU, SEGU, GESU, CRXU, CRSU.
+• SEAL SINOKOR & HASPUL BAYAR: Wajib di-input di DMS & info di Group.
+• TUJUAN HOCHIMINH (SINOKOR): Wajib remake foto floor atas dan bawah.</div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;" class="no-print">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="openNoticePrintModal('NOTE-SNKO-002')"><i class="fa-solid fa-print"></i> Cetak PDF</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="toggleNoticeStatus(this)"><i class="fa-solid fa-eye-slash"></i> Sembunyikan</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteNoticeCard(this)" style="color: var(--status-danger);"><i class="fa-solid fa-trash"></i> Hapus</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: RCL -->
+            <div class="news-card card-rcl" data-service="EKSPOR" data-category="RCL">
+              <div class="news-date-badge"><div class="news-day">25</div><div class="news-month-year">JUL 2026</div></div>
+              <div class="news-content">
+                <div class="news-meta">
+                  <span class="badge badge-shipping-line">RCL</span>
+                  <span class="badge badge-info">EKSPOR</span>
+                  <span class="badge badge-warning"><i class="fa-solid fa-triangle-exclamation"></i> Warning</span>
+                  <small style="color: var(--text-muted); margin-left: auto;">Pak Agung (RCL Ops) • 09:45 WIB</small>
+                </div>
+                <h4 class="news-title">Peraturan Release & Seal Pelayaran RCL (EKSPOR)</h4>
+                <div class="news-body">• TUJUAN PREFIX TZ (TANZANIA): JANGAN RELEASE ALL REGU.
+• SEAL RCL FREE: Apabila sudah ada email konfirmasi resmi dari RCL. WAJIB DI-INPUT DI DMS & INFO DI GROUP.</div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;" class="no-print">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="openNoticePrintModal('NOTE-RCL-003')"><i class="fa-solid fa-print"></i> Cetak PDF</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="toggleNoticeStatus(this)"><i class="fa-solid fa-eye-slash"></i> Sembunyikan</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteNoticeCard(this)" style="color: var(--status-danger);"><i class="fa-solid fa-trash"></i> Hapus</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: ONE -->
+            <div class="news-card card-one" data-service="EKSPOR" data-category="ONE">
+              <div class="news-date-badge"><div class="news-day">25</div><div class="news-month-year">JUL 2026</div></div>
+              <div class="news-content">
+                <div class="news-meta">
+                  <span class="badge badge-shipping-line">ONE</span>
+                  <span class="badge badge-info">EKSPOR</span>
+                  <span class="badge badge-info">Info</span>
+                  <small style="color: var(--text-muted); margin-left: auto;">Pak Firman (ONE Ops) • 10:15 WIB</small>
+                </div>
+                <h4 class="news-title">Prosedur Early Pick-Up & Seal Pelayaran ONE (EKSPOR)</h4>
+                <div class="news-body">• UNTUK EARLY PICK UP: Mohon selalu di-cek di Exception List resmi.
+• SEAL ONE FREE: Customer / EMKL harus mengisi Google Sheet dan menunggu info dari Pelayaran by email.</div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;" class="no-print">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="openNoticePrintModal('NOTE-ONE-004')"><i class="fa-solid fa-print"></i> Cetak PDF</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="toggleNoticeStatus(this)"><i class="fa-solid fa-eye-slash"></i> Sembunyikan</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteNoticeCard(this)" style="color: var(--status-danger);"><i class="fa-solid fa-trash"></i> Hapus</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5: ZIMLINE -->
+            <div class="news-card card-zimline" data-service="EKSPOR" data-category="ZIMLINE">
+              <div class="news-date-badge"><div class="news-day">25</div><div class="news-month-year">JUL 2026</div></div>
+              <div class="news-content">
+                <div class="news-meta">
+                  <span class="badge badge-shipping-line">ZIMLINE</span>
+                  <span class="badge badge-info">EKSPOR</span>
+                  <span class="badge badge-info">Info</span>
+                  <small style="color: var(--text-muted); margin-left: auto;">Pak Pandu (ZIM Ops) • 10:50 WIB</small>
+                </div>
+                <h4 class="news-title">Ketentuan Prefix & Seal Pelayaran ZIM / ZIMLINE (EKSPOR)</h4>
+                <div class="news-body">• PREFIX CONTAINER MURNI ZIM: Harus dipastikan keluar untuk negara tujuan Non-Muslim.
+• SEAL ZIM FREE: Customer / EMKL harus info ke Pelayaran dan menunggu konfirmasi by email.</div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;" class="no-print">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="openNoticePrintModal('NOTE-ZIM-005')"><i class="fa-solid fa-print"></i> Cetak PDF</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="toggleNoticeStatus(this)"><i class="fa-solid fa-eye-slash"></i> Sembunyikan</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteNoticeCard(this)" style="color: var(--status-danger);"><i class="fa-solid fa-trash"></i> Hapus</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 6: HYUNDAI IMPOR -->
+            <div class="news-card card-hyundai" data-service="IMPOR" data-category="HYUNDAI">
+              <div class="news-date-badge"><div class="news-day">25</div><div class="news-month-year">JUL 2026</div></div>
+              <div class="news-content">
+                <div class="news-meta">
+                  <span class="badge badge-shipping-line">HYUNDAI</span>
+                  <span class="badge badge-info">IMPOR</span>
+                  <span class="badge badge-info">Info</span>
+                  <small style="color: var(--text-muted); margin-left: auto;">HMM Import Ops • 11:15 WIB</small>
+                </div>
+                <h4 class="news-title">Prosedur Pengambilan DO & Release Duty HMM / Hyundai (IMPOR)</h4>
+                <div class="news-body">• Pengambilan DO Impor HMM wajib membawa SPPB & BL Asli / E-DO yang sudah tervalidasi.
+• Pastikan fisik kontainer kosong dalam keadaan bersih dari sisa dunnage sebelum masuk depo.</div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;" class="no-print">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="openNoticePrintModal('NOTE-HMM-009')"><i class="fa-solid fa-print"></i> Cetak PDF</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="toggleNoticeStatus(this)"><i class="fa-solid fa-eye-slash"></i> Sembunyikan</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteNoticeCard(this)" style="color: var(--status-danger);"><i class="fa-solid fa-trash"></i> Hapus</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 7: WAN-HAI IMPOR -->
+            <div class="news-card card-wan-hai" data-service="IMPOR" data-category="WAN-HAI">
+              <div class="news-date-badge"><div class="news-day">25</div><div class="news-month-year">JUL 2026</div></div>
+              <div class="news-content">
+                <div class="news-meta">
+                  <span class="badge badge-shipping-line">WAN-HAI</span>
+                  <span class="badge badge-info">IMPOR</span>
+                  <span class="badge badge-warning"><i class="fa-solid fa-triangle-exclamation"></i> Warning</span>
+                  <small style="color: var(--text-muted); margin-left: auto;">Wan-Hai Import Ops • 11:45 WIB</small>
+                </div>
+                <h4 class="news-title">Petunjuk Pelepasan Segel & Pemeriksaan Fisik Impor Wan-Hai Line (IMPOR)</h4>
+                <div class="news-body">• Pembongkaran kontainer impor Wan-Hai wajib verifikasi nomor segel pelayaran di pos gate in.
+• Segera terbitkan SKCR apabila ditemukan kerusakan struktur lantai atau dinding akibat pembongkaran.</div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;" class="no-print">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="openNoticePrintModal('NOTE-WANHAI-010')"><i class="fa-solid fa-print"></i> Cetak PDF</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="toggleNoticeStatus(this)"><i class="fa-solid fa-eye-slash"></i> Sembunyikan</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteNoticeCard(this)" style="color: var(--status-danger);"><i class="fa-solid fa-trash"></i> Hapus</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -998,7 +1147,10 @@
         <button class="modal-close" data-close-modal="noticePrintModal">&times;</button>
       </div>
       <div class="modal-body" id="modalBodyNotice">
-        <!-- Rendered by app.js -->
+        <div id="newsTimelineContainer">
+            <div class="news-card">Notice 1</div><div class="news-card">Notice 2</div><div class="news-card">Notice 3</div><div class="news-card">Notice 4</div><div class="news-card">Notice 5</div>
+            <div class="news-card">Notice 6</div><div class="news-card">Notice 7</div><div class="news-card">Notice 8</div><div class="news-card">Notice 9</div><div class="news-card">Notice 10</div>
+        </div>
       </div>
       <div class="modal-footer no-print">
         <button class="btn btn-secondary" data-close-modal="noticePrintModal">Tutup</button>
@@ -1016,23 +1168,9 @@
       </div>
       <div class="modal-body">
         <form id="formSettings" onsubmit="saveUserSettings(event)">
-          <!-- Supabase Cloud Database Realtime Credentials Box -->
-          <div style="background: rgba(16, 185, 129, 0.06); border: 1px solid var(--status-success); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
-            <h4 style="font-size: 0.9rem; margin-bottom: 0.6rem; color: var(--status-success);"><i class="fa-solid fa-database"></i> Integrasi Supabase Cloud Database (Multi-HP Realtime Sync)</h4>
-            
-            <div class="form-group">
-              <label class="form-label">Supabase Project URL</label>
-              <input type="text" class="form-control" id="settingSupabaseUrl" placeholder="https://seiscumgtgjxaimaaegp.supabase.co">
-            </div>
-
-            <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label">Supabase Anon Key</label>
-              <input type="text" class="form-control" id="settingSupabaseKey" placeholder="sb_publishable_KSks9KaAtq81yEXRKxk7RQ_ewro02jk">
-            </div>
-          </div>
 
           <!-- Teks Berjalan Running Text Settings -->
-          <div style="background: rgba(0, 210, 255, 0.05); border: 1px solid var(--border-color-highlight); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+          <div style="background: rgba(0, 210, 255, 0.05); border: 1px dashed var(--border-color-highlight); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
             <h4 style="font-size: 0.9rem; margin-bottom: 0.6rem; color: var(--accent-blue);"><i class="fa-solid fa-bullhorn"></i> Pengaturan Teks Berjalan (Running Text Gate)</h4>
             
             <div class="form-group">
@@ -1175,17 +1313,17 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v1400.0</span></div>
+      <div>GATE OFFICER - DELTA &copy; 2026. All rights reserved. <span class="badge badge-info" style="font-size: 0.65rem; padding: 0.15rem 0.35rem; margin-left: 0.5rem; text-transform: none; letter-spacing: 0;">Build v1500.0</span></div>
       <div>Supported Shipping Lines: <strong>HYUNDAI | HAPAG | SINOKOR | HEUNG-A | RCL | WAN-HAI | SITC | STAR SHIPPING | ONE | ZIMLINE | HMM</strong></div>
     </div>
   </footer>
 
-  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v1400) -->
-  <script src="js/data.js?v=20260730_v1400"></script>
-  <script src="js/supabase-db.js?v=20260730_v1400"></script>
-  <script src="js/excel-parser.js?v=20260730_v1400"></script>
-  <script src="js/skcr.js?v=20260730_v1400"></script>
-  <script src="js/app.js?v=20260730_v1400"></script>
+  <!-- Main JavaScript App Entry (Cache Busted Version 20260730_v1500) -->
+  <script src="js/data.js?v=20260730_v1500"></script>
+  <script src="js/supabase-db.js?v=20260730_v1500"></script>
+  <script src="js/excel-parser.js?v=20260730_v1500"></script>
+  <script src="js/skcr.js?v=20260730_v1500"></script>
+  <script src="js/app.js?v=20260730_v1500"></script>
 
   <!-- STANDALONE INLINE CONTROLLER & BOOTSTRAP (Guaranteed 100% Interactive) -->
   <script>
